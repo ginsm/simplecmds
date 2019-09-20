@@ -1,8 +1,8 @@
 {
   "name": "commander-validation",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Adds argument validation to commander",
-  "main": "index.js",
+  "main": "bin/validate.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/ginsm/cmdr-validation/issues"
   },
-  "homepage": "https://github.com/ginsm/cmdr-validation#readme"
+  "homepage": "https://github.com/ginsm/cmdr-validation#readme",
+  "dependencies": {
+    "commander": "^3.0.1"
+  }
 }
