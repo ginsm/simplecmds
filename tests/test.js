@@ -6,7 +6,6 @@ cmdr
     .option('noRule', '')
     .parse(process.argv);
 
-
 validate
     .rule('hasRule', ['string'], ['number', 'string'], 2)
-    .parseCmdr(cmdr);
+    .parse(cmdr);
