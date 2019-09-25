@@ -7,5 +7,5 @@ cmdr
     .parse(process.argv);
 
 validate
-    .rule('hasRule', '<number> <string,number> [number]', 2)
+    .rule('hasRule', '<number> <string,number> [number]', 3)
     .parse(cmdr);
