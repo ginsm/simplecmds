@@ -18,21 +18,21 @@ const Cmds = {
 
   /**
      * @description Create a command.
-     * @param {string} flags - Usable command flags.
+     * @param {string} flagString - Usable command flags.
      * @param {string} description - Description of the command.
      * @param {Object} callback - Callback to be used with function
      * @return {private} 'this' for chaining.
      */
-  command: function(flags = '', description = '', callback = false) {
+  command: function(flagString = '', description = '', callback = false) {
     // Parse the flags and sort them by length
-    const names = parseFlags(flags);
-    const camelCaseName = normalize(names[0]);
+    const flags = parseFlags(flagString);
+    const camelCaseName = normalize(flags[0]);
 
     // Add command to the commands object
     this.commands[camelCaseName] = {
       description,
-      names,
-      usage: flags,
+      flags,
+      usage: flagString,
       callback,
     };
 
@@ -75,8 +75,8 @@ const Cmds = {
     // Generate an object containing flags & their respective cmd name
     // e.g. {'-c,--create': 'create'}
     const commandNames = this.cmds().reduce((prev, cmd) => {
-      const names = this.commands[cmd].names;
-      return ({...prev, [names]: cmd});
+      const flags = this.commands[cmd].flags;
+      return ({...prev, [flags]: cmd});
     }, {});
 
     // Generate an object of command names and args
@@ -95,7 +95,7 @@ const Cmds = {
       // Build the object
       const key = isCommand && cmdName || lastBuilt;
       const value = isCommand ? cmdExists || [] : [...prev[lastBuilt], arg];
-      return ({...prev, [key]: value});
+      return ({...prev, [key]: convertNumbers(value)});
     }, {});
 
     // Get the entries
@@ -122,7 +122,7 @@ Cmds
     .parse(process.argv);
 console.timeEnd('Build time');
 
-console.log(Cmds);
+console.log(Cmds.commands);
 
 
 // -------------------------- Helpers -------------------------- //
@@ -177,18 +177,6 @@ function convertNumbers(input) {
   const convertNum = (arg) => /^\d+$/.test(arg) && Number(arg) || arg;
   const isArray = Array.isArray(input);
   return isArray && input.map(convertNum) || convertNum(input);
-}
-
-
-/**
-  * @description Compares two arrays and finds matching values.
-  * @param {[]} superset - First array
-  * @param {[]} subset - Second array
-  * @return {[]} Array of matching values.
-  */
-function sharedValues(superset, subset) {
-  const valueInSuper = (value) => superset.indexOf(value) >= 0;
-  return subset.filter(valueInSuper);
 }
 
 
