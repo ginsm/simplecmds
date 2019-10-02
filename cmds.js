@@ -26,7 +26,7 @@ const Cmds = {
   command: function(flagString = '', description = '', callback = false) {
     // Parse the flags and sort them by length
     const flags = parseFlags(flagString);
-    const camelCaseName = normalize(flags[0]);
+    const camelCaseName = camelCase(flags[0]);
 
     // Add command to the commands object
     this.commands[camelCaseName] = {
@@ -48,12 +48,12 @@ const Cmds = {
      */
   rule: function(notation = '', amount = 0) {
     // Used to get last command made in the method chain
-    const name = this.cmds().slice(-1)[0];
-    const object = this.commands[name];
+    const command = this.cmds().slice(-1)[0];
+    const cmdObject = this.commands[command];
 
     // Add rule to last command's object
-    this.commands[name] = {
-      ...object,
+    this.commands[command] = {
+      ...cmdObject,
       notation: notation.split(' '),
       amount,
     };
@@ -89,12 +89,12 @@ const Cmds = {
       const isCommand = command.length;
 
       // Used for key/value building
-      const cmdExists = prev.hasOwnProperty(cmdName) && [...prev[cmdName]];
       const lastBuilt = Object.keys(prev).slice(-1);
+      const arrExists = prev.hasOwnProperty(cmdName) && [...prev[cmdName]];
 
       // Build the object
       const key = isCommand && cmdName || lastBuilt;
-      const value = isCommand ? cmdExists || [] : [...prev[lastBuilt], arg];
+      const value = isCommand ? arrExists || [] : [...prev[lastBuilt], arg];
       return ({...prev, [key]: convertNumbers(value)});
     }, {});
 
@@ -106,7 +106,8 @@ const Cmds = {
     if (noArgs) console.log('placeholder help menu');
 
     parsedEntries.forEach((entry) => {
-      this.commands[entry[0]].args = entry[1];
+      const [cmd, args] = entry;
+      this.commands[cmd].args = args;
     });
   },
 };
@@ -139,32 +140,26 @@ function parseFlags(flags) {
   flags = flags.match(flagRegex).slice(0, 2) || error(0, flags);
 
   // Validate a flag
-  const validFlag = (flag) => {
+  const flagValid = (flag) => {
     const isShortFlag = flag.length === 2 && /-[\w]/.test(flag);
-    const isLongFlag = flag.length >= 4;
-    return isShortFlag || isLongFlag;
+    return isShortFlag || flag.length >= 4;
   };
 
   // Make sure every flag is valid & sort it by length
   const sortByLength = (a, b) => b.length - a.length;
-  return flags.every(validFlag) && flags.sort(sortByLength) || error(1, flags);
+  return flags.every(flagValid) && flags.sort(sortByLength) || error(1, flags);
 }
 
 
 /**
   * @description Remove any dashes and camel case a string.
-  * @param {string} string - String to normalize.
+  * @param {string} str - String to normalize.
   * @return {string} Normalized string.
   */
-function normalize(string) {
-  const camelCaseString = (text, id) => {
-    const firstWord = !id && text;
-    const uppercaseFirstLetter = text[0].toUpperCase() + text.slice(1);
-    return firstWord || uppercaseFirstLetter;
-  };
-  // Replace any -, trim trailing whitespace and split by remaining spaces
-  return string.replace(/-/g, ' ').trim().split(' ')
-      .map(camelCaseString).join('');
+function camelCase(str) {
+  const camelCaseString = (word, id) => !id && word.toLowerCase() ||
+        word[0].toUpperCase() + word.substr(1).toLowerCase();
+  return str.match(/[\w]+(?=[A-Z])|[\w]+/g).map(camelCaseString).join('');
 }
 
 
