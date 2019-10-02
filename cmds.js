@@ -65,7 +65,7 @@ const Cmds = {
   // ------------------------- Arguments ------------------------- //
 
   /**
-    * @description Parse program args and type check them.
+    * @description Parse program args and add them to their command.
     * @param {[]} args - Expects process.argv.
     */
   parse: function(args) {
@@ -105,6 +105,7 @@ const Cmds = {
     const noArgs = parsedEntries.length === 0;
     if (noArgs) console.log('placeholder help menu');
 
+    // Add args to their respective commands
     parsedEntries.forEach((entry) => {
       const [cmd, args] = entry;
       this.commands[cmd].args = args;
