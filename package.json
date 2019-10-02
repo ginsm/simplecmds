@@ -11,8 +11,11 @@
     "url": "git+https://github.com/ginsm/cmdr-validation.git"
   },
   "keywords": [
-    "commander",
-    "argument",
+    "CLI",
+    "command line",
+    "commands",
+    "arguments",
+    "type check",
     "validation"
   ],
   "author": "Ginsm",
