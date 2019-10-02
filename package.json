@@ -21,9 +21,7 @@
     "url": "https://github.com/ginsm/cmdr-validation/issues"
   },
   "homepage": "https://github.com/ginsm/cmdr-validation#readme",
-  "dependencies": {
-    "commander": "^3.0.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "eslint": "^6.4.0",
     "eslint-config-google": "^0.14.0",
