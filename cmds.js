@@ -1,5 +1,28 @@
+/*
+  TODO -
+  [x] Allow for various prefixes .create, -create, *create, so on.
+  [ ] .exec() which executes a shell cmd on command being issued
+  [ ] Concatenated short flags
+  [x] Boolean commands
+  [x] Fix not iterable lastBuilt err
+      - Temporary bandaid fix created.
+  [ ] Add a separate object for generating the main object.
+        This would build the current object and all of it's properties
+        and then add to the main object the cmd objects as such:
+          {
+            args: [...args],
+            isValid: boolean
+          }
+        The only necessary functions in Cmds would be the creation of the
+        command, rule, and parse functions. Potentially exec and any other
+        related ones.
+
+        Once it's complete, the generation object could be deleted from the
+        module to free up memory.
+*/
+
 const Cmds = {
-  // ---------------------- Command Creation ---------------------- //
+  // SECTION - Object Creation
 
   /**
     * @description Contains the commands.
@@ -11,8 +34,7 @@ const Cmds = {
      * @return {string[]} Existing command names.
      */
   cmds: function() {
-    const commandNames = Object.keys(this.commands);
-    return commandNames;
+    return Object.keys(this.commands);
   },
 
 
@@ -26,10 +48,10 @@ const Cmds = {
   command: function(flagString = '', description = '', callback = false) {
     // Parse the flags and sort them by length
     const flags = parseFlags(flagString);
-    const camelCaseName = camelCase(flags[0]);
+    const command = camelCase(flags[0]);
 
     // Add command to the commands object
-    this.commands[camelCaseName] = {
+    this.commands[command] = {
       description,
       flags,
       usage: flagString,
@@ -62,7 +84,7 @@ const Cmds = {
   },
 
 
-  // ------------------------- Arguments ------------------------- //
+  // SECTION - arguments
 
   /**
     * @description Parse program args and add them to their command.
@@ -81,34 +103,37 @@ const Cmds = {
 
     // Generate an object of command names and args
     // e.g. {*cmd: [...args]}
-    const parsedArgs = args.reduce((prev, arg) => {
-      // Resolve whether it's a command or not
-      const command = Object.keys(commandNames).filter((cmd) =>
-        cmd.includes(arg));
-      const cmdName = commandNames[command];
-      const isCommand = command.length;
+    const parsedArgs = args
+        // Used to generate the args per command
+        .reduce((prev, arg, id) => {
+          // Resolve whether it's a command or not
+          const cmdFlag = Object.keys(commandNames).filter((cmd) =>
+            cmd.includes(arg));
+          const cmdName = commandNames[cmdFlag];
+          const isCommand = cmdFlag.length;
 
-      // Used for key/value building
-      const lastBuilt = Object.keys(prev).slice(-1);
-      const arrExists = prev.hasOwnProperty(cmdName) && [...prev[cmdName]];
+          if (id == 0 && !isCommand) error(4);
+          // Used for key/value building
+          const lastBuilt = Object.keys(prev).slice(-1);
+          const arrExists = prev.hasOwnProperty(cmdName) && [...prev[cmdName]];
 
-      // Build the object
-      const key = isCommand && cmdName || lastBuilt;
-      const value = isCommand ? arrExists || [] : [...prev[lastBuilt], arg];
-      return ({...prev, [key]: convertNumbers(value)});
-    }, {});
+          // Build the object
+          const key = isCommand && cmdName || lastBuilt;
+          const value = isCommand ? arrExists || [] : [...prev[lastBuilt], arg];
+          return ({...prev, [key]: convertNumbers(value)});
+        }, {});
 
     // Get the entries
     const parsedEntries = Object.entries(parsedArgs);
 
     // Print help if no args were provided
-    const noArgs = parsedEntries.length === 0;
+    const noArgs = parsedEntries.length == 0;
     if (noArgs) console.log('placeholder help menu');
 
     // Add args to their respective commands
     parsedEntries.forEach((entry) => {
       const [cmd, args] = entry;
-      this.commands[cmd].args = args;
+      this.commands[cmd].args = args.length > 0 ? args : true;
     });
   },
 };
@@ -116,7 +141,7 @@ const Cmds = {
 
 console.time('Build time');
 Cmds
-    .command('-c, --create <text>', 'create a task', console.log)
+    .command('-c, --create <text>', 'create a task')
     .rule('<number,string>', 1)
     .command('-n, --no-rule', 'No rule contained')
     .command('-d, --delete <id> [id]', 'delete a task')
@@ -127,7 +152,7 @@ console.timeEnd('Build time');
 console.log(Cmds.commands);
 
 
-// -------------------------- Helpers -------------------------- //
+// SECTION - Helpers
 
 // ! Redo valid flag fn in this function.
 /**
@@ -137,12 +162,12 @@ console.log(Cmds.commands);
   */
 function parseFlags(flags) {
   // Find all valid flags in the provided string
-  const flagRegex = /(?<!([<\w>\[\]]))[\w-]+/g;
+  const flagRegex = /(?<!([<\w>\[\]]))([-*.=@#%~$:&\w]+)/g;
   flags = flags.match(flagRegex).slice(0, 2) || error(0, flags);
 
   // Validate a flag
   const flagValid = (flag) => {
-    const isShortFlag = flag.length === 2 && /-[\w]/.test(flag);
+    const isShortFlag = flag.length === 2 && /\S[\w]/.test(flag);
     return isShortFlag || flag.length >= 4;
   };
 
@@ -158,7 +183,7 @@ function parseFlags(flags) {
   * @return {string} Normalized string.
   */
 function camelCase(str) {
-  const camelCaseString = (word, id) => !id && word.toLowerCase() ||
+  const camelCaseString = (word, id) => id == 0 && word.toLowerCase() ||
         word[0].toUpperCase() + word.substr(1).toLowerCase();
   return str.match(/[\w]+(?=[A-Z])|[\w]+/g).map(camelCaseString).join('');
 }
@@ -175,7 +200,7 @@ function convertNumbers(input) {
   return isArray && input.map(convertNum) || convertNum(input);
 }
 
-
+// SECTION - Errors
 /**
   * @description - Dispatches an error and exits process.
   * @param {number} code - Error code.
@@ -188,6 +213,7 @@ function error(code, value) {
     `Unable to create command '${value}'.`,
     `Sorry, no commands were provided.`,
     `You cannot use two flags referencing the same command: '${value}'.`,
+    `No valid commands were provided.`,
   ];
 
   // Log error and exit
