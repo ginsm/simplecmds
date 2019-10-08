@@ -100,7 +100,9 @@ const Cmds = {
           const cmdName = commandNames[cmdFlag];
           const isCommand = cmdFlag.length;
 
+          // The first arg must be a command else issue an error (4)
           if (id == 0 && !isCommand) error(4);
+
           // Used for key/value building
           const lastBuilt = Object.keys(prev).slice(-1);
           const arrExists = prev.hasOwnProperty(cmdName) && [...prev[cmdName]];
