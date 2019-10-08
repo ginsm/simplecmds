@@ -206,19 +206,18 @@ function convertNumbers(input) {
  */
 function expandConcatFlags(arr) {
   const exp = {
-    concatenated: /(?<!\S)\W\w{2,}/g,
-    inbetweenWords: /(?<!\W)(?=\w)/g,
+    concatenatedFlags: /(?<!\S)\W\w{2,}/g,
+    inbetween: /(?<!\W)(?=\w)/g,
     byFlag: /(?=\W)/g,
   };
 
   // Find concatenated short flags and expand them into single flags
-  const expanded = arr.filter((args) => exp.concatenated.test(args))
-      .map((flags) => flags.replace(exp.inbetweenWords, '-').split(exp.byFlag));
+  const expanded = arr.filter((arr) => exp.concatenatedFlags.test(arr))
+      .map((flags) => flags.replace(exp.inbetween, '-').split(exp.byFlag));
 
-  // Add short flags to the end and filter out concatenated version
-  return [].concat.apply(arr, expanded).filter((arg) => {
-    return !exp.concatenated.test(arg);
-  });
+  // Add short flags to the end of arr and filter out concatenated version
+  return [].concat.apply(arr, expanded)
+      .filter((arg) => !exp.concatenatedFlags.test(arg));
 }
 
 // SECTION - Errors
