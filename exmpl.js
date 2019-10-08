@@ -10,4 +10,4 @@ cmds
     .parse(process.argv);
 console.timeEnd('Build time');
 
-console.log(cmds);
+console.log(cmds.commands);
