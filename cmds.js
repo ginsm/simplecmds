@@ -6,19 +6,7 @@
   [x] Boolean commands
   [x] Fix not iterable lastBuilt err
       - Temporary bandaid fix created.
-  [ ] Add a separate object for generating the main object.
-        This would build the current object and all of it's properties
-        and then add to the main object the cmd objects as such:
-          {
-            args: [...args],
-            isValid: boolean
-          }
-        The only necessary functions in Cmds would be the creation of the
-        command, rule, and parse functions. Potentially exec and any other
-        related ones.
-
-        Once it's complete, the generation object could be deleted from the
-        module to free up memory.
+  [ ] Look at parseFlag's validFlag function.
 */
 
 const Cmds = {
@@ -142,7 +130,6 @@ module.exports = Cmds;
 
 // SECTION - Helpers
 
-// ! Redo valid flag fn in this function.
 /**
   * @description Parses and validates the flags for consumption.
   * @param {string} flags - Command flags.
