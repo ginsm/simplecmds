@@ -2,7 +2,7 @@
   TODO -
   [x] Allow for various prefixes .create, -create, *create, so on.
   [ ] .exec() which executes a shell cmd on command being issued
-  [ ] Concatenated short flags
+  [x] Concatenated short flags
   [x] Boolean commands
   [x] Fix not iterable lastBuilt err
       - Temporary bandaid fix created.
@@ -91,8 +91,8 @@ const Cmds = {
     * @param {[]} args - Expects process.argv.
     */
   parse: function(args) {
-    // Remove node environment args
-    args = args.slice(2);
+    // Remove node environment args and expand concatenated short flags
+    args = expandConcatFlags(args.slice(2));
 
     // Generate an object containing flags & their respective cmd name
     // e.g. {'-c,--create': 'create'}
@@ -131,8 +131,7 @@ const Cmds = {
     if (noArgs) console.log('placeholder help menu');
 
     // Add args to their respective commands
-    parsedEntries.forEach((entry) => {
-      const [cmd, args] = entry;
+    parsedEntries.forEach(([cmd, args]) => {
       this.commands[cmd].args = args.length > 0 ? args : true;
     });
   },
@@ -141,10 +140,10 @@ const Cmds = {
 
 console.time('Build time');
 Cmds
-    .command('-c, --create <text>', 'create a task')
+    .command('-c --create <text>', 'create a task')
     .rule('<number,string>', 1)
-    .command('-n, --no-rule', 'No rule contained')
-    .command('-d, --delete <id> [id]', 'delete a task')
+    .command('-n --no-rule', 'No rule contained')
+    .command('-d --delete <id> [id]', 'delete a task')
     .rule('<number> [number]', 1)
     .parse(process.argv);
 console.timeEnd('Build time');
@@ -162,7 +161,7 @@ console.log(Cmds.commands);
   */
 function parseFlags(flags) {
   // Find all valid flags in the provided string
-  const flagRegex = /(?<!([<\w>\[\]]))([-*.=@#%~$:&\w]+)/g;
+  const flagRegex = /(?<!([<\w\[]))[^\s<\[,]+/g;
   flags = flags.match(flagRegex).slice(0, 2) || error(0, flags);
 
   // Validate a flag
@@ -198,6 +197,28 @@ function convertNumbers(input) {
   const convertNum = (arg) => /^\d+$/.test(arg) && Number(arg) || arg;
   const isArray = Array.isArray(input);
   return isArray && input.map(convertNum) || convertNum(input);
+}
+
+/**
+ * @description - Expands concatenated short flags into provided array.
+ * @param {[]} arr - Argument array.
+ * @return {[]} Arguments with the expanded short flags at the end.
+ */
+function expandConcatFlags(arr) {
+  const exp = {
+    concatenated: /(?<!\S)\W\w{2,}/g,
+    inbetweenWords: /(?<!\W)(?=\w)/g,
+    byFlag: /(?=\W)/g,
+  };
+
+  // Find concatenated short flags and expand them into single flags
+  const expanded = arr.filter((args) => exp.concatenated.test(args))
+      .map((flags) => flags.replace(exp.inbetweenWords, '-').split(exp.byFlag));
+
+  // Add short flags to the end and filter out concatenated version
+  return [].concat.apply(arr, expanded).filter((arg) => {
+    return !exp.concatenated.test(arg);
+  });
 }
 
 // SECTION - Errors
