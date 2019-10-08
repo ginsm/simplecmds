@@ -92,7 +92,7 @@ const Cmds = {
     */
   parse: function(args) {
     // Remove node environment args and expand concatenated short flags
-    args = expandConcatFlags(args.slice(2));
+    args = expandCombinedFlags(args.slice(2));
 
     // Generate an object containing flags & their respective cmd name
     // e.g. {'-c,--create': 'create'}
@@ -199,26 +199,28 @@ function convertNumbers(input) {
   return isArray && input.map(convertNum) || convertNum(input);
 }
 
+
 /**
- * @description - Expands concatenated short flags into provided array.
+ * @description - Expands combined short flags.
  * @param {[]} arr - Argument array.
- * @return {[]} Arguments with the expanded short flags at the end.
+ * @return {[]} Array with expanded short flags at the beginning.
  */
-function expandConcatFlags(arr) {
+function expandCombinedFlags(arr) {
   const exp = {
-    concatenatedFlags: /(?<!\S)\W\w{2,}/g,
+    concatenatedFlags: /(?<!\S)\W\w{2,}/,
     inbetween: /(?<!\W)(?=\w)/g,
     byFlag: /(?=\W)/g,
   };
 
   // Find concatenated short flags and expand them into single flags
-  const expanded = arr.filter((arr) => exp.concatenatedFlags.test(arr))
+  const expanded = arr.filter((item) => exp.concatenatedFlags.test(item))
       .map((flags) => flags.replace(exp.inbetween, '-').split(exp.byFlag));
 
-  // Add short flags to the end of arr and filter out concatenated version
-  return [].concat.apply(arr, expanded)
-      .filter((arg) => !exp.concatenatedFlags.test(arg));
+  // Add short flags to the beginning of arr and filter out concatenated version
+  return [...new Set(Array.prototype.concat.apply([], expanded))]
+      .concat(arr).filter((arg) => !exp.concatenatedFlags.test(arg));
 }
+
 
 // SECTION - Errors
 /**
