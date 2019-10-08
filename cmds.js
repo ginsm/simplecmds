@@ -82,6 +82,10 @@ const Cmds = {
     // Remove node environment args and expand concatenated short flags
     args = expandCombinedFlags(args.slice(2));
 
+    // Print help if no args were provided
+    const noArgs = args.length === 0;
+    if (noArgs) console.log('placeholder help menu');
+
     // Generate an object containing flags & their respective cmd name
     // e.g. {'-c,--create': 'create'}
     const commandNames = this.cmds().reduce((prev, cmd) => {
@@ -100,8 +104,8 @@ const Cmds = {
           const cmdName = commandNames[cmdFlag];
           const isCommand = cmdFlag.length;
 
-          // The first arg must be a command else issue an error (4)
-          if (id == 0 && !isCommand) error(4);
+          const firstArgNotCommand = id == 0 && !isCommand;
+          if (firstArgNotCommand) error(3);
 
           // Used for key/value building
           const lastBuilt = Object.keys(prev).slice(-1);
@@ -113,15 +117,8 @@ const Cmds = {
           return ({...prev, [key]: convertNumbers(value)});
         }, {});
 
-    // Get the entries
-    const parsedEntries = Object.entries(parsedArgs);
-
-    // Print help if no args were provided
-    const noArgs = parsedEntries.length == 0;
-    if (noArgs) console.log('placeholder help menu');
-
     // Add args to their respective commands
-    parsedEntries.forEach(([cmd, args]) => {
+    Object.entries(parsedArgs).forEach(([cmd, args]) => {
       this.commands[cmd].args = args.length > 0 ? args : true;
     });
   },
@@ -211,9 +208,8 @@ function error(code, value) {
   const errors = [
     `No flags present in command '${value}'.`,
     `Unable to create command '${value}'.`,
-    `Sorry, no commands were provided.`,
-    `You cannot use two flags referencing the same command: '${value}'.`,
-    `No valid commands were provided.`,
+    `Sorry, no commands were provided. Type -h.`,
+    `First argument must be a valid command. Type -h.`,
   ];
 
   // Log error and exit
