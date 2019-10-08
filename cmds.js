@@ -13,26 +13,26 @@ const Cmds = {
   // SECTION - Object Creation
 
   /**
-    * @description Contains the commands.
-    */
+   * @description Contains the commands.
+   */
   commands: {},
 
 
   /**
-     * @return {string[]} Existing command names.
-     */
+   * @return {string[]} Existing command names.
+   */
   cmds: function() {
     return Object.keys(this.commands);
   },
 
 
   /**
-     * @description Create a command.
-     * @param {string} flagString - Usable command flags.
-     * @param {string} description - Description of the command.
-     * @param {Object} callback - Callback to be used with function
-     * @return {private} 'this' for chaining.
-     */
+   * @description Create a command.
+   * @param {string} flagString - Usable command flags.
+   * @param {string} description - Description of the command.
+   * @param {Object} callback - Callback to be used with function
+   * @return {private} 'this' for chaining.
+   */
   command: function(flagString = '', description = '', callback = false) {
     // Parse the flags and sort them by length
     const flags = parseFlags(flagString);
@@ -51,11 +51,11 @@ const Cmds = {
 
 
   /**
-     * @description Create a validation rule.
-     * @param {string} notation - String notation of types.
-     * @param {number} amount - Acceptable amount of arguments.
-     * @return {private} 'this' for chaining.
-     */
+   * @description Create a validation rule.
+   * @param {string} notation - String notation of types.
+   * @param {number} amount - Acceptable amount of arguments.
+   * @return {private} 'this' for chaining.
+   */
   rule: function(notation = '', amount = 0) {
     // Used to get last command made in the method chain
     const command = this.cmds().slice(-1)[0];
@@ -75,9 +75,9 @@ const Cmds = {
   // SECTION - arguments
 
   /**
-    * @description Parse program args and add them to their command.
-    * @param {[]} args - Expects process.argv.
-    */
+   * @description Parse program args and add them to their command.
+   * @param {[]} args - Expects process.argv.
+   */
   parse: function(args) {
     // Remove node environment args and expand concatenated short flags
     args = expandCombinedFlags(args.slice(2));
@@ -133,10 +133,10 @@ module.exports = Cmds;
 // SECTION - Helpers
 
 /**
-  * @description Parses and validates the flags for consumption.
-  * @param {string} flags - Command flags.
-  * @return {private} Array of possible command names.
-  */
+ * @description Parses and validates the flags for consumption.
+ * @param {string} flags - Command flags.
+ * @return {private} Array of possible command names.
+ */
 function parseFlags(flags) {
   // Find all valid flags in the provided string
   const flagRegex = /(?<!([<\w\[]))[^\s<\[,]+/g;
@@ -155,10 +155,10 @@ function parseFlags(flags) {
 
 
 /**
-  * @description Remove any dashes and camel case a string.
-  * @param {string} str - String to normalize.
-  * @return {string} Normalized string.
-  */
+ * @description Remove any dashes and camel case a string.
+ * @param {string} str - String to normalize.
+ * @return {string} Normalized string.
+ */
 function camelCase(str) {
   const camelCaseString = (word, id) => id == 0 && word.toLowerCase() ||
         word[0].toUpperCase() + word.substr(1).toLowerCase();
@@ -167,10 +167,10 @@ function camelCase(str) {
 
 
 /**
-  * @description Converts any stringed numbers to a number.
-  * @param {*} input - Value(s) to be converted.
-  * @return {*} - Returns the input after attempting conversion.
-  */
+ * @description Converts any stringed numbers to a number.
+ * @param {*} input - Value(s) to be converted.
+ * @return {*} - Returns the input after attempting conversion.
+ */
 function convertNumbers(input) {
   const convertNum = (arg) => /^\d+$/.test(arg) && Number(arg) || arg;
   const isArray = Array.isArray(input);
@@ -202,10 +202,10 @@ function expandCombinedFlags(arr) {
 
 // SECTION - Errors
 /**
-  * @description - Dispatches an error and exits process.
-  * @param {number} code - Error code.
-  * @param {*} value - Relevant information.
-  */
+ * @description - Dispatches an error and exits process.
+ * @param {number} code - Error code.
+ * @param {*} value - Relevant information.
+ */
 function error(code, value) {
   // Contains error messages
   const errors = [
