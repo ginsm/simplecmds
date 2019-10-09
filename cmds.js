@@ -1,12 +1,11 @@
 /*
   TODO -
   [x] Allow for various prefixes .create, -create, *create, so on.
-  [ ] .exec() which executes a shell cmd on command being issued
+  [ ] .exec() function that executes a shell cmd on command being issued
   [x] Concatenated short flags
   [x] Boolean commands
   [x] Fix not iterable lastBuilt err
-      - Temporary bandaid fix created.
-  [ ] Look at parseFlag's validFlag function.
+  [ ] Look at parseFlag's validFlag function again.
 */
 
 const Cmds = {
@@ -21,7 +20,7 @@ const Cmds = {
   /**
    * @return {string[]} Existing command names.
    */
-  cmds: function() {
+  cmds() {
     return Object.keys(this.commands);
   },
 
@@ -33,7 +32,7 @@ const Cmds = {
    * @param {Object} callback - Callback to be used with function
    * @return {private} 'this' for chaining.
    */
-  command: function(flagString = '', description = '', callback = false) {
+  command(flagString = '', description = '', callback = false) {
     // Parse the flags and sort them by length
     const flags = parseFlags(flagString);
     const command = camelCase(flags[0]);
@@ -56,7 +55,7 @@ const Cmds = {
    * @param {number} amount - Acceptable amount of arguments.
    * @return {private} 'this' for chaining.
    */
-  rule: function(notation = '', amount = 0) {
+  rule(notation = '', amount = 0) {
     // Used to get last command made in the method chain
     const command = this.cmds().slice(-1)[0];
     const cmdObject = this.commands[command];
@@ -78,13 +77,13 @@ const Cmds = {
    * @description Parse program args and add them to their command.
    * @param {[]} args - Expects process.argv.
    */
-  parse: function(args) {
-    // Remove node environment args and expand concatenated short flags
-    args = expandCombinedFlags(args.slice(2));
-
+  parse(args) {
     // Print help if no args were provided
     const noArgs = args.length === 0;
     if (noArgs) console.log('placeholder help menu');
+
+    // Remove node environment args and expand concatenated short flags
+    args = expandCombinedFlags(args.slice(2));
 
     // Generate an object containing flags & their respective cmd name
     // e.g. {'-c,--create': 'create'}
@@ -96,7 +95,6 @@ const Cmds = {
     // Generate an object of command names and args
     // e.g. {*cmd: [...args]}
     const parsedArgs = args
-        // Used to generate the args per command
         .reduce((prev, arg, id) => {
           // Resolve whether it's a command or not
           const cmdFlag = Object.keys(commandNames).filter((cmd) =>
@@ -104,6 +102,7 @@ const Cmds = {
           const cmdName = commandNames[cmdFlag];
           const isCommand = cmdFlag.length;
 
+          // First arg must be a command
           const firstArgNotCommand = id == 0 && !isCommand;
           if (firstArgNotCommand) error(3);
 
@@ -111,13 +110,13 @@ const Cmds = {
           const lastBuilt = Object.keys(prev).slice(-1);
           const arrExists = prev.hasOwnProperty(cmdName) && [...prev[cmdName]];
 
-          // Build the object
+          // Object construction
           const key = isCommand && cmdName || lastBuilt;
           const value = isCommand ? arrExists || [] : [...prev[lastBuilt], arg];
           return ({...prev, [key]: convertNumbers(value)});
         }, {});
 
-    // Add args to their respective commands
+    // Add args to their respective commands; set as true if no args present
     Object.entries(parsedArgs).forEach(([cmd, args]) => {
       this.commands[cmd].args = args.length > 0 ? args : true;
     });
@@ -187,13 +186,24 @@ function expandCombinedFlags(arr) {
     byFlag: /(?=\W)/g,
   };
 
-  // Find concatenated short flags and expand them into single flags
-  const expanded = arr.filter((item) => exp.concatenatedFlags.test(item))
-      .map((flags) => flags.replace(exp.inbetween, '-').split(exp.byFlag));
+  // Expand any concatenated flags into short flags (in place)
+  const expanded = flatten(arr.map((arg) => {
+    return exp.concatenatedFlags.test(arg) ?
+      arg.replace(exp.inbetween, '-').split(exp.byFlag) : arg;
+  }));
 
-  // Add short flags to the beginning of arr and filter out concatenated version
-  return [...new Set(Array.prototype.concat.apply([], expanded))]
-      .concat(arr).filter((arg) => !exp.concatenatedFlags.test(arg));
+  // Removing duplicates so there's less to iterate over
+  return [...new Set(expanded)];
+}
+
+
+/**
+ * @description Flattens an array.
+ * @param {[]} arr - Array to flatten
+ * @return {[]} The flattened array.
+ */
+function flatten(arr) {
+  return Array.prototype.concat.apply([], arr);
 }
 
 
