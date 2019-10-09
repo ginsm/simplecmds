@@ -1,4 +1,5 @@
 # **cmds.js**
+---
 Easily create CLI commands and type check user given arguments. Features yet to be implemented are noted by an `[*]` following the title.
 
 ## **Installing** [*]
@@ -15,6 +16,7 @@ const cmds = require('cmds');
 
 &nbsp;
 # **Command creation**
+---
 There are two parts to command creation. The methods `.command` and `.rule`.
 
 &nbsp;
