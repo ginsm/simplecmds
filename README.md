@@ -1,5 +1,4 @@
 # **cmds.js**
----
 Easily create CLI commands and type check user given arguments. Features yet to be implemented are noted by an `[*]` following the title.
 
 ## **Installing** [*]
@@ -16,12 +15,10 @@ const cmds = require('cmds');
 
 &nbsp;
 # **Command creation**
----
 There are two parts to command creation. The methods `.command` and `.rule`.
 
 &nbsp;
 ## **.command(flags, description, callback)**
----
 
 ### **Flags**
 Flags are the keywords that users can use to issue your command. There are three types you can use:
@@ -51,7 +48,6 @@ function doSomething(args) {
 
 &nbsp;
 ## **.rule(notation, amount)**
----
 The rule method creates a ruleset for the type of argument(s) and amount of arguments for a command. The rule is applied to the command above it.
 
 *Note: The method is in place but type checking is not. It will add the rule to the command but not enforce it currently.*
