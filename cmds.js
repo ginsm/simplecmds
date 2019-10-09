@@ -6,6 +6,7 @@
   [x] Boolean commands
   [x] Fix not iterable lastBuilt err
   [ ] Look at parseFlag's validFlag function again.
+  [ ] Implement type checking
 */
 
 const Cmds = {
