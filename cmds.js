@@ -82,8 +82,8 @@ const Cmds = {
     const noArgs = args.length === 0;
     if (noArgs) console.log('placeholder help menu');
 
-    // Remove node environment args and expand concatenated short flags
-    args = expandCombinedFlags(args.slice(2));
+    // Remove node environment args, expand concatenated flags, & convert nums
+    args = convertNumbers(expandCombinedFlags(args.slice(2)));
 
     // Generate an object containing flags & their respective cmd name
     // e.g. {'-c,--create': 'create'}
@@ -113,7 +113,7 @@ const Cmds = {
           // Object construction
           const key = isCommand && cmdName || lastBuilt;
           const value = isCommand ? arrExists || [] : [...prev[lastBuilt], arg];
-          return ({...prev, [key]: convertNumbers(value)});
+          return ({...prev, [key]: value});
         }, {});
 
     // Add args to their respective commands; set as true if no args present
