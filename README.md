@@ -1,6 +1,26 @@
 # **cmds.js**
 Easily create CLI commands and type check user given arguments. Features yet to be implemented are noted by an `[*]` following the title.
 
+##   **Table of contents:** <!-- omit in toc -->
+
+- [**cmds.js**](#cmdsjs)
+  - [**Installing** [*]](#installing)
+  - [**Importing** [*]](#importing)
+- [**Command creation**](#command-creation)
+  - [**.command(flags, description, callback)**](#commandflags-description-callback)
+    - [**Flags**](#flags)
+    - [**Description**](#description)
+    - [**Callback** [*]](#callback)
+    - [**Example:**](#example)
+  - [**.rule(notation, amount)**](#rulenotation-amount)
+    - [**Notation**](#notation)
+    - [**Amount**](#amount)
+    - [**Example:**](#example-1)
+    - [**Valid and invalid commands** [*]](#valid-and-invalid-commands)
+- [**Usage**](#usage)
+
+&nbsp;
+
 ## **Installing** [*]
 
 ```
@@ -17,7 +37,6 @@ const cmds = require('cmds');
 # **Command creation**
 There are two parts to command creation. The methods `.command` and `.rule`.
 
-&nbsp;
 ## **.command(flags, description, callback)**
 
 ### **Flags**
@@ -46,7 +65,6 @@ function doSomething(args) {
 }
 ```
 
-&nbsp;
 ## **.rule(notation, amount)**
 The rule method creates a ruleset for the type of argument(s) and amount of arguments for a command. The rule is applied to the command above it.
 
@@ -58,6 +76,15 @@ The notation is a string that represents the **type** an argument can be and whe
 For example: `'<number> [number,string]'` would dictate that the first argument is **required** and must be a `number`. Subsequent arguments are *optional* and must be either a `number` or a `string`.
 
 Note: When allowing two types you must not put a space inbetween them. `'<number,string>'` is correct. `'<number, string>'` is incorrect.
+
+There are three type of arguments to choose from:
+- `number`
+- `string`
+- `boolean`
+
+Boolean would be the command being present without any arguments following it. This means that the command cannot accept more than one argument.
+
+e.g. `.rule('<string,boolean>', 1)`.
 
 ### **Amount**
 The amount dictates how many arguments are allowed. **The amount must be equal to or greater than the amount of required arguments**.
@@ -80,10 +107,53 @@ cmds
 
   function doSomething(args, valid) {
     if (valid) {
+      // If valid do something with the args
       console.log(args);
     }
   }
 ```
-The first argument must be a `number`, followed by a `string`, and subsequent arguments must be a `number` or `string`. If the end user were to enter more than three arguments, or the wrong type of argument, the valid property would be set to `false`.
+The first argument must be a `number`, second must be a `string`, and subsequent arguments must be a `number` or `string`. If the user were to enter more than three arguments, or the wrong type of argument, the valid property would be set to `false`.
 
 This will allow you to handle incorrect user input in whichever way you would like. If no rule was added for a `.command`, the valid state will be `true` by default in your command.
+
+### **Valid and invalid commands** [*]
+
+Using the example above, here are what valid and invalid commands would look like:
+
+Valid commands:
+```
+node yourProgram -f 10 'this is a string'
+node yourProgram -f 10 'this is a string' 12
+node yourProgram -f 10 'this is a string' 'another string'
+```
+
+Invalid commands:
+```
+node yourProgram -f 'this is a string' 10  <- wrong type(s)
+node yourProgram -f 10  <- missing required (second argument)
+node yourProgram -f 10 'this is a string' 10 12  <- too many args
+```
+
+&nbsp;
+# **Usage**
+To demonstrate the usage, lets build a simple program. Create a file called 'myProgram.js' and insert the following code:
+
+```javascript
+const cmds = require('cmds');
+
+cmds
+  .command('-e --echo <message>', 'Echos the given message', echo)
+  .rule('<string,number>', 1)
+  .parse(process.argv);
+
+// expects only one argument; a string or number.
+function echo(args, valid) {
+  if (valid) {
+    console.log(args[0]);
+  } else {
+    cmds.help();
+  }
+}
+```
+
+Running `node myProgram -e 'message to echo'` would result in an output of '`message to echo`' to stdout. Running `node myProgram -e` or `node myProgram -e one two` would result in the help menu being displayed instead.
