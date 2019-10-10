@@ -65,6 +65,7 @@ function doSomething(args) {
 }
 ```
 
+&nbsp;
 ## **.rule(notation, amount)**
 The rule method creates a ruleset for the type of argument(s) and amount of arguments for a command. The rule is applied to the command above it.
 
