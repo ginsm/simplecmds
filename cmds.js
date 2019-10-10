@@ -86,39 +86,16 @@ const Cmds = {
     // Remove node environment args, expand concatenated flags, & convert nums
     args = convertNumbers(expandCombinedFlags(args.slice(2)));
 
-    // Generate an object containing flags & their respective cmd name
-    // e.g. {'-c,--create': 'create'}
+    // Generate an object containing flags & their respective cmd names
     const commandNames = this.cmds().reduce((prev, cmd) => {
-      const flags = this.commands[cmd].flags;
-      return ({...prev, [flags]: cmd});
+      return ({...prev, [this.commands[cmd].flags]: cmd});
     }, {});
 
-    // Generate an object of command names and args
-    // e.g. {*cmd: [...args]}
-    const parsedArgs = args
-        .reduce((prev, arg, id) => {
-          // Resolve whether it's a command or not
-          const cmdFlag = Object.keys(commandNames).filter((cmd) =>
-            cmd.includes(arg));
-          const cmdName = commandNames[cmdFlag];
-          const isCommand = cmdFlag.length;
-
-          // First arg must be a command
-          const firstArgNotCommand = id == 0 && !isCommand;
-          if (firstArgNotCommand) error(3);
-
-          // Used for key/value building
-          const lastBuilt = Object.keys(prev).slice(-1);
-          const arrExists = prev.hasOwnProperty(cmdName) && [...prev[cmdName]];
-
-          // Object construction
-          const key = isCommand && cmdName || lastBuilt;
-          const value = isCommand ? arrExists || [] : [...prev[lastBuilt], arg];
-          return ({...prev, [key]: value});
-        }, {});
+    // Get the args for each command, e.g. {command: [...args]}
+    const commandArgs = parseArgs(args, commandNames);
 
     // Add args to their respective commands; set as true if no args present
-    Object.entries(parsedArgs).forEach(([cmd, args]) => {
+    Object.entries(commandArgs).forEach(([cmd, args]) => {
       this.commands[cmd].args = args.length > 0 ? args : true;
     });
   },
@@ -152,6 +129,59 @@ function parseFlags(flags) {
 
 
 /**
+ * @description - Expands combined short flags.
+ * @param {[]} arr - Argument array.
+ * @return {[]} Array with expanded short flags at the beginning.
+ */
+function expandCombinedFlags(arr) {
+  const exp = {
+    concatenatedFlags: /(?<!\S)\W\w{2,}/,
+    inbetween: /(?<!\W)(?=\w)/g,
+    byFlag: /(?=\W)/g,
+  };
+
+  // Expand any concatenated flags into short flags (in place)
+  const expanded = flatten(arr.map((arg) => {
+    return exp.concatenatedFlags.test(arg) ?
+      arg.replace(exp.inbetween, '-').split(exp.byFlag) : arg;
+  }));
+
+  // Removing duplicates so there's less to iterate over
+  return [...new Set(expanded)];
+}
+
+/**
+ * @description Generates an object containing commands and their args.
+ * @param {[]} args - User arguments and commands.
+ * @param {Object} commandNames - Flags and their respective command name.
+ * @return {Object} Generated object containing args.
+ */
+function parseArgs(args, commandNames) {
+  return args
+      .reduce((prev, arg, id) => {
+        // Resolve whether it's a command or not
+        const cmdFlag = Object.keys(commandNames).filter((cmd) =>
+          cmd.includes(arg));
+        const cmdName = commandNames[cmdFlag];
+        const isCommand = cmdFlag.length;
+
+        // First arg must be a command
+        const firstArgNotCommand = id == 0 && !isCommand;
+        if (firstArgNotCommand) error(3);
+
+        // Used for key/value building
+        const lastBuilt = Object.keys(prev).slice(-1);
+        const arrExists = prev.hasOwnProperty(cmdName) && [...prev[cmdName]];
+
+        // Object construction
+        const key = isCommand && cmdName || lastBuilt;
+        const value = isCommand ? arrExists || [] : [...prev[lastBuilt], arg];
+        return ({...prev, [key]: value});
+      }, {});
+}
+
+
+/**
  * @description Remove any dashes and camel case a string.
  * @param {string} str - String to normalize.
  * @return {string} Normalized string.
@@ -172,29 +202,6 @@ function convertNumbers(input) {
   const convertNum = (arg) => /^\d+$/.test(arg) && Number(arg) || arg;
   const isArray = Array.isArray(input);
   return isArray && input.map(convertNum) || convertNum(input);
-}
-
-
-/**
- * @description - Expands combined short flags.
- * @param {[]} arr - Argument array.
- * @return {[]} Array with expanded short flags at the beginning.
- */
-function expandCombinedFlags(arr) {
-  const exp = {
-    concatenatedFlags: /(?<!\S)\W\w{2,}/,
-    inbetween: /(?<!\W)(?=\w)/g,
-    byFlag: /(?=\W)/g,
-  };
-
-  // Expand any concatenated flags into short flags (in place)
-  const expanded = flatten(arr.map((arg) => {
-    return exp.concatenatedFlags.test(arg) ?
-      arg.replace(exp.inbetween, '-').split(exp.byFlag) : arg;
-  }));
-
-  // Removing duplicates so there's less to iterate over
-  return [...new Set(expanded)];
 }
 
 
