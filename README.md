@@ -1,9 +1,9 @@
-# **cmds.js**
-Easily create CLI commands and type check user given arguments. Features yet to be implemented are noted by an `[*]` following the title.
+# **cmds.js** (placeholder)
+Easily create CLI commands and type check user given arguments. This project is a work in progress. Features yet to be implemented are noted by an `[*]` following the title.
 
 ##   **Table of contents:** <!-- omit in toc -->
 
-- [**cmds.js**](#cmdsjs)
+- [**cmds.js** (placeholder)](#cmdsjs-placeholder)
   - [**Installing** [*]](#installing)
   - [**Importing** [*]](#importing)
 - [**Command creation**](#command-creation)
@@ -11,13 +11,14 @@ Easily create CLI commands and type check user given arguments. Features yet to 
     - [**Flags**](#flags)
     - [**Description**](#description)
     - [**Callback** [*]](#callback)
-    - [**Example:**](#example)
+    - [**Command Example:**](#command-example)
   - [**.rule(notation, amount)**](#rulenotation-amount)
     - [**Notation**](#notation)
     - [**Amount**](#amount)
-    - [**Example:**](#example-1)
+    - [**Rule Example:**](#rule-example)
     - [**Valid and invalid commands** [*]](#valid-and-invalid-commands)
 - [**Usage**](#usage)
+  - [**Simple program**](#simple-program)
 
 &nbsp;
 
@@ -45,15 +46,15 @@ Flags are the keywords that users can use to issue your command. There are three
 - Long: `--long`
 - Alt: `long`
 
-The prefix does not need to be a dash (`-`). It can be any non-letter character *except* `<>` or `[]`. You can only use **two** flags per command; subsequent flags will be ignored.
+You can only use **two** flags per command; subsequent flags will be ignored. The prefix does not need to be a dash (`-`). It can be any non-letter character *except* `<>` or `[]`.
 
 ### **Description**
-The description will be used when generating the help menu. This tells the user what the purpose of the command is.
+The description will be used when generating the help menu. This tells the user the purpose of the command.
 
 ### **Callback** [*]
 The callback will be invoked with two arguments: the command's `args` and `valid`. Refer to the help section of `.rule` to understand what `valid` means.
 
-### **Example:**
+### **Command Example:**
 ```javascript
 cmds
   .command('-s --long', 'My command', doSomething)
@@ -67,25 +68,25 @@ function doSomething(args) {
 
 &nbsp;
 ## **.rule(notation, amount)**
-The rule method creates a ruleset for the type of argument(s) and amount of arguments for a command. The rule is applied to the command above it.
+The rule method creates a ruleset for the type of argument(s) and amount of arguments for a command. The rule is applied to the command above it in the chain.
 
-*Note: The method is in place but type checking is not. It will add the rule to the command but not enforce it currently.*
+*Note: The rule method is implemented but type checking is not. It will add the rule to the command but not enforce it currently.*
 
 ### **Notation**
 The notation is a string that represents the **type** an argument can be and whether it is required (`<>`) or optional (`[]`).
 
 For example: `'<number> [number,string]'` would dictate that the first argument is **required** and must be a `number`. Subsequent arguments are *optional* and must be either a `number` or a `string`.
 
-Note: When allowing two types you must not put a space inbetween them. `'<number,string>'` is correct. `'<number, string>'` is incorrect.
-
 There are three type of arguments to choose from:
 - `number`
 - `string`
 - `boolean`
 
-Boolean would be the command being present without any arguments following it. This means that the command cannot accept more than one argument.
+Boolean would be the command being present without any arguments following it. This means that the command cannot accept more than one argument:
 
-e.g. `.rule('<string,boolean>', 1)`.
+Example: `.rule('<string,boolean>', 1)`.
+
+Note: When allowing two types you must not put a space inbetween them. `'<number,string>'` is correct. `'<number, string>'` is incorrect.
 
 ### **Amount**
 The amount dictates how many arguments are allowed. **The amount must be equal to or greater than the amount of required arguments**.
@@ -97,7 +98,7 @@ The amount dictates how many arguments are allowed. **The amount must be equal t
 // ...
 .rule('<number> <string>', 1); // incorrect
 ```
-### **Example:**
+### **Rule Example:**
 
 To allow for 2 required arguments and 1 optional the syntax would look like this:
 ```javascript
@@ -137,24 +138,32 @@ node yourProgram -f 10 'this is a string' 10 12  <- too many args
 
 &nbsp;
 # **Usage**
+This module uses method chaining to construct your command line interface. The last method must be `.parse()` which requires `process.argv` as an argument.
+
+## **Simple program**
 To demonstrate the usage, lets build a simple program. Create a file called 'myProgram.js' and insert the following code:
 
 ```javascript
+// import module
 const cmds = require('cmds');
 
+// create a command using .command and .rule (echo)
 cmds
   .command('-e --echo <message>', 'Echos the given message', echo)
   .rule('<string,number>', 1)
   .parse(process.argv);
 
-// expects only one argument; a string or number.
+// accepts only one argument: a string or number.
 function echo(args, valid) {
   if (valid) {
-    console.log(args[0]);
+    const [message] = args
+    console.log(message);
   } else {
     cmds.help();
-  }
+  } 
 }
 ```
 
-Running `node myProgram -e 'message to echo'` would result in an output of '`message to echo`' to stdout. Running `node myProgram -e` or `node myProgram -e one two` would result in the help menu being displayed instead.
+Running `node myProgram -e 'message to echo'` would result in an output of '`message to echo`' to stdout.
+
+*Note: This will not work currently. Check back later.*
