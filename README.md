@@ -36,7 +36,7 @@ const cmds = require('cmds');
 
 &nbsp;
 # **Command creation**
-There are two parts to command creation. The methods `.command` and `.rule`.
+There are two parts to command creation: `.command` and `.rule`.
 
 ## **.command(flags, description, callback)**
 
@@ -149,7 +149,7 @@ const cmds = require('cmds');
 
 // create a command using .command and .rule (echo)
 cmds
-  .command('-e --echo <message>', 'Echos the given message', echo)
+  .command('-e --echo', 'Echos the given message', echo)
   .rule('<string,number>', 1)
   .parse(process.argv);
 
