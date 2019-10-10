@@ -72,7 +72,7 @@ const Cmds = {
   },
 
 
-  // SECTION - arguments
+  // SECTION - Main Parser
 
   /**
    * @description Parse program args and add them to their command.
@@ -81,18 +81,16 @@ const Cmds = {
   parse(args) {
     // Print help if no args were provided
     const noArgs = args.length === 0;
-    if (noArgs) console.log('placeholder help menu');
+    if (noArgs) {
+      console.log('placeholder help menu');
+      process.exit();
+    }
 
-    // Remove node environment args, expand concatenated flags, & convert nums
+    // Remove node environment args, expand concatenated flags, convert nums
     args = convertNumbers(expandCombinedFlags(args.slice(2)));
 
-    // Generate an object containing flags & their respective cmd names
-    const commandNames = this.cmds().reduce((prev, cmd) => {
-      return ({...prev, [this.commands[cmd].flags]: cmd});
-    }, {});
-
     // Get the args for each command, e.g. {command: [...args]}
-    const commandArgs = parseArgs(args, commandNames);
+    const commandArgs = parseArgs(args);
 
     // Add args to their respective commands; set as true if no args present
     Object.entries(commandArgs).forEach(([cmd, args]) => {
@@ -104,7 +102,7 @@ const Cmds = {
 module.exports = Cmds;
 
 
-// SECTION - Helpers
+// SECTION - Parsing Methods
 
 /**
  * @description Parses and validates the flags for consumption.
@@ -156,7 +154,13 @@ function expandCombinedFlags(arr) {
  * @param {Object} commandNames - Flags and their respective command name.
  * @return {Object} Generated object containing args.
  */
-function parseArgs(args, commandNames) {
+function parseArgs(args) {
+  // Generate an object containing flags & their respective cmd names
+  const commandNames = this.cmds().reduce((prev, cmd) => {
+    return ({...prev, [this.commands[cmd].flags]: cmd});
+  }, {});
+
+  // Build the object containing args for each command
   return args
       .reduce((prev, arg, id) => {
         // Resolve whether it's a command or not
@@ -181,6 +185,8 @@ function parseArgs(args, commandNames) {
 }
 
 
+// SECTION - Helper Methods
+
 /**
  * @description Remove any dashes and camel case a string.
  * @param {string} str - String to normalize.
@@ -194,7 +200,7 @@ function camelCase(str) {
 
 
 /**
- * @description Converts any stringed numbers to a number.
+ * @description Converts any stringed number to a number.
  * @param {*} input - Value(s) to be converted.
  * @return {*} - Returns the input after attempting conversion.
  */
@@ -216,6 +222,7 @@ function flatten(arr) {
 
 
 // SECTION - Errors
+
 /**
  * @description - Dispatches an error and exits process.
  * @param {number} code - Error code.
