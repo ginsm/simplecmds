@@ -91,12 +91,13 @@ const Cmds = {
 
     // Get the args for each command, e.g. {command: [...args]}
     const commandArgs = parseArgs(args, this);
-    delete commandArgs.building;
 
     // Add args to their respective commands; set as true if no args present
-    Object.entries(commandArgs).forEach(([cmd, args]) => {
-      this.commands[cmd].args = args.length > 0 ? args : true;
-    });
+    Object.entries(commandArgs)
+        .filter((cmd) => Array.isArray(cmd[1]))
+        .forEach(([cmd, args]) => {
+          this.commands[cmd].args = args.length > 0 ? args : true;
+        });
   },
 };
 
