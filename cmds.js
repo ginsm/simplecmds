@@ -90,7 +90,8 @@ const Cmds = {
     args = convertNumbers(expandCombinedFlags(args.slice(2)));
 
     // Get the args for each command, e.g. {command: [...args]}
-    const commandArgs = parseArgs(args);
+    const commandArgs = parseArgs(args, this);
+    delete commandArgs.building;
 
     // Add args to their respective commands; set as true if no args present
     Object.entries(commandArgs).forEach(([cmd, args]) => {
@@ -148,39 +149,34 @@ function expandCombinedFlags(arr) {
   return [...new Set(expanded)];
 }
 
+
 /**
  * @description Generates an object containing commands and their args.
- * @param {[]} args - User arguments and commands.
- * @param {Object} commandNames - Flags and their respective command name.
+ * @param {[]} args - Process.argv
+ * @param {[]} that - The main object.
  * @return {Object} Generated object containing args.
  */
-function parseArgs(args) {
-  // Generate an object containing flags & their respective cmd names
-  const commandNames = this.cmds().reduce((prev, cmd) => {
-    return ({...prev, [this.commands[cmd].flags]: cmd});
-  }, {});
-
+function parseArgs(args, that) {
   // Build the object containing args for each command
   return args
       .reduce((prev, arg, id) => {
         // Resolve whether it's a command or not
-        const cmdFlag = Object.keys(commandNames).filter((cmd) =>
-          cmd.includes(arg));
-        const cmdName = commandNames[cmdFlag];
-        const isCommand = cmdFlag.length;
+        const getCommand = Object.entries(that.commands).find((cmd) =>
+          cmd[1].flags.includes(arg)) || false;
+        const command = getCommand ? getCommand[0] : false;
 
         // First arg must be a command
-        const firstArgNotCommand = id == 0 && !isCommand;
+        const firstArgNotCommand = id == 0 && !command;
         if (firstArgNotCommand) error(3);
 
         // Used for key/value building
-        const lastBuilt = Object.keys(prev).slice(-1);
-        const arrExists = prev.hasOwnProperty(cmdName) && [...prev[cmdName]];
+        const building = command || prev.building;
+        const exists = prev.hasOwnProperty(command) && [...prev[command]];
 
         // Object construction
-        const key = isCommand && cmdName || lastBuilt;
-        const value = isCommand ? arrExists || [] : [...prev[lastBuilt], arg];
-        return ({...prev, [key]: value});
+        const key = command || prev.building;
+        const value = command ? exists || [] : [...prev[building], arg];
+        return ({...prev, [key]: value, building});
       }, {});
 }
 
