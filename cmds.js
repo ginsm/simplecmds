@@ -1,3 +1,6 @@
+// Node Imports
+const basename = require('path').basename;
+
 /*
   TODO -
   [x] Allow for various prefixes .create, -create, *create, so on.
@@ -5,8 +8,9 @@
   [x] Concatenated short flags
   [x] Boolean commands
   [x] Fix not iterable lastBuilt err
-  [ ] Look at parseFlag's validFlag function again.
   [ ] Implement type checking
+  [x] Help Menu
+      [ ] Add -h --help commands by default.
 */
 
 const Cmds = {
@@ -71,6 +75,56 @@ const Cmds = {
     return this;
   },
 
+  /**
+   * @description Assigns a custom help message to a command.
+   * @param {string} message - Custom help message.
+   * @return {private} 'this' for chaining.
+   */
+  help(message) {
+    const command = this.cmds().slice(-1)[0];
+    const cmdObject = this.commands[command];
+
+    this.commands[command] = {
+      ...cmdObject,
+      help: message,
+    };
+
+    return this;
+  },
+
+  // SECTION - Help Menu
+
+  /**
+   * @description Prints a help menu and exits program process.
+   * @param {Object} commands - Program commands.
+   * @return {Private} Exit program process.
+   */
+  showHelp(commands) {
+    const programName = basename(process.argv[1], '.js');
+    const commandUsage = Object.values(commands).map((cmd) => cmd.usage);
+    const usageLength = longest(commandUsage).length;
+
+    // Build command usage
+    const cmds = Object.values(commands)
+        .map((command, index) => {
+          const usage = commandUsage[index];
+          const spaces = Array((usageLength + 5) - usage.length).join(' ');
+          const message = `${usage}${spaces}${command.description}`;
+          return command.help || message;
+        });
+
+    // Build the rest of the menu
+    const menu = [
+      `${programName[0].toUpperCase() + programName.substr(1)} Help Menu\n`,
+      ...cmds,
+      `\nUsage: ${programName} <command> [arg]`,
+    ];
+
+    menu.forEach((line) => console.log(line));
+
+    return process.exit();
+  },
+
 
   // SECTION - Main Parser
 
@@ -79,24 +133,25 @@ const Cmds = {
    * @param {[]} args - Expects process.argv.
    */
   parse(args) {
+    // Remove node environment args
+    args = args.slice(2);
+
     // Print help if no args were provided
     const noArgs = args.length === 0;
-    if (noArgs) {
-      console.log('placeholder help menu');
-      process.exit();
-    }
+    if (noArgs) this.showHelp(this.commands);
 
-    // Remove node environment args, expand concatenated flags, convert nums
-    args = convertNumbers(expandCombinedFlags(args.slice(2)));
+    // Expand concatenated flags and convert num strings
+    args = convertNumbers(expandCombinedFlags(args));
 
     // Get the args for each command, e.g. {command: [...args]}
-    const commandArgs = parseArgs(args, this);
+    const commandArgs = parseArgs(args, Object.entries(this.commands));
 
     // Add args to their respective commands; set as true if no args present
     Object.entries(commandArgs)
-        .filter((cmd) => Array.isArray(cmd[1]))
         .forEach(([cmd, args]) => {
-          this.commands[cmd].args = args.length > 0 ? args : true;
+          if (Array.isArray(args)) {
+            this.commands[cmd].args = args.length > 0 ? args : true;
+          }
         });
   },
 };
@@ -129,41 +184,17 @@ function parseFlags(flags) {
 
 
 /**
- * @description - Expands combined short flags.
- * @param {[]} arr - Argument array.
- * @return {[]} Array with expanded short flags at the beginning.
- */
-function expandCombinedFlags(arr) {
-  const exp = {
-    concatenatedFlags: /(?<!\S)\W\w{2,}/,
-    inbetween: /(?<!\W)(?=\w)/g,
-    byFlag: /(?=\W)/g,
-  };
-
-  // Expand any concatenated flags into short flags (in place)
-  const expanded = flatten(arr.map((arg) => {
-    return exp.concatenatedFlags.test(arg) ?
-      arg.replace(exp.inbetween, '-').split(exp.byFlag) : arg;
-  }));
-
-  // Removing duplicates so there's less to iterate over
-  return [...new Set(expanded)];
-}
-
-
-/**
  * @description Generates an object containing commands and their args.
  * @param {[]} args - Process.argv
- * @param {[]} that - The main object.
+ * @param {[]} commands - Object containing commands.
  * @return {Object} Generated object containing args.
  */
-function parseArgs(args, that) {
-  // Build the object containing args for each command
+function parseArgs(args, commands) {
   return args
       .reduce((prev, arg, id) => {
         // Resolve whether it's a command or not
-        const getCommand = Object.entries(that.commands).find((cmd) =>
-          cmd[1].flags.includes(arg)) || false;
+        const getCommand = commands
+            .find((cmd) => cmd[1].flags.includes(arg)) || false;
         const command = getCommand ? getCommand[0] : false;
 
         // First arg must be a command
@@ -195,6 +226,38 @@ function camelCase(str) {
   return str.match(/[\w]+(?=[A-Z])|[\w]+/g).map(camelCaseString).join('');
 }
 
+/**
+ * @description Finds the longest string in an array.
+ * @param {[string]} arr - Array of strings.
+ * @return {string} Longest string.
+ */
+function longest(arr) {
+  return arr.reduce((a, b) => b.length > a.length ? b : a);
+}
+
+
+/**
+ * @description - Expands combined short flags.
+ * @param {[]} arr - Argument array.
+ * @return {[]} Array with expanded short flags at the beginning.
+ */
+function expandCombinedFlags(arr) {
+  const exp = {
+    concatenated: /(?<!\S)\W\w{2,}/,
+    inbetweenChars: /(?<!\W)(?=\w)/g,
+    byFlag: /(?=\W)/g,
+  };
+
+  // Expand any concatenated flags into short flags (in place)
+  const expanded = flatten(arr.map((arg) => {
+    return exp.concatenated.test(arg) ?
+      arg.replace(exp.inbetweenChars, '-').split(exp.byFlag) : arg;
+  }));
+
+  // Removing duplicates so there's less to iterate over
+  return [...new Set(expanded)];
+}
+
 
 /**
  * @description Converts any stringed number to a number.
@@ -202,8 +265,8 @@ function camelCase(str) {
  * @return {*} - Returns the input after attempting conversion.
  */
 function convertNumbers(input) {
-  const convertNum = (arg) => /^\d+$/.test(arg) && Number(arg) || arg;
   const isArray = Array.isArray(input);
+  const convertNum = (arg) => +arg ? +arg : arg;
   return isArray && input.map(convertNum) || convertNum(input);
 }
 
