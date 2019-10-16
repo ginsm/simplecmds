@@ -38,9 +38,8 @@ const Cmds = {
    * @return {private} 'this' for chaining.
    */
   command(flagString = '', description = '', callback = false) {
-    // Parse the flags and sort them by length
     const flags = parseFlags(flagString);
-    const command = camelCase(flags[0]);
+    const command = camelCase(longest(flags));
 
     // Add command to the commands object
     this.commands[command] = {
@@ -177,9 +176,8 @@ function parseFlags(flags) {
     return isShortFlag || flag.length >= 4;
   };
 
-  // Make sure every flag is valid & sort it by length
-  const sortByLength = (a, b) => b.length - a.length;
-  return flags.every(flagValid) && flags.sort(sortByLength) || error(1, flags);
+  // Make sure every flag is valid
+  return flags.every(flagValid) && flags || error(1, flags);
 }
 
 
