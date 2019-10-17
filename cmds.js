@@ -10,8 +10,10 @@ const basename = require('path').basename;
   [x] Fix not iterable lastBuilt err
   [ ] Implement type checking
   [x] Help Menu
-      [ ] Add -h --help commands by default.
+      [x] Add -h --help commands by default.
+  [ ] Create a generation object to not populate Cmds object.
 */
+
 
 const Cmds = {
   // SECTION - Object Creation
