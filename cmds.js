@@ -11,7 +11,7 @@ const basename = require('path').basename;
   [ ] Implement type checking
   [x] Help Menu
       [x] Add -h --help commands by default.
-  [ ] Create a generation object to not populate Cmds object.
+  [ ] Create a generation object to not pollute the Cmds object.
 */
 
 
