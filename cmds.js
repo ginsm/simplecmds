@@ -91,6 +91,38 @@ const Cmds = {
     return this;
   },
 
+
+  // SECTION - Main Parser
+
+  /**
+   * @description Parse program args and add them to their command.
+   * @param {[]} args - Expects process.argv.
+   */
+  parse(args) {
+    // Remove node environment args
+    args = args.slice(2);
+
+    // Print help if no args were provided
+    (args.length === 0) && this.showHelp();
+
+    // Expand concatenated flags and convert num strings
+    args = convertNumbers(expandCombinedFlags(args));
+
+    // Get the args for each command, e.g. {command: [...args]}
+    const commandArgs = parseArgs(args, Object.entries(this.commands));
+
+    // Add args to their respective commands; set as true if no args present
+    Object.entries(commandArgs).forEach(([cmd, args]) => {
+      if (Array.isArray(args)) {
+        this.commands[cmd].args = args.length > 0 ? args : true;
+      }
+    });
+
+    // Build the default commands
+    buildDefaultCmds();
+  },
+
+
   // SECTION - Help Menu
 
   /**
@@ -98,13 +130,13 @@ const Cmds = {
    * @param {Object} commands - Program commands.
    * @return {Private} Exit program process.
    */
-  showHelp(commands) {
+  showHelp() {
     const programName = basename(process.argv[1], '.js');
-    const commandUsage = Object.values(commands).map((cmd) => cmd.usage);
+    const commandUsage = Object.values(this.commands).map((cmd) => cmd.usage);
     const usageLength = longest(commandUsage).length;
 
     // Build command usage
-    const cmds = Object.values(commands)
+    const cmds = Object.values(this.commands)
         .map((command, index) => {
           const usage = commandUsage[index];
           const spaces = Array((usageLength + 5) - usage.length).join(' ');
@@ -122,36 +154,6 @@ const Cmds = {
     menu.forEach((line) => console.log(line));
 
     return process.exit();
-  },
-
-
-  // SECTION - Main Parser
-
-  /**
-   * @description Parse program args and add them to their command.
-   * @param {[]} args - Expects process.argv.
-   */
-  parse(args) {
-    // Remove node environment args
-    args = args.slice(2);
-
-    // Print help if no args were provided
-    const noArgs = args.length === 0;
-    if (noArgs) this.showHelp(this.commands);
-
-    // Expand concatenated flags and convert num strings
-    args = convertNumbers(expandCombinedFlags(args));
-
-    // Get the args for each command, e.g. {command: [...args]}
-    const commandArgs = parseArgs(args, Object.entries(this.commands));
-
-    // Add args to their respective commands; set as true if no args present
-    Object.entries(commandArgs)
-        .forEach(([cmd, args]) => {
-          if (Array.isArray(args)) {
-            this.commands[cmd].args = args.length > 0 ? args : true;
-          }
-        });
   },
 };
 
@@ -212,6 +214,20 @@ function parseArgs(args, commands) {
 
 
 // SECTION - Helper Methods
+
+/**
+ * @description Build the default commands.
+ */
+function buildDefaultCmds() {
+  if (!Cmds.commands.hasOwnProperty('help')) {
+    Cmds.commands.help = {
+      description: 'Output the help menu.',
+      flags: ['-h', '--help'],
+      usage: '-h --help',
+      callback: Cmds.showHelp.bind(Cmds),
+    };
+  }
+}
 
 /**
  * @description Remove any dashes and camel case a string.
