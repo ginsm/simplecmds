@@ -9,7 +9,7 @@ const basename = require('path').basename;
   [x] Fix not iterable lastBuilt err
   [x] Implement type checking
   [x] Help Menu
-  [x] Add -h --help commands by default.
+  [x] Add default commands during generation. Allow for overwriting.
   [ ] Fix parseArgs acting as a set instead of an array
   [ ] Create a generation object to not pollute the Cmds object.
   [ ] .exec() function that executes a shell cmd on command being issued
