@@ -13,6 +13,8 @@ const basename = require('path').basename;
   [ ] Fix parseArgs acting as a set instead of an array
   [ ] Create a generation object to not pollute the Cmds object.
   [ ] .exec() function that executes a shell cmd on command being issued
+  [ ] Change buildDefaultCmds to handleDefaultCmds
+      -
 */
 
 const Cmds = {
@@ -101,7 +103,7 @@ const Cmds = {
    * @param {[]} args - Expects process.argv.
    */
   parse(args) {
-    // Remove node args, expand concatenated flags and convert num strings
+    // Remove node args, expand concatenated flags, and convert num strings
     args = convertNumbers(expandCombinedFlags(args.slice(2)));
 
     // Print help if no args were provided
@@ -120,10 +122,13 @@ const Cmds = {
     // Build the default commands
     buildDefaultCmds();
 
-    const valid = Object.entries(this.commands).map((entry, id) =>
-      entry[1].hasOwnProperty('notation') && entry[1].hasOwnProperty('args') && typeCheck(entry)
-    );
-    console.log(valid);
+    // Type check and add a valid property to each command
+    Object.entries(this.commands).forEach(([cmd, obj]) => {
+      const checkCmd = hasOwnProperties(obj, 'notation', 'args');
+      if (checkCmd) {
+        this.commands[cmd].valid = typeCheck(obj);
+      }
+    });
   },
 
 
@@ -247,16 +252,16 @@ function buildDefaultCmds() {
 
 /**
  * @description - Check the types and amount of args for a command.
- * @param {[]} entry - Command name and object.
+ * @param {[]} obj - Command name and object.
  * @return {boolean} Valid or not.
  */
-function typeCheck(entry) {
+function typeCheck(obj) {
   // Deconstruct object
-  const {notation, amount, args} = entry[1];
+  const {notation, amount, args} = obj;
 
   // Amount checking
   const required = notation.filter((notation) => notation[0] === '<');
-  const properAmount = args.length <= amount && amount >= required.length;
+  const properAmount = args.length <= amount && args.length >= required.length;
 
   // Type checking
   const argTypes = args.map((arg) => typeof arg);
@@ -276,7 +281,7 @@ function typeCheck(entry) {
   })
       .every((arg) => arg === true);
 
-  return (properAmount && validTypes);
+  return {amount: properAmount, types: validTypes};
 }
 
 
@@ -345,6 +350,17 @@ function convertNumbers(input) {
  */
 function flatten(arr) {
   return Array.prototype.concat.apply([], arr);
+}
+
+/**
+ * @description
+ * @param {{}} obj - Object to check.
+ * @param  {...any} properties - Properties to check.
+ * @return {boolean} Result of the check.
+ */
+function hasOwnProperties(obj, ...properties) {
+  return properties.map((property) => obj.hasOwnProperty(property))
+      .every((value) => value == true);
 }
 
 
