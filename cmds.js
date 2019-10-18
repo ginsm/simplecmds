@@ -4,16 +4,16 @@ const basename = require('path').basename;
 /*
   TODO -
   [x] Allow for various prefixes .create, -create, *create, so on.
-  [ ] .exec() function that executes a shell cmd on command being issued
   [x] Concatenated short flags
   [x] Boolean commands
   [x] Fix not iterable lastBuilt err
-  [ ] Implement type checking
+  [x] Implement type checking
   [x] Help Menu
-      [x] Add -h --help commands by default.
+  [x] Add -h --help commands by default.
+  [ ] Fix parseArgs acting as a set instead of an array
   [ ] Create a generation object to not pollute the Cmds object.
+  [ ] .exec() function that executes a shell cmd on command being issued
 */
-
 
 const Cmds = {
   // SECTION - Object Creation
@@ -101,14 +101,11 @@ const Cmds = {
    * @param {[]} args - Expects process.argv.
    */
   parse(args) {
-    // Remove node environment args
-    args = args.slice(2);
+    // Remove node args, expand concatenated flags and convert num strings
+    args = convertNumbers(expandCombinedFlags(args.slice(2)));
 
     // Print help if no args were provided
     (args.length === 0) && this.showHelp();
-
-    // Expand concatenated flags and convert num strings
-    args = convertNumbers(expandCombinedFlags(args));
 
     // Get the args for each command, e.g. {command: [...args]}
     const commandArgs = parseArgs(args, Object.entries(this.commands));
@@ -116,12 +113,17 @@ const Cmds = {
     // Add args to their respective commands; set as true if no args present
     Object.entries(commandArgs).forEach(([cmd, args]) => {
       if (Array.isArray(args)) {
-        this.commands[cmd].args = args.length > 0 ? args : true;
+        this.commands[cmd].args = args.length > 0 ? args : [true];
       }
     });
 
     // Build the default commands
     buildDefaultCmds();
+
+    const valid = Object.entries(this.commands).map((entry, id) =>
+      entry[1].hasOwnProperty('notation') && entry[1].hasOwnProperty('args') && typeCheck(entry)
+    );
+    console.log(valid);
   },
 
 
@@ -214,22 +216,71 @@ function parseArgs(args, commands) {
       }, {});
 }
 
-
-// SECTION - Helper Methods
+// SECTION - Building Methods
 
 /**
  * @description Build the default commands.
  */
 function buildDefaultCmds() {
-  if (!Cmds.commands.hasOwnProperty('help')) {
-    Cmds.commands.help = {
+  const defaults = {
+    help: {
       description: 'Output the help menu.',
       flags: ['-h', '--help'],
       usage: '-h --help',
       callback: Cmds.showHelp.bind(Cmds),
-    };
+    },
+    version: {
+      description: 'Output the program version',
+      flags: ['-v', '--version'],
+      usage: '-v --version',
+    },
+  };
+
+  for (entry of Object.entries(defaults)) {
+    if (!Cmds.commands.hasOwnProperty(entry[0])) {
+      Cmds.commands[entry[0]] = entry[1];
+    }
   }
 }
+
+// SECTION - Type checking
+
+/**
+ * @description - Check the types and amount of args for a command.
+ * @param {[]} entry - Command name and object.
+ * @return {boolean} Valid or not.
+ */
+function typeCheck(entry) {
+  // Deconstruct object
+  const {notation, amount, args} = entry[1];
+
+  // Amount checking
+  const required = notation.filter((notation) => notation[0] === '<');
+  const properAmount = args.length <= amount && amount >= required.length;
+
+  // Type checking
+  const argTypes = args.map((arg) => typeof arg);
+  const optional = notation.filter((notation) => notation[0] === '[');
+  const lastOptional = optional.slice(-1)[0];
+
+  const validTypes = args.map((_, id) => {
+    const valid = (notation) => notation.includes(argTypes[id]);
+
+    // Conditions
+    const idRequired = (id <= required.length - 1);
+    const noNotation = (id > notation.length - 1);
+    const currNotation = notation[id];
+
+    return idRequired ? valid(currNotation) : optional.length &&
+          (noNotation ? valid(lastOptional) : valid(currNotation));
+  })
+      .every((arg) => arg === true);
+
+  return (properAmount && validTypes);
+}
+
+
+// SECTION - Helper Methods
 
 /**
  * @description Remove any dashes and camel case a string.
