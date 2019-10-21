@@ -10,11 +10,11 @@ const basename = require('path').basename;
   [x] Implement type checking
   [x] Help Menu
   [x] Add default commands during generation. Allow for overwriting.
-  [ ] Fix parseArgs acting as a set instead of an array
-  [ ] Create a generation object to not pollute the Cmds object.
-  [ ] .exec() function that executes a shell cmd on command being issued
   [ ] Change buildDefaultCmds to handleDefaultCmds
-      -
+      - Handle them during build process
+  [ ] Fix parseArgs acting as a set instead of an array
+  [ ] Version command
+  [ ] .exec() function that executes a shell cmd on command being issued
 */
 
 const Cmds = {
@@ -29,8 +29,8 @@ const Cmds = {
   /**
    * @return {string[]} Existing command names.
    */
-  cmds() {
-    return Object.keys(this.commands);
+  lastBuilt() {
+    return Object.keys(this.commands).slice(-1)[0];
   },
 
 
@@ -65,7 +65,7 @@ const Cmds = {
    */
   rule(notation = '', amount = 0) {
     // Used to get last command made in the method chain
-    const command = this.cmds().slice(-1)[0];
+    const command = this.lastBuilt();
     const cmdObject = this.commands[command];
 
     // Add rule to last command's object
@@ -84,7 +84,7 @@ const Cmds = {
    * @return {private} 'this' for chaining.
    */
   help(message) {
-    const command = this.cmds().slice(-1)[0];
+    const command = this.lastBuilt();
     const cmdObject = this.commands[command];
 
     this.commands[command] = {
@@ -113,22 +113,30 @@ const Cmds = {
     const commandArgs = parseArgs(args, Object.entries(this.commands));
 
     // Add args to their respective commands; set as true if no args present
-    Object.entries(commandArgs).forEach(([cmd, args]) => {
-      if (Array.isArray(args)) {
-        this.commands[cmd].args = args.length > 0 ? args : [true];
+    forPropertyIn(commandArgs, (prop, value) => {
+      if (Array.isArray(value)) {
+        this.commands[prop].args = value.length ? value : [true];
       }
     });
-
-    // Build the default commands
-    buildDefaultCmds();
 
     // Type check and add a valid property to each command
-    Object.entries(this.commands).forEach(([cmd, obj]) => {
-      const checkCmd = hasOwnProperties(obj, 'notation', 'args');
-      if (checkCmd) {
-        this.commands[cmd].valid = typeCheck(obj);
+    // Expose args and valid properties to this object's surface
+    forPropertyIn(this.commands, (prop, value) => {
+      if (hasProperties(value, 'notation', 'args')) {
+        this.commands[prop].valid = typeCheck(value);
       }
+
+      this[prop] = {
+        args: value.args,
+        valid: value.hasOwnProperty('valid') ? value.valid : true,
+      };
     });
+
+    // Clean up main object
+    ['commands', 'command', 'lastBuilt',
+      'help', 'rule', 'parse'].forEach((item) =>
+      delete this[item]
+    );
   },
 
 
@@ -137,7 +145,6 @@ const Cmds = {
   /**
    * @description Prints a help menu and exits program process.
    * @param {Object} commands - Program commands.
-   * @return {Private} Exit program process.
    */
   showHelp() {
     const programName = basename(process.argv[1], '.js');
@@ -148,8 +155,8 @@ const Cmds = {
     const cmds = Object.values(this.commands)
         .map((command, index) => {
           const usage = commandUsage[index];
-          const spaces = Array((usageLength + 5) - usage.length).join(' ');
-          const message = `${usage}${spaces}${command.description}`;
+          const spaces = Array((usageLength + 3) - usage.length).join(' ');
+          const message = `${usage} ${spaces} ${command.description}`;
           return command.help || message;
         });
 
@@ -162,7 +169,7 @@ const Cmds = {
 
     menu.forEach((line) => console.log(line));
 
-    return process.exit();
+    process.exit();
   },
 };
 
@@ -241,9 +248,9 @@ function buildDefaultCmds() {
     },
   };
 
-  for (entry of Object.entries(defaults)) {
-    if (!Cmds.commands.hasOwnProperty(entry[0])) {
-      Cmds.commands[entry[0]] = entry[1];
+  for ([cmd, obj] of Object.entries(defaults)) {
+    if (!Cmds.commands.hasOwnProperty(cmd)) {
+      Cmds.commands[cmd] = obj;
     }
   }
 }
@@ -281,11 +288,24 @@ function typeCheck(obj) {
   })
       .every((arg) => arg === true);
 
-  return {amount: properAmount, types: validTypes};
+  return properAmount && validTypes;
 }
 
 
 // SECTION - Helper Methods
+
+/**
+ * @description Run a callback for each property in an object.
+ * @param {Object} obj - Object to iterate.
+ * @param {*} callback - Receives property and its value.
+ */
+function forPropertyIn(obj, callback) {
+  for (const prop in obj) {
+    if (obj[prop] !== null) {
+      callback(prop, obj[prop]);
+    }
+  }
+}
 
 /**
  * @description Remove any dashes and camel case a string.
@@ -297,6 +317,7 @@ function camelCase(str) {
         word[0].toUpperCase() + word.substr(1).toLowerCase();
   return str.match(/[\w]+(?=[A-Z])|[\w]+/g).map(camelCaseString).join('');
 }
+
 
 /**
  * @description Finds the longest string in an array.
@@ -358,7 +379,7 @@ function flatten(arr) {
  * @param  {...any} properties - Properties to check.
  * @return {boolean} Result of the check.
  */
-function hasOwnProperties(obj, ...properties) {
+function hasProperties(obj, ...properties) {
   return properties.map((property) => obj.hasOwnProperty(property))
       .every((value) => value == true);
 }
