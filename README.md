@@ -152,7 +152,7 @@ const cmds = require('cmds');
 
 // create a command using .command and .rule (echo)
 cmds
-  .command('-e --echo', 'Echos the given message', echo)
+  .command('-e --echo <text>', 'Echos the given message', echo)
   .rule('<string,number>', 1)
   .parse(process.argv);
 
