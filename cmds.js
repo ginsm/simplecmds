@@ -11,6 +11,7 @@ const basename = require('path').basename;
   [x] Help Menu
   [x] Add default commands during generation. Allow for overwriting.
   [x] Create a separate object for building the commands.
+  [x] Handle callbacks
   [ ] Handle default commands (help & version).
   [ ] Fix parseArgs acting as a set instead of an array.
   [ ] .exec() function that executes a shell cmd on command being issued
@@ -223,6 +224,12 @@ function finalizeCommands(cmd, obj, args) {
     });
   } else {
     this[cmd].valid = true;
+  }
+
+  // Run callback for command
+  if (obj.callback) {
+    const {args, valid} = this[cmd];
+    obj.callback(args, valid);
   }
 }
 
