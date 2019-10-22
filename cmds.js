@@ -10,10 +10,8 @@ const basename = require('path').basename;
   [x] Implement type checking
   [x] Help Menu
   [x] Add default commands during generation. Allow for overwriting.
-  [ ] Change buildDefaultCmds to handleDefaultCmds
-      - Handle them during build process
-  [ ] Fix parseArgs acting as a set instead of an array
-  [ ] Version command
+  [ ] Handle default commands (help & version).
+  [ ] Fix parseArgs acting as a set instead of an array.
   [ ] .exec() function that executes a shell cmd on command being issued
 */
 
@@ -103,34 +101,13 @@ const Cmds = {
    * @param {[]} args - Expects process.argv.
    */
   parse(args) {
-    // Remove node args, expand concatenated flags, and convert num strings
+    // Sort out the args
     args = convertNumbers(expandCombinedFlags(args.slice(2)));
-
-    // Print help if no args were provided
-    (args.length === 0) && this.showHelp();
-
-    // Get the args for each command, e.g. {command: [...args]}
+    (!args.length) && this.showHelp();
     const commandArgs = parseArgs(args, Object.entries(this.commands));
 
-    // Add args to their respective commands; set as true if no args present
-    forPropertyIn(commandArgs, (prop, value) => {
-      if (Array.isArray(value)) {
-        this.commands[prop].args = value.length ? value : [true];
-      }
-    });
-
-    // Type check and add a valid property to each command
-    // Expose args and valid properties to this object's surface
-    forPropertyIn(this.commands, (prop, value) => {
-      if (hasProperties(value, 'notation', 'args')) {
-        this.commands[prop].valid = typeCheck(value);
-      }
-
-      this[prop] = {
-        args: value.args,
-        valid: value.hasOwnProperty('valid') ? value.valid : true,
-      };
-    });
+    // Populate main object with commands & their args + validity.
+    iterate(this.commands, buildFinalCommands.bind(this), commandArgs);
 
     // Clean up main object
     ['commands', 'command', 'lastBuilt',
@@ -149,13 +126,13 @@ const Cmds = {
   showHelp() {
     const programName = basename(process.argv[1], '.js');
     const commandUsage = Object.values(this.commands).map((cmd) => cmd.usage);
-    const usageLength = longest(commandUsage).length;
+    const longestUsage = longest(commandUsage).length;
 
     // Build command usage
     const cmds = Object.values(this.commands)
         .map((command, index) => {
           const usage = commandUsage[index];
-          const spaces = Array((usageLength + 3) - usage.length).join(' ');
+          const spaces = Array((longestUsage + 3) - usage.length).join(' ');
           const message = `${usage} ${spaces} ${command.description}`;
           return command.help || message;
         });
@@ -231,27 +208,26 @@ function parseArgs(args, commands) {
 // SECTION - Building Methods
 
 /**
- * @description Build the default commands.
+ * @description Creates the object the end user deals with.
+ * @param {*} cmd - Command name.
+ * @param {*} obj - Command object.
+ * @param {*} args - Object containing command args.
  */
-function buildDefaultCmds() {
-  const defaults = {
-    help: {
-      description: 'Output the help menu.',
-      flags: ['-h', '--help'],
-      usage: '-h --help',
-      callback: Cmds.showHelp.bind(Cmds),
-    },
-    version: {
-      description: 'Output the program version',
-      flags: ['-v', '--version'],
-      usage: '-v --version',
-    },
-  };
+function buildFinalCommands(cmd, obj, args) {
+  // Resolve arguments
+  if (args.hasOwnProperty(cmd)) {
+    this[cmd] = {args: args[cmd].length ? args[cmd] : [true]};
+  }
 
-  for ([cmd, obj] of Object.entries(defaults)) {
-    if (!Cmds.commands.hasOwnProperty(cmd)) {
-      Cmds.commands[cmd] = obj;
-    }
+  // Typecheck arguments
+  if (hasProperties(obj, 'notation', 'amount')) {
+    this[cmd].valid = typeCheck({
+      args: this[cmd].args,
+      notation: obj.notation,
+      amount: obj.amount,
+    });
+  } else {
+    this[cmd].valid = true;
   }
 }
 
@@ -274,18 +250,18 @@ function typeCheck(obj) {
   const argTypes = args.map((arg) => typeof arg);
   const optional = notation.filter((notation) => notation[0] === '[');
   const lastOptional = optional.slice(-1)[0];
+  const validTypes = args
+      .map((_, id) => {
+        const valid = (notation) => notation.includes(argTypes[id]);
 
-  const validTypes = args.map((_, id) => {
-    const valid = (notation) => notation.includes(argTypes[id]);
+        // Conditions
+        const idRequired = (id <= required.length - 1);
+        const noNotation = (id > notation.length - 1);
+        const currNotation = notation[id];
 
-    // Conditions
-    const idRequired = (id <= required.length - 1);
-    const noNotation = (id > notation.length - 1);
-    const currNotation = notation[id];
-
-    return idRequired ? valid(currNotation) : optional.length &&
+        return idRequired ? valid(currNotation) : optional.length &&
           (noNotation ? valid(lastOptional) : valid(currNotation));
-  })
+      })
       .every((arg) => arg === true);
 
   return properAmount && validTypes;
@@ -298,11 +274,12 @@ function typeCheck(obj) {
  * @description Run a callback for each property in an object.
  * @param {Object} obj - Object to iterate.
  * @param {*} callback - Receives property and its value.
+ * @param {*} optional - Optional parameter to pass to callback.
  */
-function forPropertyIn(obj, callback) {
+function iterate(obj, callback, optional) {
   for (const prop in obj) {
     if (obj[prop] !== null) {
-      callback(prop, obj[prop]);
+      callback(prop, obj[prop], optional);
     }
   }
 }
