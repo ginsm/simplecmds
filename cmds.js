@@ -1,22 +1,6 @@
 // Node Imports
 const basename = require('path').basename;
 
-/*
-  TODO -
-  [x] Allow for various prefixes .create, -create, *create, so on.
-  [x] Concatenated short flags
-  [x] Boolean commands
-  [x] Fix not iterable lastBuilt err
-  [x] Implement type checking
-  [x] Help Menu
-  [x] Add default commands during generation. Allow for overwriting.
-  [x] Create a separate object for building the commands.
-  [x] Handle callbacks
-  [ ] Handle default commands (help & version).
-  [ ] Fix parseArgs acting as a set instead of an array.
-  [ ] .exec() function that executes a shell cmd on command being issued
-*/
-
 /**
    * @description Contains the commands during generation.
    */
