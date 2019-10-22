@@ -2,10 +2,8 @@
 Easily create CLI commands and type check user given arguments. 
 
 **Note**
-```
-This project is a work in progress; including the README. 
-Features yet to be implemented are noted by an `[*]` following the title.
-```
+
+This project is a work in progress. Features yet to be implemented are noted by an `[*]` following the title.
 
 ##   **Table of contents:** <!-- omit in toc -->
 
