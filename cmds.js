@@ -10,25 +10,26 @@ const basename = require('path').basename;
   [x] Implement type checking
   [x] Help Menu
   [x] Add default commands during generation. Allow for overwriting.
+  [x] Create a separate object for building the commands.
   [ ] Handle default commands (help & version).
   [ ] Fix parseArgs acting as a set instead of an array.
   [ ] .exec() function that executes a shell cmd on command being issued
 */
 
+/**
+   * @description Contains the commands during generation.
+   */
+const Generation = {};
+
 const Cmds = {
   // SECTION - Object Creation
 
   /**
-   * @description Contains the commands.
-   */
-  commands: {},
-
-
-  /**
-   * @return {string[]} Existing command names.
+   * @description Get last command built.
+   * @return {string} Name of the last command built.
    */
   lastBuilt() {
-    return Object.keys(this.commands).slice(-1)[0];
+    return Object.keys(Generation).slice(-1)[0];
   },
 
 
@@ -43,8 +44,7 @@ const Cmds = {
     const flags = parseFlags(flagString);
     const command = camelCase(longest(flags));
 
-    // Add command to the commands object
-    this.commands[command] = {
+    Generation[command] = {
       description,
       flags,
       usage: flagString,
@@ -62,12 +62,10 @@ const Cmds = {
    * @return {private} 'this' for chaining.
    */
   rule(notation = '', amount = 0) {
-    // Used to get last command made in the method chain
     const command = this.lastBuilt();
-    const cmdObject = this.commands[command];
+    const cmdObject = Generation[command];
 
-    // Add rule to last command's object
-    this.commands[command] = {
+    Generation[command] = {
       ...cmdObject,
       notation: notation.split(' '),
       amount,
@@ -83,9 +81,9 @@ const Cmds = {
    */
   help(message) {
     const command = this.lastBuilt();
-    const cmdObject = this.commands[command];
+    const cmdObject = Generation[command];
 
-    this.commands[command] = {
+    Generation[command] = {
       ...cmdObject,
       help: message,
     };
@@ -101,17 +99,16 @@ const Cmds = {
    * @param {[]} args - Expects process.argv.
    */
   parse(args) {
-    // Sort out the args
+    // Remove node env args, expand concat flags, and convert nums
     args = convertNumbers(expandCombinedFlags(args.slice(2)));
     (!args.length) && this.showHelp();
-    const commandArgs = parseArgs(args, Object.entries(this.commands));
+    const commandArgs = parseArgs(args, Object.entries(Generation));
 
     // Populate main object with commands & their args + validity.
-    iterate(this.commands, buildFinalCommands.bind(this), commandArgs);
+    iterate(Generation, finalizeCommands.bind(this), commandArgs);
 
     // Clean up main object
-    ['commands', 'command', 'lastBuilt',
-      'help', 'rule', 'parse'].forEach((item) =>
+    ['command', 'lastBuilt', 'help', 'rule', 'parse'].forEach((item) =>
       delete this[item]
     );
   },
@@ -125,19 +122,17 @@ const Cmds = {
    */
   showHelp() {
     const programName = basename(process.argv[1], '.js');
-    const commandUsage = Object.values(this.commands).map((cmd) => cmd.usage);
-    const longestUsage = longest(commandUsage).length;
+    const cmdUsage = Object.values(Generation).map((cmd) => cmd.usage);
+    const longestUsage = longest(cmdUsage).length;
 
     // Build command usage
-    const cmds = Object.values(this.commands)
-        .map((command, index) => {
-          const usage = commandUsage[index];
+    const cmds = Object.values(Generation)
+        .map((command) => {
+          const {usage, description} = command;
           const spaces = Array((longestUsage + 3) - usage.length).join(' ');
-          const message = `${usage} ${spaces} ${command.description}`;
-          return command.help || message;
+          return command.help || `${usage} ${spaces} ${description}`;
         });
 
-    // Build the rest of the menu
     const menu = [
       `${programName[0].toUpperCase() + programName.substr(1)} Help Menu\n`,
       ...cmds,
@@ -190,7 +185,6 @@ function parseArgs(args, commands) {
             .find((cmd) => cmd[1].flags.includes(arg)) || false;
         const command = getCommand ? getCommand[0] : false;
 
-        // First arg must be a command
         const firstArgNotCommand = id == 0 && !command;
         if (firstArgNotCommand) error(3);
 
@@ -214,7 +208,7 @@ function parseArgs(args, commands) {
  * @param {*} obj - Command object.
  * @param {*} args - Object containing command args.
  */
-function buildFinalCommands(cmd, obj, args) {
+function finalizeCommands(cmd, obj, args) {
   // Resolve arguments
   if (args.hasOwnProperty(cmd)) {
     this[cmd] = {args: args[cmd].length ? args[cmd] : [true]};
@@ -259,37 +253,28 @@ function expandCombinedFlags(arr) {
 // SECTION - Type checking
 
 /**
- * @description - Check the types and amount of args for a command.
+ * @description Check the types and amount of args for a command.
  * @param {[]} obj - Command name and object.
- * @return {boolean} Valid or not.
+ * @return {boolean} Validity represented by a boolean.
  */
-function typeCheck(obj) {
-  // Deconstruct object
-  const {notation, amount, args} = obj;
-
-  // Amount checking
+function typeCheck({notation, amount, args}) {
   const required = notation.filter((notation) => notation[0] === '<');
-  const properAmount = args.length <= amount && args.length >= required.length;
+  const optional = notation.slice(required.length);
+  const validAmount = args.length <= amount && args.length >= required.length;
 
   // Type checking
-  const argTypes = args.map((arg) => typeof arg);
-  const optional = notation.filter((notation) => notation[0] === '[');
   const lastOptional = optional.slice(-1)[0];
-  const validTypes = args
-      .map((_, id) => {
-        const valid = (notation) => notation.includes(argTypes[id]);
+  const valid = (notation, arg) => notation.includes(typeof arg);
+  const validTypes = args.map((arg, id) => {
+    const idRequired = (id <= required.length - 1);
+    const noNotation = (id > notation.length - 1);
+    const currNotation = notation[id];
 
-        // Conditions
-        const idRequired = (id <= required.length - 1);
-        const noNotation = (id > notation.length - 1);
-        const currNotation = notation[id];
+    return idRequired ? valid(currNotation, arg) : optional.length &&
+          (noNotation ? valid(lastOptional, arg) : valid(currNotation, arg));
+  }).every((arg) => arg === true);
 
-        return idRequired ? valid(currNotation) : optional.length &&
-          (noNotation ? valid(lastOptional) : valid(currNotation));
-      })
-      .every((arg) => arg === true);
-
-  return properAmount && validTypes;
+  return validAmount && validTypes;
 }
 
 
