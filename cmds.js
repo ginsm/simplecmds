@@ -205,6 +205,7 @@ function parseArgs(args, commands) {
       }, {});
 }
 
+
 // SECTION - Building Methods
 
 /**
@@ -230,6 +231,30 @@ function buildFinalCommands(cmd, obj, args) {
     this[cmd].valid = true;
   }
 }
+
+
+/**
+ * @description - Expands combined short flags.
+ * @param {[]} arr - Argument array.
+ * @return {[]} Array with expanded short flags at the beginning.
+ */
+function expandCombinedFlags(arr) {
+  const exp = {
+    concatenated: /(?<!\S)\W\w{2,}/,
+    inbetweenChars: /(?<!\W)(?=\w)/g,
+    byFlag: /(?=\W)/g,
+  };
+
+  // Expand any concatenated flags into short flags (in place)
+  const expanded = flatten(arr.map((arg) => {
+    return exp.concatenated.test(arg) ?
+      arg.replace(exp.inbetweenChars, '-').split(exp.byFlag) : arg;
+  }));
+
+  // Removing duplicates so there's less to iterate over
+  return [...new Set(expanded)];
+}
+
 
 // SECTION - Type checking
 
@@ -284,6 +309,7 @@ function iterate(obj, callback, optional) {
   }
 }
 
+
 /**
  * @description Remove any dashes and camel case a string.
  * @param {string} str - String to normalize.
@@ -307,29 +333,6 @@ function longest(arr) {
 
 
 /**
- * @description - Expands combined short flags.
- * @param {[]} arr - Argument array.
- * @return {[]} Array with expanded short flags at the beginning.
- */
-function expandCombinedFlags(arr) {
-  const exp = {
-    concatenated: /(?<!\S)\W\w{2,}/,
-    inbetweenChars: /(?<!\W)(?=\w)/g,
-    byFlag: /(?=\W)/g,
-  };
-
-  // Expand any concatenated flags into short flags (in place)
-  const expanded = flatten(arr.map((arg) => {
-    return exp.concatenated.test(arg) ?
-      arg.replace(exp.inbetweenChars, '-').split(exp.byFlag) : arg;
-  }));
-
-  // Removing duplicates so there's less to iterate over
-  return [...new Set(expanded)];
-}
-
-
-/**
  * @description Converts any stringed number to a number.
  * @param {*} input - Value(s) to be converted.
  * @return {*} - Returns the input after attempting conversion.
@@ -349,6 +352,7 @@ function convertNumbers(input) {
 function flatten(arr) {
   return Array.prototype.concat.apply([], arr);
 }
+
 
 /**
  * @description
