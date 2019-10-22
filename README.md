@@ -1,5 +1,11 @@
 # **cmds.js** (placeholder)
-Easily create CLI commands and type check user given arguments. This project is a work in progress. Features yet to be implemented are noted by an `[*]` following the title.
+Easily create CLI commands and type check user given arguments. 
+
+**Note**
+```
+This project is a work in progress; including the README. 
+Features yet to be implemented are noted by an `[*]` following the title.
+```
 
 ##   **Table of contents:** <!-- omit in toc -->
 
@@ -10,22 +16,23 @@ Easily create CLI commands and type check user given arguments. This project is 
   - [**.command(flags, description, callback)**](#commandflags-description-callback)
     - [**Flags**](#flags)
     - [**Description**](#description)
-    - [**Callback** [*]](#callback)
+    - [**Callback**](#callback)
     - [**Command Example:**](#command-example)
   - [**.rule(notation, amount)**](#rulenotation-amount)
     - [**Notation**](#notation)
     - [**Amount**](#amount)
     - [**Rule Example:**](#rule-example)
-    - [**Valid and invalid commands** [*]](#valid-and-invalid-commands)
+    - [**Valid and invalid commands**](#valid-and-invalid-commands)
 - [**Usage**](#usage)
   - [**Simple program**](#simple-program)
+- [**Todo**](#todo)
 
 &nbsp;
 
 ## **Installing** [*]
 
 ```
-npm install cmdsjs
+npm install cmds
 ```
 
 ## **Importing** [*]
@@ -51,7 +58,7 @@ You can only use **two** flags per command; subsequent flags will be ignored. Th
 ### **Description**
 The description will be used when generating the help menu. This tells the user the purpose of the command.
 
-### **Callback** [*]
+### **Callback**
 The callback will be invoked with two arguments: the command's `args` and `valid`. Refer to the help section of `.rule` to understand what `valid` means.
 
 ### **Command Example:**
@@ -118,7 +125,7 @@ The first argument must be a `number`, second must be a `string`, and subsequent
 
 This will allow you to handle incorrect user input in whichever way you would like. If no rule was added for a `.command`, the valid state will be `true` by default in your command.
 
-### **Valid and invalid commands** [*]
+### **Valid and invalid commands**
 
 Using the example above, here are what valid and invalid commands would look like:
 
@@ -156,8 +163,7 @@ cmds
 // accepts only one argument: a string or number.
 function echo(args, valid) {
   if (valid) {
-    const [message] = args
-    console.log(message);
+    console.log(args[0]);
   } else {
     cmds.help();
   } 
@@ -166,4 +172,17 @@ function echo(args, valid) {
 
 Running `node myProgram -e 'message to echo'` would result in an output of '`message to echo`' to stdout.
 
-*Note: This will not work currently. Check back later.*
+# **Todo**
+```
+[x] Allow for various prefixes .create, -create, *create, so on.
+[x] Concatenated short flags.
+[x] Boolean commands.
+[x] Fix not iterable lastBuilt err.
+[x] Implement type checking.
+[x] Help Menu.
+[x] Create a separate object for building the commands.
+[x] Handle callbacks.
+[ ] Handle default commands (help & version).
+[ ] Fix parseArgs acting as a set instead of an array.
+[ ] .exec() function that executes a shell cmd on command being issued.
+```
