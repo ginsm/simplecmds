@@ -184,6 +184,24 @@ function parseArgs(args, commands) {
       }, {});
 }
 
+/**
+ * @description Invoke default command handlers.
+ * @param {[]} args - Process.argv.
+ */
+function handleDefaults(args) {
+  const Defaults = {
+    version: {
+      flags: ['-v', '--version'],
+      issued: false,
+    },
+
+    help: {
+      flags: ['-h', '--help'],
+      issued: false,
+    },
+  };
+}
+
 
 // SECTION - Building Methods
 
@@ -194,26 +212,25 @@ function parseArgs(args, commands) {
  * @param {*} args - Object containing command args.
  */
 function finalizeCommands(cmd, obj, args) {
-  // Resolve arguments
   if (args.hasOwnProperty(cmd)) {
     this[cmd] = {args: args[cmd].length ? args[cmd] : [true]};
-  }
 
-  // Typecheck arguments
-  if (hasProperties(obj, 'notation', 'amount')) {
-    this[cmd].valid = typeCheck({
-      args: this[cmd].args,
-      notation: obj.notation,
-      amount: obj.amount,
-    });
-  } else {
-    this[cmd].valid = true;
-  }
+    // Typecheck arguments
+    if (hasProperties(obj, 'notation', 'amount')) {
+      this[cmd].valid = typeCheck({
+        args: this[cmd].args,
+        notation: obj.notation,
+        amount: obj.amount,
+      });
+    } else {
+      this[cmd].valid = true;
+    }
 
-  // Run callback for command
-  if (obj.callback) {
-    const {args, valid} = this[cmd];
-    obj.callback(args, valid);
+    // Run callback for command
+    if (obj.callback) {
+      const {args, valid} = this[cmd];
+      obj.callback(args, valid);
+    }
   }
 }
 
