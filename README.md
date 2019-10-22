@@ -161,7 +161,7 @@ function echo(args, valid) {
   if (valid) {
     console.log(args[0]);
   } else {
-    cmds.help();
+    cmds.showHelp();
   } 
 }
 ```
