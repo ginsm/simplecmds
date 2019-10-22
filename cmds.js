@@ -85,7 +85,7 @@ const Cmds = {
    */
   parse(args) {
     // Remove node env args, expand concat flags, and convert nums
-    args = convertNumbers(expandCombinedFlags(args.slice(2)));
+    args = handleDefaults(convertNumbers(expandCombinedFlags(args.slice(2))));
     (!args.length) && this.showHelp();
     const commandArgs = parseArgs(args, Object.entries(Generation));
 
@@ -119,7 +119,7 @@ const Cmds = {
         });
 
     const menu = [
-      `${programName[0].toUpperCase() + programName.substr(1)} Help Menu\n`,
+      `${capitalize(programName)}'s Help Menu\n`,
       ...cmds,
       `\nUsage: ${programName} <command> [arg]`,
     ];
@@ -184,22 +184,30 @@ function parseArgs(args, commands) {
       }, {});
 }
 
+
 /**
  * @description Invoke default command handlers.
  * @param {[]} args - Process.argv.
+ * @return {[]} Args with default commands removed.
  */
 function handleDefaults(args) {
-  const Defaults = {
-    version: {
-      flags: ['-v', '--version'],
-      issued: false,
-    },
+  const defaults = [
+    {flags: ['-v', '--version'], ran: false},
+    {flags: ['-h', '--help'], ran: false, callback: Cmds.showHelp},
+  ];
 
-    help: {
-      flags: ['-h', '--help'],
-      issued: false,
-    },
+  for (const obj of defaults) {
+    args.forEach((arg) => {
+      const found = obj.flags.includes(arg);
+      if (found) {
+        args.splice(args.indexOf(arg), 1);
+        !obj.ran && (obj.callback && obj.callback());
+        obj.ran = true;
+      };
+    });
   };
+
+  return args;
 }
 
 
@@ -296,7 +304,7 @@ function typeCheck({notation, amount, args}) {
  */
 function iterate(obj, callback, optional) {
   for (const prop in obj) {
-    if (obj[prop] !== null) {
+    if (obj[prop]) {
       callback(prop, obj[prop], optional);
     }
   }
@@ -312,6 +320,16 @@ function camelCase(str) {
   const camelCaseString = (word, id) => id == 0 && word.toLowerCase() ||
         word[0].toUpperCase() + word.substr(1).toLowerCase();
   return str.match(/[\w]+(?=[A-Z])|[\w]+/g).map(camelCaseString).join('');
+}
+
+
+/**
+ * @description Capitalize the first letter of a word.
+ * @param {string} word - Word to capitalize.
+ * @return {string} Capitalized word.
+ */
+function capitalize(word) {
+  return word[0].toUpperCase() + word.substr(1);
 }
 
 
