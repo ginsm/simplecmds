@@ -10,15 +10,6 @@ const Cmds = {
   // SECTION - Object Creation
 
   /**
-   * @description Get last command built.
-   * @return {string} Name of the last command built.
-   */
-  lastBuilt() {
-    return Object.keys(Generation).slice(-1)[0];
-  },
-
-
-  /**
    * @description Create a command.
    * @param {string} flagString - Usable command flags.
    * @param {string} description - Description of the command.
@@ -47,7 +38,7 @@ const Cmds = {
    * @return {private} 'this' for chaining.
    */
   rule(notation = '', amount = 0) {
-    const command = this.lastBuilt();
+    const command = lastBuiltCmd();
     const cmdObject = Generation[command];
 
     Generation[command] = {
@@ -65,7 +56,7 @@ const Cmds = {
    * @return {private} 'this' for chaining.
    */
   help(message) {
-    const command = this.lastBuilt();
+    const command = lastBuiltCmd();
     const cmdObject = Generation[command];
 
     Generation[command] = {
@@ -93,7 +84,7 @@ const Cmds = {
     iterate(Generation, finalizeCommands.bind(this), commandArgs);
 
     // Clean up main object
-    ['command', 'lastBuilt', 'help', 'rule', 'parse'].forEach((item) =>
+    ['command', 'help', 'rule', 'parse'].forEach((item) =>
       delete this[item]
     );
   },
@@ -295,6 +286,15 @@ function typeCheck({notation, amount, args}) {
 
 
 // SECTION - Helper Methods
+
+/**
+ * @description Get last command built.
+ * @return {string} Name of the last command built.
+ */
+function lastBuiltCmd() {
+  return Object.keys(Generation).slice(-1)[0];
+}
+
 
 /**
  * @description Run a callback for each property in an object.
