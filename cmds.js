@@ -14,10 +14,12 @@ const Cmds = {
    * @param {*} vers - Version number.
    * @return {Object} 'this' for chaining.
    */
-  version(vers) {
+  setVersion(vers) {
     this.version = vers;
     return this;
   },
+
+  version: 'v1.0.0',
 
 
   /**
@@ -94,7 +96,7 @@ const Cmds = {
     iterate(Generation, finalizeCommands.bind(this), commandArgs);
 
     // Clean up main object
-    ['command', 'help', 'rule', 'parse'].forEach((item) =>
+    ['setVersion', 'command', 'help', 'rule', 'parse'].forEach((item) =>
       delete this[item]
     );
   },
@@ -111,17 +113,24 @@ const Cmds = {
     const cmdUsage = Object.values(Generation).map((cmd) => cmd.usage);
     const longestUsage = longest(cmdUsage).length;
 
+    // Create string with n spaces.
+    const space = (length) => Array(length).join(' ');
+
     // Build command usage
     const cmds = Object.values(Generation)
         .map((command) => {
           const {usage, description} = command;
-          const spaces = Array((longestUsage + 3) - usage.length).join(' ');
+          const spaces = space((longestUsage + 3) - usage.length);
           return command.help || `${usage} ${spaces} ${description}`;
         });
 
     const menu = [
-      `${capitalize(programName)}'s Help Menu\n`,
+      `› ${capitalize(programName)} ${this.version}\n`,
+      'Commands:',
       ...cmds,
+      '\nDefaults:',
+      `-h --help ${space((longestUsage + 3) - 9)} Output help menu.`,
+      `-v --version ${space((longestUsage + 3) - 12)} Output version number.`,
       `\nUsage: ${programName} <command> [arg]`,
     ];
 
@@ -304,8 +313,7 @@ function typeCheck({notation, amount, args}) {
  * @description Output the version number.
  */
 function showVersion() {
-  const versionWasSet = typeof Cmds.version !== 'function';
-  console.log(versionWasSet && Cmds.version || 'v1.0.0');
+  console.log(Cmds.version);
 }
 
 
