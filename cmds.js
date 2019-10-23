@@ -125,13 +125,13 @@ const Cmds = {
         });
 
     const menu = [
-      `› ${capitalize(programName)} ${this.version}\n`,
+      `Program: ${capitalize(programName)} (${this.version})\n`,
       'Commands:',
       ...cmds,
       '\nDefaults:',
       `-h --help ${space((longestUsage + 3) - 9)} Output help menu.`,
       `-v --version ${space((longestUsage + 3) - 12)} Output version number.`,
-      `\nUsage: ${programName} <command> [arg]`,
+      `\nUsage: ${programName} <command> [...args]`,
     ];
 
     menu.forEach((line) => console.log(line));
@@ -158,7 +158,7 @@ function parseFlags(flags) {
   // Validate a flag
   const flagValid = (flag) => {
     const isShortFlag = flag.length === 2 && /\S[\w]/.test(flag);
-    return isShortFlag || flag.length >= 4;
+    return isShortFlag || flag.length >= 3;
   };
 
   // Make sure every flag is valid
