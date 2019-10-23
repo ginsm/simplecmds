@@ -182,6 +182,8 @@ Running `node myProgram -e 'message to echo'` would result in an output of '`mes
 [x] Add version setter and getter.
 [ ] Add custom help description.
 [ ] Fix parseArgs acting as a set instead of an array.
-[ ] .exec() function that executes a shell cmd on command being issued.
-[ ] Rework error handling
+[ ] Work on flag identification regex.
+[ ] Allow for no amount passed in rule to mean unlimited args.
+[ ] .exec() executes a shell cmd when a cmd is issued.
+[ ] Rework error handling.
 ```
