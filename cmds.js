@@ -21,13 +21,22 @@ const Cmds = {
 
   version: 'v1.0.0',
 
+  /**
+   * @description Set a description for your program.
+   * @param {string} message - Description message.
+   * @return {Object} 'this' for chaining.
+   */
+  description(message) {
+    return this;
+  },
+
 
   /**
    * @description Create a command.
    * @param {string} flagString - Usable command flags.
    * @param {string} description - Description of the command.
    * @param {Object} callback - Callback to be used with function
-   * @return {private} 'this' for chaining.
+   * @return {Object} 'this' for chaining.
    */
   command(flagString = '', description = '', callback = false) {
     const flags = parseFlags(flagString);
@@ -85,7 +94,7 @@ const Cmds = {
 
   /**
    * @description Parse program args and add them to their command.
-   * @param {[]} args - Expects process.argv.
+   * @param {Array} args - Expects process.argv.
    */
   parse(args) {
     // Remove node env args, expand concat flags, and convert nums
@@ -106,7 +115,6 @@ const Cmds = {
 
   /**
    * @description Prints a help menu and exits program process.
-   * @param {Object} commands - Program commands.
    */
   showHelp() {
     const programName = basename(process.argv[1], '.js');
@@ -168,8 +176,8 @@ function parseFlags(flags) {
 
 /**
  * @description Generates an object containing commands and their args.
- * @param {[]} args - Process.argv
- * @param {[]} commands - Object containing commands.
+ * @param {Array} args - Process.argv
+ * @param {Object[]} commands - Object containing commands.
  * @return {Object} Generated object containing args.
  */
 function parseArgs(args, commands) {
@@ -197,8 +205,8 @@ function parseArgs(args, commands) {
 
 /**
  * @description Invoke default command handlers.
- * @param {[]} args - Process.argv.
- * @return {[]} Args with default commands removed.
+ * @param {Array} args - Process.argv.
+ * @return {Array} Args with default commands removed.
  */
 function handleDefaults(args) {
   (args.length == 0) && Cmds.showHelp();
@@ -258,8 +266,8 @@ function finalizeCommands(cmd, obj, args) {
 
 /**
  * @description - Expands combined short flags.
- * @param {[]} arr - Argument array.
- * @return {[]} Array with expanded short flags at the beginning.
+ * @param {Array} arr - Argument array.
+ * @return {Array} Array with expanded short flags at the beginning.
  */
 function expandCombinedFlags(arr) {
   const exp = {
@@ -280,7 +288,7 @@ function expandCombinedFlags(arr) {
 
 /**
  * @description Check the types and amount of args for a command.
- * @param {[]} obj - Command name and object.
+ * @param {Array} obj - Command name and object.
  * @return {boolean} Validity represented by a boolean.
  */
 function typeCheck({notation, amount, args}) {
@@ -362,7 +370,7 @@ function capitalize(word) {
 
 /**
  * @description Finds the longest string in an array.
- * @param {[string]} arr - Array of strings.
+ * @param {string[]} arr - Array of strings.
  * @return {string} Longest string.
  */
 function longest(arr) {
@@ -384,8 +392,8 @@ function convertNumbers(input) {
 
 /**
  * @description Flattens an array.
- * @param {[]} arr - Array to flatten
- * @return {[]} The flattened array.
+ * @param {Array} arr - Array to flatten
+ * @return {Array} The flattened array.
  */
 function flatten(arr) {
   return Array.prototype.concat.apply([], arr);
@@ -393,7 +401,7 @@ function flatten(arr) {
 
 
 /**
- * @description
+ * @description Check an object for multiple properties.
  * @param {{}} obj - Object to check.
  * @param  {...any} properties - Properties to check.
  * @return {boolean} Result of the check.
