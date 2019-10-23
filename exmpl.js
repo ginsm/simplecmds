@@ -1,6 +1,7 @@
 const cmds = require('./cmds');
 
 cmds
+    .version('v0.1.8')
     .command('-c --create <text>', 'Create a task')
     .rule('<number,string>', 1)
     .command('-d --delete <id> [id]', 'Delete a task')
