@@ -27,6 +27,7 @@ const Cmds = {
    * @return {Object} 'this' for chaining.
    */
   description(message) {
+    this.description = message;
     return this;
   },
 
@@ -120,6 +121,7 @@ const Cmds = {
     const programName = basename(process.argv[1], '.js');
     const cmdUsage = Object.values(Generation).map((cmd) => cmd.usage);
     const longestUsage = longest(cmdUsage).length;
+    const descriptionSet = typeof this.description == 'string';
 
     // Create string with n spaces.
     const space = (length) => Array(length).join(' ');
@@ -133,7 +135,8 @@ const Cmds = {
         });
 
     const menu = [
-      `Program: ${capitalize(programName)} (${this.version})\n`,
+      `Program: ${capitalize(programName)} (${this.version})`,
+      descriptionSet && `Description: ${this.description}\n` || '',
       'Commands:',
       ...cmds,
       '\nDefaults:',
@@ -212,8 +215,8 @@ function handleDefaults(args) {
   (args.length == 0) && Cmds.showHelp();
 
   const defaults = [
-    {flags: ['-v', '--version'], ran: false, callback: showVersion},
-    {flags: ['-h', '--help'], ran: false, callback: Cmds.showHelp},
+    {flags: ['-v', '--version'], ran: false, callback: showVersion.bind(Cmds)},
+    {flags: ['-h', '--help'], ran: false, callback: Cmds.showHelp.bind(Cmds)},
   ];
 
   for (const obj of defaults) {
@@ -318,7 +321,7 @@ function typeCheck({notation, amount, args}) {
  * @description Output the version number.
  */
 function showVersion() {
-  console.log(Cmds.version);
+  console.log(this.version);
 }
 
 
