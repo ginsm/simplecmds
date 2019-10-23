@@ -179,6 +179,8 @@ Running `node myProgram -e 'message to echo'` would result in an output of '`mes
 [x] Create a separate object for building the commands.
 [x] Handle callbacks.
 [x] Handle default commands (help & version).
+[x] Add version setter and getter.
+[ ] Add custom help description.
 [ ] Fix parseArgs acting as a set instead of an array.
 [ ] .exec() function that executes a shell cmd on command being issued.
 ```
