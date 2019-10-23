@@ -10,6 +10,17 @@ const Cmds = {
   // SECTION - Object Creation
 
   /**
+   * @description Set the version number.
+   * @param {*} vers - Version number.
+   * @return {Object} 'this' for chaining.
+   */
+  version(vers) {
+    this.version = vers;
+    return this;
+  },
+
+
+  /**
    * @description Create a command.
    * @param {string} flagString - Usable command flags.
    * @param {string} description - Description of the command.
@@ -77,7 +88,6 @@ const Cmds = {
   parse(args) {
     // Remove node env args, expand concat flags, and convert nums
     args = handleDefaults(convertNumbers(expandCombinedFlags(args.slice(2))));
-    (!args.length) && this.showHelp();
     const commandArgs = parseArgs(args, Object.entries(Generation));
 
     // Populate main object with commands & their args + validity.
@@ -182,8 +192,10 @@ function parseArgs(args, commands) {
  * @return {[]} Args with default commands removed.
  */
 function handleDefaults(args) {
+  (args.length == 0) && Cmds.showHelp();
+
   const defaults = [
-    {flags: ['-v', '--version'], ran: false},
+    {flags: ['-v', '--version'], ran: false, callback: showVersion},
     {flags: ['-h', '--help'], ran: false, callback: Cmds.showHelp},
   ];
 
@@ -198,7 +210,8 @@ function handleDefaults(args) {
     });
   };
 
-  return args;
+  // terminating early if no other args
+  return args.length && args || process.exit();
 }
 
 
@@ -286,6 +299,15 @@ function typeCheck({notation, amount, args}) {
 
 
 // SECTION - Helper Methods
+
+/**
+ * @description Output the version number.
+ */
+function showVersion() {
+  const versionWasSet = typeof Cmds.version !== 'function';
+  console.log(versionWasSet && Cmds.version || 'v1.0.0');
+}
+
 
 /**
  * @description Get last command built.
