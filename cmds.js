@@ -269,13 +269,10 @@ function expandCombinedFlags(arr) {
   };
 
   // Expand any concatenated flags into short flags (in place)
-  const expanded = flatten(arr.map((arg) => {
+  return flatten(arr.map((arg) => {
     return exp.concatenated.test(arg) ?
       arg.replace(exp.inbetweenChars, '-').split(exp.byFlag) : arg;
   }));
-
-  // Removing duplicates so there's less to iterate over
-  return [...new Set(expanded)];
 }
 
 
