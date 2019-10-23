@@ -186,4 +186,5 @@ Running `node myProgram -e 'message to echo'` would result in an output of '`mes
 [ ] Allow for no amount passed in rule to mean unlimited args.
 [ ] .exec() executes a shell cmd when a cmd is issued.
 [ ] Rework error handling.
+[ ] Name this project already!
 ```
