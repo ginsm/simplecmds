@@ -179,11 +179,11 @@ Running `node myProgram -e 'message to echo'` would result in an output of '`mes
 [x] Handle callbacks.
 [x] Handle default commands (help & version).
 [x] Add version setter and getter.
-[x] Fix parseArgs acting as a set instead of an array. (f5a3e5b) oof
-[x] Add custom help description.
+[x] Fix parseArgs acting as a set instead of an array. (fixed: f5a3e5b) oof
+[x] Add custom help description. (added: 1df3b2d)
 [x] Work on flag identification regex. (updated: f82505b)
 [x] Rework flagValid in parseFlags. (removed: f82505b)
-[ ] Allow for no amount passed in rule to mean unlimited args.
+[x] Allow for no amount passed in rule to mean unlimited args. (added: 5f60239)
 [ ] .exec() executes a shell cmd when a cmd is issued.
 [ ] Rework error handling.
 [ ] Name this project already!
