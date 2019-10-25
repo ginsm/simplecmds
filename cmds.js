@@ -416,7 +416,7 @@ function error(code, value) {
   // Contains error messages
   const errors = [
     `Creation: No flags present in command '${value}'.`,
-    `Use: First argument must be a valid command. Type -h.`,
+    `First argument must be a valid command. Type -h.`,
   ];
 
   // Log error and exit
