@@ -102,13 +102,14 @@ const Cmds = {
     args = handleDefaults(convertNumbers(expandCombinedFlags(args.slice(2))));
     const commandArgs = parseArgs(args, Object.entries(Generation));
 
-    // Populate main object with commands & their args + validity.
-    iterate(Generation, finalizeCommands.bind(this), commandArgs);
-
     // Clean up main object
-    ['setVersion', 'command', 'help', 'rule', 'parse'].forEach((item) =>
+    ['description', 'setVersion', 'command',
+      'help', 'rule', 'parse'].forEach((item) =>
       delete this[item]
     );
+
+    // Populate main object with commands & their args + validity.
+    iterate(Generation, finalizeCommands.bind(this), commandArgs);
   },
 
 
@@ -182,7 +183,6 @@ function parseArgs(args, commands) {
         const getCommand = commands
             .find((cmd) => cmd[1].flags.includes(arg)) || false;
         const command = getCommand ? getCommand[0] : false;
-
         const firstArgNotCommand = id == 0 && !command;
         if (firstArgNotCommand) error(1);
 
@@ -205,7 +205,6 @@ function parseArgs(args, commands) {
  */
 function handleDefaults(args) {
   (args.length == 0) && Cmds.showHelp();
-
   const defaults = [
     {flags: ['-v', '--version'], ran: false, callback: showVersion.bind(Cmds)},
     {flags: ['-d', '--debug'], ran: false, callback:
@@ -215,8 +214,7 @@ function handleDefaults(args) {
 
   for (const obj of defaults) {
     args.forEach((arg) => {
-      const found = obj.flags.includes(arg);
-      if (found) {
+      if (obj.flags.includes(arg)) {
         args.splice(args.indexOf(arg), 1);
         !obj.ran && (obj.callback && obj.callback());
         obj.ran = true;
@@ -290,22 +288,20 @@ function expandCombinedFlags(arr) {
  */
 function typeCheck({notation, amount = 0, args}) {
   const required = notation.filter((notation) => notation[0] === '<');
-  const optional = notation.slice(required.length);
-  const validAmount = args.length <= amount && args.length >= required.length;
+  const validRequiredAmount = args.length >= required.length;
+  const validAmount = args.length <= amount && validRequiredAmount;
+  const lastNotation = notation.slice(-1)[0];
 
   // Type checking
-  const lastOptional = optional.slice(-1)[0];
   const valid = (notation, arg) => notation.includes(typeof arg);
   const validTypes = args.map((arg, id) => {
-    const idRequired = (id <= required.length - 1);
+    const idRequired = (required.length - 1 >= id);
     const noNotation = (id > notation.length - 1);
-    const currNotation = notation[id];
-
-    return idRequired ? valid(currNotation, arg) : optional.length &&
-          (noNotation ? valid(lastOptional, arg) : valid(currNotation, arg));
+    return idRequired ? valid(notation[id], arg) : !idRequired &&
+          (noNotation ? valid(lastNotation, arg) : valid(notation[id], arg));
   }).every((arg) => arg === true);
 
-  return validAmount && validTypes;
+  return (amount ? validAmount : validRequiredAmount) && validTypes;
 }
 
 
