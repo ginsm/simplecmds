@@ -170,7 +170,6 @@ Running `node myProgram -e 'message to echo'` would result in an output of '`mes
 
 # **Todo**
 ```
-[x] Allow for various prefixes .create, -create, *create, so on.
 [x] Concatenated short flags.
 [x] Boolean commands.
 [x] Fix not iterable lastBuilt err.
@@ -182,8 +181,8 @@ Running `node myProgram -e 'message to echo'` would result in an output of '`mes
 [x] Add version setter and getter.
 [x] Fix parseArgs acting as a set instead of an array. (f5a3e5b) oof
 [x] Add custom help description.
-[ ] Work on flag identification regex.
-[ ] Fix flagValid in parseFlags.
+[x] Work on flag identification regex.
+[ ] Rework flagValid in parseFlags.
 [ ] Allow for no amount passed in rule to mean unlimited args.
 [ ] .exec() executes a shell cmd when a cmd is issued.
 [ ] Rework error handling.
