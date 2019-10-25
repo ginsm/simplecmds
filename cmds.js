@@ -34,19 +34,19 @@ const Cmds = {
 
   /**
    * @description Create a command.
-   * @param {string} flagString - Usable command flags.
+   * @param {string} usage - Usable command flags.
    * @param {string} description - Description of the command.
    * @param {Object} callback - Callback to be used with function
    * @return {Object} 'this' for chaining.
    */
-  command(flagString = '', description = '', callback = false) {
-    const flags = parseFlags(flagString);
+  command(usage = '', description = '', callback = false) {
+    const flags = parseFlags(usage);
     const command = camelCase(longest(flags));
 
     Generation[command] = {
       description,
       flags,
-      usage: flagString,
+      usage,
       callback,
     };
 
@@ -121,7 +121,7 @@ const Cmds = {
     const programName = basename(process.argv[1], '.js');
     const cmdUsage = Object.values(Generation).map((cmd) => cmd.usage);
     const longestUsage = longest(cmdUsage).length;
-    const descriptionSet = typeof this.description == 'string';
+    const descriptionExists = typeof this.description == 'string';
 
     // Create string with n spaces.
     const space = (length) => Array(length).join(' ');
@@ -134,14 +134,16 @@ const Cmds = {
           return command.help || `${usage} ${spaces} ${description}`;
         });
 
+    // Contains more static content
     const menu = [
       `Program: ${capitalize(programName)} (${this.version})`,
-      descriptionSet && `Description: ${this.description}\n` || '',
+      descriptionExists && `Description: ${this.description}\n` || '',
       'Commands:',
       ...cmds,
       '\nDefaults:',
       `-h --help ${space((longestUsage + 3) - 9)} Output help menu.`,
       `-v --version ${space((longestUsage + 3) - 12)} Output version number.`,
+      `-d --debug ${space((longestUsage + 3) - 10)} Output debug info.`,
       `\nUsage: ${programName} <command> [...args]`,
     ];
 
@@ -157,23 +159,13 @@ module.exports = Cmds;
 // SECTION - Parsing Methods
 
 /**
- * @description Parses and validates the flags for consumption.
- * @param {string} flags - Command flags.
- * @return {private} Array of possible command names.
+ * @description Finds every valid flag in the usage string.
+ * @param {string} usage - Contains command flags.
+ * @return {private} Array of found flags (up to 2).
  */
-function parseFlags(flags) {
-  // Find all valid flags in the provided string
-  const flagRegex = /(?<!([<\w\[]))[^\s<\[,]+/g;
-  flags = flags.match(flagRegex).slice(0, 2) || error(0, flags);
-
-  // Validate a flag
-  const flagValid = (flag) => {
-    const isShortFlag = flag.length === 2 && /\S[\w]/.test(flag);
-    return isShortFlag || flag.length >= 3;
-  };
-
-  // Make sure every flag is valid
-  return flags.every(flagValid) && flags || error(1, flags);
+function parseFlags(usage) {
+  const flagRegex = /(?<!\S)(-\w\b|--[\w-]{3,}|(?=[^-])[\w-]{3,})/g;
+  return usage.match(flagRegex).slice(0, 2) || error(0, usage);
 }
 
 
@@ -192,7 +184,7 @@ function parseArgs(args, commands) {
         const command = getCommand ? getCommand[0] : false;
 
         const firstArgNotCommand = id == 0 && !command;
-        if (firstArgNotCommand) error(3);
+        if (firstArgNotCommand) error(1);
 
         // Used for key/value building
         const building = command || prev.building;
@@ -216,6 +208,8 @@ function handleDefaults(args) {
 
   const defaults = [
     {flags: ['-v', '--version'], ran: false, callback: showVersion.bind(Cmds)},
+    {flags: ['-d', '--debug'], ran: false, callback:
+      () => console.log(Generation)},
     {flags: ['-h', '--help'], ran: false, callback: Cmds.showHelp.bind(Cmds)},
   ];
 
@@ -294,7 +288,7 @@ function expandCombinedFlags(arr) {
  * @param {Array} obj - Command name and object.
  * @return {boolean} Validity represented by a boolean.
  */
-function typeCheck({notation, amount, args}) {
+function typeCheck({notation, amount = 0, args}) {
   const required = notation.filter((notation) => notation[0] === '<');
   const optional = notation.slice(required.length);
   const validAmount = args.length <= amount && args.length >= required.length;
@@ -425,10 +419,8 @@ function hasProperties(obj, ...properties) {
 function error(code, value) {
   // Contains error messages
   const errors = [
-    `No flags present in command '${value}'.`,
-    `Unable to create command '${value}'.`,
-    `Sorry, no commands were provided. Type -h.`,
-    `First argument must be a valid command. Type -h.`,
+    `Creation: No flags present in command '${value}'.`,
+    `Use: First argument must be a valid command. Type -h.`,
   ];
 
   // Log error and exit
