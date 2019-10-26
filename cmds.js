@@ -58,7 +58,7 @@ const Cmds = {
    * @param {Array} args - Expects process.argv.
    */
   parse(args) {
-    // Remove node env args, expand concat flags, and convert nums
+    // Remove node env args, expand concat flags, and convert string nums
     args = handleDefaults(convertNumbers(expandCombinedFlags(args.slice(2))));
     const commandArgs = parseArgs(args, Object.entries(Generation));
 
@@ -113,7 +113,7 @@ const Cmds = {
     // Create string with n spaces.
     const space = (length) => Array(length).join(' ');
 
-    // Build command usage
+    // Build command usage and description strings
     const cmds = Object.values(Generation)
         .map((command) => {
           const {usage, description} = command;
@@ -164,17 +164,15 @@ function parseFlags(usage) {
 function parseArgs(args, commands) {
   return args
       .reduce((prev, arg, id) => {
-        // Resolve whether it's a command or not
         const command =
           (commands.find(([cmd, obj]) => obj.flags.includes(arg)) || [])[0];
+
         const firstArgNotCommand = id == 0 && !command;
         if (firstArgNotCommand) error(1);
 
-        // Used for key/value building
         const building = command || prev.building;
         const exists = prev.hasOwnProperty(command) && [...prev[command]];
 
-        // Object construction
         const key = command || prev.building;
         const value = command ? exists || [] : [...prev[building], arg];
         return ({...prev, [key]: value, building});
@@ -241,7 +239,7 @@ function expandCombinedFlags(arr) {
  */
 function finalizeCommands(cmd, obj, args) {
   if (args.hasOwnProperty(cmd)) {
-    // insert true if no args (boolean cmd)
+    // Insert true if no args present (boolean cmd)
     this[cmd] = {args: args[cmd].length ? args[cmd] : [true]};
 
     // Typecheck arguments
@@ -277,7 +275,7 @@ function typeCheck({notation, amount = 0, args}) {
   const validAmount = args.length <= amount && validRequiredAmount;
   const lastNotation = notation.slice(-1)[0];
 
-  // Type checking
+  // Check types
   const valid = (notation, arg) => notation.includes(typeof arg);
   const validTypes = args.map((arg, id) => {
     const idRequired = (required.length - 1 >= id);
@@ -390,13 +388,10 @@ function hasProperties(obj, ...properties) {
  * @param {*} value - Relevant information.
  */
 function error(code, value) {
-  // Contains error messages
   const errors = [
     `Creation: No flags present in command '${value}'.`,
     `First argument must be a valid command. Type -h.`,
   ];
-
-  // Log error and exit
   console.error(`[Error] ${errors[code]}`);
   process.exit();
 }
