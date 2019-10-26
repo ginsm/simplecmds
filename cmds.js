@@ -51,7 +51,7 @@ const Cmds = {
   },
 
   /**
-   * @description Assigns a custom help message to a command.
+   * @description Assign a custom help message to a command.
    * @param {string} message - Custom help message.
    * @return {private} 'this' for chaining.
    */
@@ -118,7 +118,7 @@ const Cmds = {
   // SECTION - Help Menu
 
   /**
-   * @description Prints a help menu and exits program process.
+   * @description Print a help menu and exit program process.
    * @return {private} Exit process.
    */
   showHelp() {
@@ -162,7 +162,7 @@ module.exports = Cmds;
 // SECTION - Parsing Methods
 
 /**
- * @description Finds every valid flag in the usage string.
+ * @description Find every valid flag in an usage string.
  * @param {string} usage - Contains command flags.
  * @return {private} Array of found flags (up to 2).
  */
@@ -173,7 +173,7 @@ function parseFlags(usage) {
 
 
 /**
- * @description Generates an object containing commands and their args.
+ * @description Generate an object containing commands and their args.
  * @param {Array} args - Process.argv
  * @param {Object[]} commands - Object containing commands.
  * @return {Object} Generated object containing args.
@@ -232,7 +232,26 @@ function handleDefaults(args) {
 // SECTION - Building Methods
 
 /**
- * @description Creates the object the end user deals with.
+ * @description - Expand combined short flags.
+ * @param {Array} arr - Argument array.
+ * @return {Array} Array with expanded short flags at the beginning.
+ */
+function expandCombinedFlags(arr) {
+  const exp = {
+    concatenated: /(?<!\S)\W\w{2,}/,
+    inbetweenChars: /(?<!\W)(?=\w)/g,
+    byFlag: /(?=\W)/g,
+  };
+
+  // Expand any concatenated flags into short flags (in place)
+  return flatten(arr.map((arg) => exp.concatenated.test(arg) ?
+      arg.replace(exp.inbetweenChars, '-').split(exp.byFlag) : arg
+  ));
+}
+
+
+/**
+ * @description Create the object the end user deals with.
  * @param {*} cmd - Command name.
  * @param {*} obj - Command object.
  * @param {*} args - Object containing command args.
@@ -259,25 +278,6 @@ function finalizeCommands(cmd, obj, args) {
       obj.callback(args, valid);
     }
   }
-}
-
-
-/**
- * @description - Expands combined short flags.
- * @param {Array} arr - Argument array.
- * @return {Array} Array with expanded short flags at the beginning.
- */
-function expandCombinedFlags(arr) {
-  const exp = {
-    concatenated: /(?<!\S)\W\w{2,}/,
-    inbetweenChars: /(?<!\W)(?=\w)/g,
-    byFlag: /(?=\W)/g,
-  };
-
-  // Expand any concatenated flags into short flags (in place)
-  return flatten(arr.map((arg) => exp.concatenated.test(arg) ?
-      arg.replace(exp.inbetweenChars, '-').split(exp.byFlag) : arg
-  ));
 }
 
 
@@ -357,7 +357,7 @@ function capitalize(word) {
 
 
 /**
- * @description Finds the longest string in an array.
+ * @description Find the longest string in an array.
  * @param {string[]} arr - Array of strings.
  * @return {string} Longest string.
  */
@@ -367,7 +367,7 @@ function longest(arr) {
 
 
 /**
- * @description Converts any stringed number to a number.
+ * @description Convert any stringed number to a number.
  * @param {*} input - Value(s) to be converted.
  * @return {*} - Returns the input after attempting conversion.
  */
@@ -378,7 +378,7 @@ function convertNumbers(input) {
 
 
 /**
- * @description Flattens an array.
+ * @description Flatten an array.
  * @param {Array} arr - Array to flatten
  * @return {Array} The flattened array.
  */
@@ -402,7 +402,7 @@ function hasProperties(obj, ...properties) {
 // SECTION - Errors
 
 /**
- * @description - Dispatches an error and exits process.
+ * @description - Dispatch an error and exit process.
  * @param {number} code - Error code.
  * @param {*} value - Relevant information.
  */
