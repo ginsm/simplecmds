@@ -10,29 +10,6 @@ const Cmds = {
   // SECTION - Object Creation
 
   /**
-   * @description Set the version number.
-   * @param {*} vers - Version number.
-   * @return {Object} 'this' for chaining.
-   */
-  setVersion(vers) {
-    this.version = vers;
-    return this;
-  },
-
-  version: 'v1.0.0',
-
-  /**
-   * @description Set a description for your program.
-   * @param {string} message - Description message.
-   * @return {Object} 'this' for chaining.
-   */
-  description(message) {
-    this.description = message;
-    return this;
-  },
-
-
-  /**
    * @description Create a command.
    * @param {string} usage - Usable command flags.
    * @param {string} description - Description of the command.
@@ -113,10 +90,36 @@ const Cmds = {
   },
 
 
+  // SECTION - Setters
+
+  /**
+   * @description Set the version number.
+   * @param {*} vers - Version number.
+   * @return {Object} 'this' for chaining.
+   */
+  setVersion(vers) {
+    this.version = vers;
+    return this;
+  },
+
+  version: 'v1.0.0',
+
+  /**
+   * @description Set a description for your program.
+   * @param {string} message - Description message.
+   * @return {Object} 'this' for chaining.
+   */
+  description(message) {
+    this.description = message;
+    return this;
+  },
+
+
   // SECTION - Help Menu
 
   /**
    * @description Prints a help menu and exits program process.
+   * @return {private} Exit process.
    */
   showHelp() {
     const programName = basename(process.argv[1], '.js');
@@ -149,8 +152,7 @@ const Cmds = {
     ];
 
     menu.forEach((line) => console.log(line));
-
-    process.exit();
+    return process.exit();
   },
 };
 
@@ -180,9 +182,8 @@ function parseArgs(args, commands) {
   return args
       .reduce((prev, arg, id) => {
         // Resolve whether it's a command or not
-        const getCommand = commands
-            .find((cmd) => cmd[1].flags.includes(arg)) || false;
-        const command = getCommand ? getCommand[0] : false;
+        const command =
+          (commands.find(([cmd, obj]) => obj.flags.includes(arg)) || [])[0];
         const firstArgNotCommand = id == 0 && !command;
         if (firstArgNotCommand) error(1);
 
@@ -206,7 +207,8 @@ function parseArgs(args, commands) {
 function handleDefaults(args) {
   (args.length == 0) && Cmds.showHelp();
   const defaults = [
-    {flags: ['-v', '--version'], ran: false, callback: showVersion.bind(Cmds)},
+    {flags: ['-v', '--version'], ran: false, callback:
+      () => console.log(Cmds.version)},
     {flags: ['-d', '--debug'], ran: false, callback:
       () => console.log(Generation)},
     {flags: ['-h', '--help'], ran: false, callback: Cmds.showHelp.bind(Cmds)},
@@ -222,7 +224,7 @@ function handleDefaults(args) {
     });
   };
 
-  // terminating early if no other args
+  // terminate early if no other args
   return args.length && args || process.exit();
 }
 
@@ -237,6 +239,7 @@ function handleDefaults(args) {
  */
 function finalizeCommands(cmd, obj, args) {
   if (args.hasOwnProperty(cmd)) {
+    // insert true if no args (boolean cmd)
     this[cmd] = {args: args[cmd].length ? args[cmd] : [true]};
 
     // Typecheck arguments
@@ -272,10 +275,9 @@ function expandCombinedFlags(arr) {
   };
 
   // Expand any concatenated flags into short flags (in place)
-  return flatten(arr.map((arg) => {
-    return exp.concatenated.test(arg) ?
-      arg.replace(exp.inbetweenChars, '-').split(exp.byFlag) : arg;
-  }));
+  return flatten(arr.map((arg) => exp.concatenated.test(arg) ?
+      arg.replace(exp.inbetweenChars, '-').split(exp.byFlag) : arg
+  ));
 }
 
 
@@ -306,13 +308,6 @@ function typeCheck({notation, amount = 0, args}) {
 
 
 // SECTION - Helper Methods
-
-/**
- * @description Output the version number.
- */
-function showVersion() {
-  console.log(this.version);
-}
 
 
 /**
@@ -377,9 +372,8 @@ function longest(arr) {
  * @return {*} - Returns the input after attempting conversion.
  */
 function convertNumbers(input) {
-  const isArray = Array.isArray(input);
   const convertNum = (arg) => +arg ? +arg : arg;
-  return isArray && input.map(convertNum) || convertNum(input);
+  return Array.isArray(input) && input.map(convertNum) || convertNum(input);
 }
 
 
