@@ -50,23 +50,6 @@ const Cmds = {
     return this;
   },
 
-  /**
-   * @description Assign a custom help message to a command.
-   * @param {string} message - Custom help message.
-   * @return {private} 'this' for chaining.
-   */
-  help(message) {
-    const command = lastBuiltCmd();
-    const cmdObject = Generation[command];
-
-    Generation[command] = {
-      ...cmdObject,
-      help: message,
-    };
-
-    return this;
-  },
-
 
   // SECTION - Main Parser
 
