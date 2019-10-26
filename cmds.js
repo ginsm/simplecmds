@@ -58,15 +58,18 @@ const Cmds = {
    * @param {Array} args - Expects process.argv.
    */
   parse(args) {
-    // Remove node env args, expand concat flags, and convert string nums
-    args = handleDefaults(convertNumbers(expandCombinedFlags(args.slice(2))));
-    const commandArgs = parseArgs(args, Object.entries(Generation));
-
     // Clean up main object
     ['description', 'setVersion', 'command',
       'help', 'rule', 'parse'].forEach((item) =>
       delete this[item]
     );
+
+    // Remove node env args, expand concat flags, and convert stringed nums
+    args = convertNumbers(expandCombinedFlags(args.slice(2)));
+    const commandArgs = parseArgs(args, Object.entries(Generation));
+
+    // Issue any default commands
+    handleDefaults(args);
 
     // Populate main object with commands & their args + validity.
     iterate(Generation, finalizeCommands.bind(this), commandArgs);
