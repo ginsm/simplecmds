@@ -1,7 +1,9 @@
 // SECTION - Interface
-const cmds = require('../cmds')
+const cmds = require('../cmds');
+
+cmds
     .setVersion('v0.1.0')
-    .description('Basic NodeJS Calculator')
+    .description('Basic Node Calculator')
     .command('-a --add [nums]', 'Add numbers.', add)
     .rule('<number> [number]')
     .command('-s --subtract [nums]', 'Subtract numbers.', subtract)
