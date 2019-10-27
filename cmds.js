@@ -4,7 +4,23 @@ const basename = require('path').basename;
 /**
    * @description Contains the commands during generation.
    */
-const Generation = {};
+const Generation = {
+  help: {
+    description: 'Output help menu.',
+    flags: ['-h', '--help'],
+    usage: '-h --help',
+    notation: ['<boolean>'],
+    amount: 0,
+  },
+  debug: {
+    description: 'Output debug information.',
+    flags: ['-D', '--debug'],
+    usage: '-D --debug',
+    notation: ['<boolean>'],
+    amount: 0,
+    callback: () => console.log(Generation),
+  },
+};
 
 const Cmds = {
   // SECTION - Object Creation
@@ -51,27 +67,6 @@ const Cmds = {
   },
 
 
-  // SECTION - Main Parser
-
-  /**
-   * @description Parse program args and add them to their command.
-   * @param {Array} args - Expects process.argv.
-   */
-  parse(args) {
-    // Clean up main object
-    ['setVersion', 'command', 'help', 'rule', 'parse'].forEach((item) =>
-      delete this[item]
-    );
-
-    // Remove node env args, expand concat flags, and convert stringed nums
-    args = handleDefaults(convertNumbers(expandCombinedFlags(args.slice(2))));
-    const commandArgs = parseArgs(args, Object.entries(Generation));
-
-    // Populate main object with commands & their args + validity.
-    iterate(Generation, finalizeCommands.bind(this), commandArgs);
-  },
-
-
   // SECTION - Setters
 
   /**
@@ -100,10 +95,9 @@ const Cmds = {
   // SECTION - Help Menu
 
   /**
-   * @description Print a help menu and exit program process.
-   * @return {private} Exit process.
+   * @description Output the help menu.
    */
-  showHelp() {
+  help() {
     const programName = basename(process.argv[1], '.js');
     const cmdUsage = Object.values(Generation).map((cmd) => cmd.usage);
     const longestUsage = longest(cmdUsage).length;
@@ -125,16 +119,42 @@ const Cmds = {
       `Program: ${capitalize(programName)} (${this.version})`,
       descriptionExists && `Description: ${this.description}\n` || '',
       'Commands:',
-      ...cmds,
+      ...cmds.slice(2),
       '\nDefaults:',
       `-h --help ${space((longestUsage + 3) - 9)} Output help menu.`,
-      `-v --version ${space((longestUsage + 3) - 12)} Output version number.`,
       `-D --debug ${space((longestUsage + 3) - 10)} Output debug info.`,
       `\nUsage: ${programName} <command> [...args]`,
     ];
 
     menu.forEach((line) => console.log(line));
-    return process.exit();
+  },
+
+
+  // SECTION - Main Parser
+
+  /**
+   * @description Parse program args and add them to their command.
+   * @param {Array} args - Expects process.argv.
+   */
+  parse(args) {
+    // Clean up main object
+    ['setVersion', 'command', 'rule', 'parse'].forEach((item) =>
+      delete this[item]
+    );
+
+    // Remove node env args, expand concat flags, and convert stringed nums
+    args = convertNumbers(expandCombinedFlags(args.slice(2)));
+    if (args.length == 0) {
+      Cmds.help();
+      process.exit();
+    }
+
+    // Set 'help' callback
+    Generation.help.callback = this.help.bind(this);
+
+    // Populate main object with commands & their args + validity.
+    const commandArgs = parseArgs(args, Object.entries(Generation));
+    iterate(Generation, finalizeCommands.bind(this), commandArgs);
   },
 };
 
@@ -176,36 +196,6 @@ function parseArgs(args, commands) {
         const value = command ? exists || [] : [...prev[building], arg];
         return ({...prev, [key]: value, building});
       }, {});
-}
-
-
-/**
- * @description Invoke default command handlers.
- * @param {Array} args - Process.argv.
- * @return {Array} Args with default commands removed.
- */
-function handleDefaults(args) {
-  (args.length == 0) && Cmds.showHelp();
-  const defaults = [
-    {flags: ['-v', '--version'], ran: false, callback:
-      () => console.log(Cmds.version)},
-    {flags: ['-D', '--debug'], ran: false, callback:
-      () => console.log(Generation)},
-    {flags: ['-h', '--help'], ran: false, callback: Cmds.showHelp.bind(Cmds)},
-  ];
-
-  for (const obj of defaults) {
-    args.forEach((arg) => {
-      if (obj.flags.includes(arg)) {
-        args.splice(args.indexOf(arg), 1);
-        !obj.ran && (obj.callback && obj.callback());
-        obj.ran = true;
-      };
-    });
-  };
-
-  // terminate early if no other args
-  return args.length && args || process.exit();
 }
 
 
