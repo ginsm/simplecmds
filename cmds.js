@@ -9,15 +9,11 @@ const Generation = {
     description: 'Output help menu.',
     flags: ['-h', '--help'],
     usage: '-h --help',
-    notation: ['<boolean>'],
-    amount: 0,
   },
   debug: {
     description: 'Output debug information.',
     flags: ['-D', '--debug'],
     usage: '-D --debug',
-    notation: ['<boolean>'],
-    amount: 0,
     callback: () => console.log(Generation),
   },
 };
