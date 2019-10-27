@@ -59,17 +59,13 @@ const Cmds = {
    */
   parse(args) {
     // Clean up main object
-    ['description', 'setVersion', 'command',
-      'help', 'rule', 'parse'].forEach((item) =>
+    ['setVersion', 'command', 'help', 'rule', 'parse'].forEach((item) =>
       delete this[item]
     );
 
     // Remove node env args, expand concat flags, and convert stringed nums
-    args = convertNumbers(expandCombinedFlags(args.slice(2)));
+    args = handleDefaults(convertNumbers(expandCombinedFlags(args.slice(2))));
     const commandArgs = parseArgs(args, Object.entries(Generation));
-
-    // Issue any default commands
-    handleDefaults(args);
 
     // Populate main object with commands & their args + validity.
     iterate(Generation, finalizeCommands.bind(this), commandArgs);
@@ -133,7 +129,7 @@ const Cmds = {
       '\nDefaults:',
       `-h --help ${space((longestUsage + 3) - 9)} Output help menu.`,
       `-v --version ${space((longestUsage + 3) - 12)} Output version number.`,
-      `-d --debug ${space((longestUsage + 3) - 10)} Output debug info.`,
+      `-D --debug ${space((longestUsage + 3) - 10)} Output debug info.`,
       `\nUsage: ${programName} <command> [...args]`,
     ];
 
@@ -193,7 +189,7 @@ function handleDefaults(args) {
   const defaults = [
     {flags: ['-v', '--version'], ran: false, callback:
       () => console.log(Cmds.version)},
-    {flags: ['-d', '--debug'], ran: false, callback:
+    {flags: ['-D', '--debug'], ran: false, callback:
       () => console.log(Generation)},
     {flags: ['-h', '--help'], ran: false, callback: Cmds.showHelp.bind(Cmds)},
   ];
