@@ -1,6 +1,6 @@
 {
   "name": "commander-validation",
-  "version": "0.9.4",
+  "version": "0.9.7",
   "description": "Adds argument validation to commander",
   "main": "bin/validate.js",
   "scripts": {
