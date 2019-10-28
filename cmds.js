@@ -126,7 +126,10 @@ const Cmds = {
 
     // Remove node env args, expand concat flags, and convert stringed nums
     args = convertNumbers(expandCombinedFlags(args.slice(2)));
-    (args.length == 0) && Cmds.help();
+    if (args.length == 0) {
+      Cmds.help();
+      process.exit();
+    }
 
     // Populate main object with commands & their args + validity.
     const commandArgs = parseArgs(args, Object.entries(Generation));
