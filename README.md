@@ -184,8 +184,8 @@ Running `node myProgram -e 'message to echo'` would result in an output of '`mes
 [x] Work on flag identification regex. (updated: f82505b)
 [x] Rework flagValid in parseFlags. (removed: f82505b)
 [x] Allow for no amount passed in rule to mean unlimited args. (added: 5f60239)
-[ ] Rework handleDefaults. Hardcode defaults, capitalize short flags upon conflicts
-    with user made commands.
+[x] Rework handleDefaults. Create another function to insert them instead. (added: cce96c0).
+[x] Capitalize default short flag(s) upon conflicting user made flags. (added: cce96c0)
 [ ] .exec() executes a shell cmd when a cmd is issued.
 [ ] Rework error handling.
 [ ] Name this project already!
