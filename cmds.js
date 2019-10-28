@@ -4,19 +4,7 @@ const basename = require('path').basename;
 /**
    * @description Contains the commands during generation.
    */
-const Generation = {
-  help: {
-    description: 'Output help menu.',
-    flags: ['-h', '--help'],
-    usage: '-h --help',
-  },
-  debug: {
-    description: 'Output debug information.',
-    flags: ['-D', '--debug'],
-    usage: '-D --debug',
-    callback: () => console.log(Generation),
-  },
-};
+const Generation = {};
 
 const Cmds = {
   // SECTION - Object Creation
@@ -99,26 +87,21 @@ const Cmds = {
     const longestUsage = longest(cmdUsage).length;
     const descriptionExists = typeof this.description == 'string';
 
-    // Create string with n spaces.
-    const space = (length) => Array(length).join(' ');
-
     // Build command usage and description strings
     const cmds = Object.values(Generation)
         .map((command) => {
           const {usage, description} = command;
-          const spaces = space((longestUsage + 3) - usage.length);
+          const spaces = Array((longestUsage + 4) - usage.length).join(' ');
           return command.help || `${usage} ${spaces} ${description}`;
         });
 
-    // Contains more static content
     const menu = [
       `Program: ${capitalize(programName)} (${this.version})`,
       descriptionExists && `Description: ${this.description}\n` || '',
       'Commands:',
-      ...cmds.slice(2),
-      '\nDefaults:',
-      `-h --help ${space((longestUsage + 3) - 9)} Output help menu.`,
-      `-D --debug ${space((longestUsage + 3) - 10)} Output debug info.`,
+      ...cmds.slice(0, -2),
+      `\nDefaults:`,
+      ...cmds.slice(-2),
       `\nUsage: ${programName} <command> [...args]`,
     ];
 
@@ -138,15 +121,12 @@ const Cmds = {
       delete this[item]
     );
 
+    // Add default commands
+    addDefaultCommands();
+
     // Remove node env args, expand concat flags, and convert stringed nums
     args = convertNumbers(expandCombinedFlags(args.slice(2)));
-    if (args.length == 0) {
-      Cmds.help();
-      process.exit();
-    }
-
-    // Set 'help' callback
-    Generation.help.callback = this.help.bind(this);
+    (args.length == 0) && Cmds.help();
 
     // Populate main object with commands & their args + validity.
     const commandArgs = parseArgs(args, Object.entries(Generation));
@@ -215,6 +195,26 @@ function expandCombinedFlags(arr) {
   ));
 }
 
+/**
+ * @description Add the default commands to Generation object.
+ */
+function addDefaultCommands() {
+  Object.assign(Generation, {
+    help: {
+      description: 'Output help menu.',
+      flags: [flagConflict('-h'), '--help'],
+      usage: `${flagConflict('-h')} --help`,
+      callback: Cmds.help.bind(Cmds),
+    },
+    debug: {
+      description: 'Output debug information.',
+      flags: [flagConflict('-d'), '--debug'],
+      usage: `${flagConflict('-d')} --debug`,
+      callback: () => console.log(Generation),
+    },
+  });
+}
+
 
 /**
  * @description Create the object the end user deals with.
@@ -274,6 +274,17 @@ function typeCheck({notation, amount = 0, args}) {
 
 
 // SECTION - Helper Methods
+
+/**
+ * @description Determine existence of a flag.
+ * @param {string} flag - Flag to look up.
+ * @return {boolean} True or false.
+ */
+function flagConflict(flag) {
+  return Object.values(Generation).filter((command) => {
+    return command.flags.includes(flag);
+  }).length > 0 && flag.toUpperCase() || flag;
+}
 
 
 /**
