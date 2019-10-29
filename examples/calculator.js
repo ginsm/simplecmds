@@ -35,7 +35,7 @@ function multiply(args, valid) {
 
 // SECTION - Helpers
 function calculate(args, valid, operation) {
-  valid ? console.log(args.reduce(operation)) : cmds.showHelp();
+  valid ? console.log(args.reduce(operation)) : cmds.help();
 }
 
 function op(operation) {
