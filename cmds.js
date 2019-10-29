@@ -95,17 +95,14 @@ const Cmds = {
           return command.help || `${usage} ${spaces} ${description}`;
         });
 
-    const menu = [
-      `Program: ${capitalize(programName)} (${this.version})`,
+    [`Program: ${capitalize(programName)} (${this.version})`,
       descriptionExists && `Description: ${this.description}\n` || '',
       'Commands:',
       ...cmds.slice(0, -2),
       `\nDefaults:`,
       ...cmds.slice(-2),
       `\nUsage: ${programName} <command> [...args]`,
-    ];
-
-    menu.forEach((line) => console.log(line));
+    ].forEach((line) => console.log(line));
   },
 
 
@@ -133,7 +130,7 @@ const Cmds = {
 
     // Populate main object with commands & their args + validity.
     const commandArgs = parseArgs(args, Object.entries(Generation));
-    iterate(Generation, finalizeCommands.bind(this), commandArgs);
+    iterate(Generation, finalizeCommand.bind(this), commandArgs);
   },
 };
 
@@ -163,7 +160,7 @@ function parseArgs(args, commands) {
   return args
       .reduce((prev, arg, id) => {
         const command =
-          (commands.find(([cmd, obj]) => obj.flags.includes(arg)) || [])[0];
+          (commands.find(([_, obj]) => obj.flags.includes(arg)) || [])[0];
 
         const firstArgNotCommand = id == 0 && !command;
         if (firstArgNotCommand) error(1);
@@ -225,21 +222,19 @@ function addDefaultCommands() {
  * @param {*} obj - Command object.
  * @param {*} args - Object containing command args.
  */
-function finalizeCommands(cmd, obj, args) {
+function finalizeCommand(cmd, obj, args) {
   if (args.hasOwnProperty(cmd)) {
-    // Insert true if no args present (boolean cmd)
-    this[cmd] = {args: args[cmd].length ? args[cmd] : [true]};
-
-    // Typecheck arguments
-    if (hasProperties(obj, 'notation', 'amount')) {
-      this[cmd].valid = typeCheck({
-        args: this[cmd].args,
-        notation: obj.notation,
-        amount: obj.amount,
-      });
-    } else {
-      this[cmd].valid = true;
-    }
+    Object.assign(this, {
+      [cmd]: {
+        args: args[cmd],
+        valid: hasProperties(obj, 'notation', 'amount') ?
+          typeCheck({
+            args: args[cmd].length ? args[cmd] : [true],
+            notation: obj.notation,
+            amount: obj.amount,
+          }) : true,
+      },
+    });
 
     // Run callback for command
     if (obj.callback) {
