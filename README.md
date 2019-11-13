@@ -1,5 +1,5 @@
 # **cmds.js** (placeholder)
-Easily create CLI commands and type check user given arguments. 
+Easily create commandline commands and type check user given arguments. 
 
 *This project is a work in progress. Features yet to be implemented are noted by an `[*]` following the title.*
 
