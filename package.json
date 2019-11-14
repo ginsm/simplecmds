@@ -1,8 +1,8 @@
 {
-  "name": "commander-validation",
-  "version": "0.9.8",
-  "description": "Adds argument validation to commander",
-  "main": "bin/validate.js",
+  "name": "simplecmds",
+  "version": "1.0.0",
+  "description": "Easily create commandline interfaces and type check arguments",
+  "main": "./cmds.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
