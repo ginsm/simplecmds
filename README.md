@@ -1,13 +1,11 @@
-# **cmds.js** (placeholder)
+# **SimpleCMDs**
 Easily create CLI commands and type check user given arguments. 
 
-*This project is a work in progress. Features yet to be implemented are noted by an `[*]` following the title.*
+##   Table of contents: <!-- omit in toc -->
 
-##   **Table of contents:** <!-- omit in toc -->
-
-- [**cmds.js** (placeholder)](#cmdsjs-placeholder)
-  - [**Installing** [*]](#installing)
-  - [**Importing** [*]](#importing)
+- [**SimpleCMDs**](#simplecmds)
+  - [**Installing**](#installing)
+  - [**Importing**](#importing)
 - [**Command creation**](#command-creation)
   - [**.command(flags, description, callback)**](#commandflags-description-callback)
     - [**Flags**](#flags)
@@ -21,20 +19,19 @@ Easily create CLI commands and type check user given arguments.
     - [**Valid and invalid commands**](#valid-and-invalid-commands)
 - [**Usage**](#usage)
   - [**Simple program**](#simple-program)
-- [**Todo**](#todo)
 
 &nbsp;
 
-## **Installing** [*]
+## **Installing**
 
 ```
-npm install cmds
+npm install simplecmds
 ```
 
-## **Importing** [*]
+## **Importing**
 
 ```javascript
-const cmds = require('cmds');
+const cmds = require('simplecmds');
 ```
 
 &nbsp;
@@ -148,10 +145,10 @@ To demonstrate the usage, lets build a simple program. Create a file called 'myP
 
 ```javascript
 // import module
-const cmds = require('cmds');
+const simplecmds = require('simplecmds');
 
 // create a command using .command and .rule (echo)
-cmds
+simplecmds
   .command('-e --echo <text>', 'Echos the given message', echo)
   .rule('<string,number>', 1)
   .parse(process.argv);
@@ -161,32 +158,9 @@ function echo(args, valid) {
   if (valid) {
     console.log(args[0]);
   } else {
-    cmds.showHelp();
+    simplecmds.showHelp();
   } 
 }
 ```
 
 Running `node myProgram -e 'message to echo'` would result in an output of '`message to echo`' to stdout.
-
-# **Todo**
-```
-[x] Concatenated short flags.
-[x] Boolean commands.
-[x] Fix not iterable lastBuilt err.
-[x] Implement type checking.
-[x] Help Menu.
-[x] Create a separate object for building the commands.
-[x] Handle callbacks.
-[x] Handle default commands (help & version).
-[x] Add version setter and getter.
-[x] Fix parseArgs acting as a set instead of an array. (fixed: f5a3e5b) oof
-[x] Add custom help description. (added: 1df3b2d)
-[x] Work on flag identification regex. (updated: f82505b)
-[x] Rework flagValid in parseFlags. (removed: f82505b)
-[x] Allow for no amount passed in rule to mean unlimited args. (added: 5f60239)
-[x] Rework handleDefaults. Create another function to insert them instead. (added: cce96c0).
-[x] Capitalize default short flag(s) upon conflicting user made flags. (added: cce96c0)
-[ ] .exec() executes a shell cmd when a cmd is issued.
-[ ] Rework error handling.
-[ ] Name this project already!
-```
