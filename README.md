@@ -1,5 +1,5 @@
 # **SimpleCMDs**
-Easily create CLI commands and type check user given arguments. 
+Easily create commandline interfaces and type check arguments.
 
 ##   Table of contents: <!-- omit in toc -->
 
