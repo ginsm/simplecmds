@@ -4,43 +4,19 @@ const cmds = require('../cmds');
 cmds
     .setVersion('v0.1.0')
     .description('Basic Node Calculator')
-    .command('-a --add [nums]', 'Add numbers.', add)
+    .command('-a --add [nums]', 'Add numbers.', op((a, b) => a + b))
     .rule('<number> [number]')
-    .command('-s --subtract [nums]', 'Subtract numbers.', subtract)
+    .command('-s --subtract [nums]', 'Subtract numbers.', op((a, b) => a - b))
     .rule('<number> [number]')
-    .command('-d --divide [nums]', 'Divide numbers.', divide)
+    .command('-d --divide [nums]', 'Divide numbers.', op((a, b) => a / b))
     .rule('<number> [number]')
-    .command('-m --multiply [nums]', 'Multiply numbers.', multiply)
+    .command('-m --multiply [nums]', 'Multiply numbers.', op((a, b) => a * b))
     .rule('<number> [number]')
     .parse(process.argv);
 
 
-// SECTION - Command Handlers
-function add(args, valid) {
-  calculate(args, valid, op('+'));
-}
-
-function subtract(args, valid) {
-  calculate(args, valid, op('-'));
-}
-
-function divide(args, valid) {
-  calculate(args, valid, op('/'));
-}
-
-function multiply(args, valid) {
-  calculate(args, valid, op('*'));
-}
-
-
-// SECTION - Helpers
-function calculate(args, valid, operation) {
-  valid ? console.log(args.reduce(operation)) : cmds.help();
-}
-
 function op(operation) {
-  return {
-    '+': (a, b) => a + b, '-': (a, b) => a - b,
-    '*': (a, b) => a * b, '/': (a, b) => a / b,
-  }[operation];
+  return function(args, valid) {
+    valid ? console.log(args.reduce(operation)) : cmds.help();
+  };
 }
