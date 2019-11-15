@@ -11,9 +11,11 @@
     "url": "git+https://github.com/ginsm/cmdr-validation.git"
   },
   "keywords": [
-    "CLI",
+    "simplecmds",
     "commandline",
+    "commandline interface",
     "commands",
+    "cli",
     "arguments",
     "type check",
     "validation"
@@ -21,9 +23,9 @@
   "author": "Ginsm",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ginsm/cmdr-validation/issues"
+    "url": "https://github.com/ginsm/simplecmds/issues"
   },
-  "homepage": "https://github.com/ginsm/cmdr-validation#readme",
+  "homepage": "https://github.com/ginsm/simplecmds#readme",
   "dependencies": {},
   "devDependencies": {
     "eslint": "^6.4.0",
