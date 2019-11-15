@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 // SECTION - Interface
 const cmds = require('../cmds');
 
