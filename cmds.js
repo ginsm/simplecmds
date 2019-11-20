@@ -109,7 +109,10 @@ const Cmds = {
    */
   parse(args) {
     // Clean up main object
-    ['setVersion', 'command', 'rule', 'parse'].forEach((item) =>
+    const toDelete = ['set', 'command', 'rule',
+      'parse', 'defaultRule', 'disableDebug'];
+
+    toDelete.forEach((item) =>
       delete this[item]
     );
 
