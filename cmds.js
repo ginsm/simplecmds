@@ -72,16 +72,22 @@ const Cmds = {
    */
   version: 'v1.0.0',
 
+  /**
+   * @description Enable debug by default.
+   */
+  debug: true,
+
   // SECTION - Help Menu
 
   /**
    * @description Output the help menu.
+   * @param {boolean} exit - Exit program after running.
    */
-  help() {
+  help(exit) {
     const programName = basename(process.argv[1], '.js');
     const cmdUsage = Object.values(Generation).map((cmd) => cmd.usage);
     const longestUsage = longest(cmdUsage).length;
-    const defaultAmount = this.disableDebug ? -1 : -2;
+    const defaultAmount = this.debug ? -2 : -1;
 
     // Build command usage and description strings
     const cmds = Object.values(Generation)
@@ -99,6 +105,10 @@ const Cmds = {
       ...cmds.slice(defaultAmount),
       `\nUsage: ${programName} <command> [...args]`,
     ].forEach((line) => console.log(line));
+
+    if (exit) {
+      process.exit();
+    }
   },
 
 
@@ -110,13 +120,12 @@ const Cmds = {
    */
   parse(args) {
     // Add default commands
-    addDefaultCommands(this.disableDebug);
+    addDefaultCommands(this.debug);
 
     // Remove node env args, expand concat flags, and convert stringed nums
     args = convertNumbers(expandCombinedFlags(args.slice(2)));
     if (args.length == 0) {
-      Cmds.help();
-      process.exit();
+      this.help(true);
     }
 
     // Populate main object with commands & their args + validity.
@@ -154,7 +163,7 @@ function parseArgs(args, commands) {
           (commands.find(([_, obj]) => obj.flags.includes(arg)) || [])[0];
 
         const firstArgNotCommand = id == 0 && !command;
-        if (firstArgNotCommand) error(1);
+        if (firstArgNotCommand) Cmds.help.call(Cmds, true);
 
         const building = command || prev.building;
         const exists = prev.hasOwnProperty(command) && [...prev[command]];
@@ -198,7 +207,7 @@ function addDefaultCommands(debug) {
       usage: `${flagConflict('-h')} --help`,
       callback: Cmds.help.bind(Cmds),
     },
-    ...(!debug && {debug: {
+    ...(debug && {debug: {
       description: 'Output debug information.',
       flags: [flagConflict('-d'), '--debug'],
       usage: `${flagConflict('-d')} --debug`,
