@@ -5,8 +5,11 @@ const cmds = require('../cmds');
 const options = {
   version: 'v1.1.0',
   description: 'Basic NodeJS Calculator',
-  defaultRule: ['<number> [number]', 0],
   debug: false,
+  defaultRule: {
+    rule: '<number> [number]',
+    amount: 0,
+  },
 };
 
 cmds
