@@ -3,8 +3,12 @@
 const cmds = require('../cmds');
 
 cmds
-    .setVersion('v0.1.0')
-    .description('Basic Node Calculator')
+    .set({
+      version: 'v1.1.0',
+      description: 'Basic NodeJS Calculator',
+      defaultRule: ['<number> [number]', 0],
+      disableDebug: true,
+    })
     .command('-a --add [nums]', 'Add numbers.', op((a, b) => a + b))
     .rule('<number> [number]')
     .command('-s --subtract [nums]', 'Subtract numbers.', op((a, b) => a - b))
@@ -21,3 +25,5 @@ function op(operation) {
     valid ? console.log(args.reduce(operation)) : cmds.help();
   };
 }
+
+console.log(cmds);
