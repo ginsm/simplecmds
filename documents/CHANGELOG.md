@@ -20,11 +20,11 @@ This change has happened for several reasons:
 
 ### Added:
 - Major change: Commands are now created as one object.
-- `.set(options)` method. Takes in an object and sets global program options.
-- Disable debug command — this can be set in `.set` using `{ debug: false }`.
-- Default rule — this can be set in `.set` using `{ defaultRule: { rule: '<number>', amount: 0 } }`.
-- version and description are handled by `.set` using `{ version: 'v1.0.0', description: 'Description' }`.
-- `.help` now has a `exit` parameter; if true then `process.exit` will be invoked.
+- `.set(options)` method. Takes in an object and sets global program options:
+  - Disable debug command.
+  - Default rule for all commands.
+  - version and description are moved to `.set`.
+- `.help` now has an `exit` parameter; if true then `process.exit` will be invoked.
 - `CHANGELOG.md` for better documentation.
 
 &nbsp;
@@ -32,7 +32,7 @@ This change has happened for several reasons:
 ### Changed
 - `parseFlags` method -> `generateAlias`.
 - `flagConflict` method -> `aliasConflict`.
-- Example `calculator.js` has been updated to reflect these changes.
+- `examples/calculator.js` has been updated to reflect these changes.
   
 &nbsp;
 
