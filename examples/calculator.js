@@ -1,5 +1,4 @@
 /* eslint-disable require-jsdoc */
-// SECTION - Interface
 const simplecmds = require('../cmds');
 
 simplecmds
