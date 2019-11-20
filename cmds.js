@@ -81,7 +81,6 @@ const Cmds = {
     const programName = basename(process.argv[1], '.js');
     const cmdUsage = Object.values(Generation).map((cmd) => cmd.usage);
     const longestUsage = longest(cmdUsage).length;
-    const descriptionExists = typeof this.description == 'string';
 
     // Build command usage and description strings
     const cmds = Object.values(Generation)
@@ -92,7 +91,7 @@ const Cmds = {
         });
 
     [`Program: ${capitalize(programName)} (${this.version})`,
-      descriptionExists && `Description: ${this.description}\n` || '',
+      this.description && `Description: ${this.description}\n` || '',
       'Commands:',
       ...cmds.slice(0, -2),
       `\nDefaults:`,
