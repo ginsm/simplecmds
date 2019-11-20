@@ -32,6 +32,7 @@ This change has happened for several reasons:
 ### Changed
 - `parseFlags` method -> `generateAlias`.
 - `flagConflict` method -> `aliasConflict`.
+- Example `calculator.js` has been updated to reflect these changes.
   
 &nbsp;
 
