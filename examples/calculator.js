@@ -2,13 +2,15 @@
 // SECTION - Interface
 const cmds = require('../cmds');
 
+const options = {
+  version: 'v1.1.0',
+  description: 'Basic NodeJS Calculator',
+  defaultRule: ['<number> [number]', 0],
+  debug: false,
+};
+
 cmds
-    .set({
-      version: 'v1.1.0',
-      description: 'Basic NodeJS Calculator',
-      defaultRule: ['<number> [number]', 0],
-      disableDebug: true,
-    })
+    .set(options)
     .command('-a --add [nums]', 'Add numbers.', op((a, b) => a + b))
     .rule('<number> [number]')
     .command('-s --subtract [nums]', 'Subtract numbers.', op((a, b) => a - b))

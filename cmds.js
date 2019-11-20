@@ -81,6 +81,7 @@ const Cmds = {
     const programName = basename(process.argv[1], '.js');
     const cmdUsage = Object.values(Generation).map((cmd) => cmd.usage);
     const longestUsage = longest(cmdUsage).length;
+    const defaultAmount = this.disableDebug ? -1 : -2;
 
     // Build command usage and description strings
     const cmds = Object.values(Generation)
@@ -93,9 +94,9 @@ const Cmds = {
     [`Program: ${capitalize(programName)} (${this.version})`,
       this.description && `Description: ${this.description}\n` || '',
       'Commands:',
-      ...cmds.slice(0, -2),
+      ...cmds.slice(0, defaultAmount),
       `\nDefaults:`,
-      ...cmds.slice(-2),
+      ...cmds.slice(defaultAmount),
       `\nUsage: ${programName} <command> [...args]`,
     ].forEach((line) => console.log(line));
   },
@@ -108,16 +109,8 @@ const Cmds = {
    * @param {Array} args - Expects process.argv.
    */
   parse(args) {
-    // Clean up main object
-    const toDelete = ['set', 'command', 'rule',
-      'parse', 'defaultRule', 'disableDebug'];
-
-    toDelete.forEach((item) =>
-      delete this[item]
-    );
-
     // Add default commands
-    addDefaultCommands();
+    addDefaultCommands(this.disableDebug);
 
     // Remove node env args, expand concat flags, and convert stringed nums
     args = convertNumbers(expandCombinedFlags(args.slice(2)));
@@ -195,8 +188,9 @@ function expandCombinedFlags(arr) {
 
 /**
  * @description Add the default commands to Generation object.
+ * @param {boolean} debug - Debug enabled
  */
-function addDefaultCommands() {
+function addDefaultCommands(debug) {
   Object.assign(Generation, {
     help: {
       description: 'Output help menu.',
@@ -204,12 +198,12 @@ function addDefaultCommands() {
       usage: `${flagConflict('-h')} --help`,
       callback: Cmds.help.bind(Cmds),
     },
-    debug: {
+    ...(!debug && {debug: {
       description: 'Output debug information.',
       flags: [flagConflict('-d'), '--debug'],
       usage: `${flagConflict('-d')} --debug`,
       callback: () => console.log(Generation),
-    },
+    }}),
   });
 }
 
