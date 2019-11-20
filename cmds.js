@@ -52,6 +52,25 @@ const Cmds = {
 
 
   // SECTION - Setters
+  /**
+  * @description Set the program options.
+  * @param {Object} options - Program options.
+  * @return {Private} 'this' for chaining.
+  * @usage
+  * There are a few options you can set:
+  * - version: string
+  * - description: string
+  * - defaultRule: array i.e. ['<number> [number]', 0]
+  * - disableDebug: boolean
+  */
+  set(options) {
+    return Object.assign(this, options);
+  },
+
+  /**
+   * @description Default version value.
+   */
+  version: 'v1.0.0',
 
   // SECTION - Help Menu
 
