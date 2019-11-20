@@ -25,5 +25,3 @@ function op(operation) {
     valid ? console.log(args.reduce(operation)) : cmds.help();
   };
 }
-
-console.log(cmds);
