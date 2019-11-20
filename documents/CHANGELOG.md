@@ -26,9 +26,19 @@ This change has happened for several reasons:
 - Default rule — this can be set in `.set` using `{ defaultRule: { rule: '<number>', amount: 0 } }`.
 - version and description are handled by `.set` using `{ version: 'v1.0.0', description: 'Description' }`.
 - `.help` now has a `exit` parameter; if true then `process.exit` will be invoked.
+
+&nbsp;
+
+### Changed
+- `parseFlags` method -> `generateAlias`.
+- `flagConflict` method -> `aliasConflict`.
   
 &nbsp;
 
 ### Removed:
-- `.setVersion()` method.
-- `.description()` method.
+- `.setVersion` method.
+- `.description` method.
+- `.command` method.
+- `.rule` method.
+- `lastBuiltCommand` method.
+- `.camelCase` method.
