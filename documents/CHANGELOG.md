@@ -19,13 +19,13 @@ This change has happened for several reasons:
 &nbsp;
 
 ### Added:
-- `CHANGELOG.md` for better documentation.
 - Major change: Commands are now created as one object.
 - `.set(options)` method. Takes in an object and sets global program options.
 - Disable debug command — this can be set in `.set` using `{ debug: false }`.
 - Default rule — this can be set in `.set` using `{ defaultRule: { rule: '<number>', amount: 0 } }`.
 - version and description are handled by `.set` using `{ version: 'v1.0.0', description: 'Description' }`.
 - `.help` now has a `exit` parameter; if true then `process.exit` will be invoked.
+- `CHANGELOG.md` for better documentation.
 
 &nbsp;
 
