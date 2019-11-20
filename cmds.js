@@ -53,29 +53,6 @@ const Cmds = {
 
   // SECTION - Setters
 
-  /**
-   * @description Set the version number.
-   * @param {*} vers - Version number.
-   * @return {Object} 'this' for chaining.
-   */
-  setVersion(vers) {
-    this.version = vers;
-    return this;
-  },
-
-  version: 'v1.0.0',
-
-  /**
-   * @description Set a description for your program.
-   * @param {string} message - Description message.
-   * @return {Object} 'this' for chaining.
-   */
-  description(message) {
-    this.description = message;
-    return this;
-  },
-
-
   // SECTION - Help Menu
 
   /**
