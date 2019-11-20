@@ -10,43 +10,18 @@ const Cmds = {
   // SECTION - Object Creation
 
   /**
-   * @description Create a command.
-   * @param {string} usage - Usable command flags.
-   * @param {string} description - Description of the command.
-   * @param {Object} callback - Callback to be used with function
-   * @return {Object} 'this' for chaining.
+   * @description Build the commands from a given object.
+   * @param {Object} commands - Object containing all commands.
+   * @return {Private} 'this' for chaining.
    */
-  command(usage = '', description = '', callback = false) {
-    const flags = parseFlags(usage);
-    const command = camelCase(longest(flags));
-
-    Generation[command] = {
-      description,
-      flags,
-      usage,
-      callback,
-    };
-
-    return this;
-  },
-
-
-  /**
-   * @description Create a validation rule.
-   * @param {string} notation - String notation of types.
-   * @param {number} amount - Acceptable amount of arguments.
-   * @return {private} 'this' for chaining.
-   */
-  rule(notation = '', amount = 0) {
-    const command = lastBuiltCmd();
-    const cmdObject = Generation[command];
-
-    Generation[command] = {
-      ...cmdObject,
-      notation: notation.split(' '),
-      amount,
-    };
-
+  commands(commands) {
+    commands = Object.entries(commands)
+        .map(([key, command]) => [key, {
+          alias: generateAlias(command.usage),
+          ...this.defaultRule,
+          ...command,
+        }]);
+    Object.assign(Generation, Object.fromEntries(commands));
     return this;
   },
 
@@ -58,10 +33,10 @@ const Cmds = {
   * @return {Private} 'this' for chaining.
   * @usage
   * There are a few options you can set:
-  * - version: string
-  * - description: string
-  * - defaultRule: array i.e. ['<number> [number]', 0]
-  * - disableDebug: boolean
+  * - version: string ('v1.0.0')
+  * - description: string ('My simple NodeJS program')
+  * - defaultRule: array (['<number> [number]', 0])
+  * - disableDebug: boolean (true/false)
   */
   set(options) {
     return Object.assign(this, options);
@@ -140,17 +115,6 @@ module.exports = Cmds;
 // SECTION - Parsing Methods
 
 /**
- * @description Find every valid flag in an usage string.
- * @param {string} usage - Contains command flags.
- * @return {private} Array of found flags (up to 2).
- */
-function parseFlags(usage) {
-  const flagRegex = /(?<!\S)(-\w\b|--[\w-]{3,}|(?=[^-])[\w-]{3,})/g;
-  return usage.match(flagRegex).slice(0, 2) || error(0, usage);
-}
-
-
-/**
  * @description Generate an object containing commands and their args.
  * @param {Array} args - Process.argv
  * @param {Object[]} commands - Object containing commands.
@@ -160,7 +124,7 @@ function parseArgs(args, commands) {
   return args
       .reduce((prev, arg, id) => {
         const command =
-          (commands.find(([_, obj]) => obj.flags.includes(arg)) || [])[0];
+          (commands.find(([_, obj]) => obj.alias.includes(arg)) || [])[0];
 
         const firstArgNotCommand = id == 0 && !command;
         if (firstArgNotCommand) Cmds.help.call(Cmds, true);
@@ -174,8 +138,6 @@ function parseArgs(args, commands) {
       }, {});
 }
 
-
-// SECTION - Building Methods
 
 /**
  * @description - Expand combined short flags.
@@ -195,6 +157,19 @@ function expandCombinedFlags(arr) {
   ));
 }
 
+
+// SECTION - Building Methods
+
+/**
+ * @description Find every valid flag in an usage string.
+ * @param {string} usage - Contains command flags.
+ * @return {private} Array of found flags (up to 2).
+ */
+function generateAlias(usage) {
+  const flagRegex = /(?<!\S)(-\w\b|--[\w-]{3,}|(?=[^-])[\w-]{3,})/g;
+  return usage.match(flagRegex).slice(0, 2) || error(0, usage);
+}
+
 /**
  * @description Add the default commands to Generation object.
  * @param {boolean} debug - Debug enabled
@@ -203,14 +178,14 @@ function addDefaultCommands(debug) {
   Object.assign(Generation, {
     help: {
       description: 'Output help menu.',
-      flags: [flagConflict('-h'), '--help'],
-      usage: `${flagConflict('-h')} --help`,
+      alias: [aliasConflict('-h'), '--help'],
+      usage: `${aliasConflict('-h')} --help`,
       callback: Cmds.help.bind(Cmds),
     },
     ...(debug && {debug: {
       description: 'Output debug information.',
-      flags: [flagConflict('-d'), '--debug'],
-      usage: `${flagConflict('-d')} --debug`,
+      alias: [aliasConflict('-d'), '--debug'],
+      usage: `${aliasConflict('-d')} --debug`,
       callback: () => console.log(Generation),
     }}),
   });
@@ -228,10 +203,10 @@ function finalizeCommand(cmd, obj, args) {
     Object.assign(this, {
       [cmd]: {
         args: args[cmd],
-        valid: hasProperties(obj, 'notation', 'amount') ?
+        valid: hasProperties(obj, 'rule', 'amount') ?
           typeCheck({
             args: args[cmd].length ? args[cmd] : [true],
-            notation: obj.notation,
+            rule: obj.rule,
             amount: obj.amount,
           }) : true,
       },
@@ -253,19 +228,20 @@ function finalizeCommand(cmd, obj, args) {
  * @param {Array} obj - Command name and object.
  * @return {boolean} Validity represented by a boolean.
  */
-function typeCheck({notation, amount = 0, args}) {
-  const required = notation.filter((notation) => notation[0] === '<');
+function typeCheck({rule, amount = 0, args}) {
+  rule = rule.split(' ');
+  const required = rule.filter((rule) => rule[0] === '<');
   const validRequiredAmount = args.length >= required.length;
   const validAmount = args.length <= amount && validRequiredAmount;
-  const lastNotation = notation.slice(-1)[0];
+  const lastNotation = rule.slice(-1)[0];
 
   // Check types
-  const valid = (notation, arg) => notation.includes(typeof arg);
+  const valid = (rule, arg) => rule.includes(typeof arg);
   const validTypes = args.map((arg, id) => {
     const idRequired = (required.length - 1 >= id);
-    const noNotation = (id > notation.length - 1);
-    return idRequired ? valid(notation[id], arg) : !idRequired &&
-          (noNotation ? valid(lastNotation, arg) : valid(notation[id], arg));
+    const noNotation = (id > rule.length - 1);
+    return idRequired ? valid(rule[id], arg) : !idRequired &&
+          (noNotation ? valid(lastNotation, arg) : valid(rule[id], arg));
   }).every((arg) => arg === true);
 
   return (amount ? validAmount : validRequiredAmount) && validTypes;
@@ -275,23 +251,14 @@ function typeCheck({notation, amount = 0, args}) {
 // SECTION - Helper Methods
 
 /**
- * @description Determine existence of a flag.
- * @param {string} flag - Flag to look up.
- * @return {boolean} True or false.
+ * @description Handle conflicting alias'.
+ * @param {string} alias - Alias to look up.
+ * @return {boolean} Uppercase alias.
  */
-function flagConflict(flag) {
+function aliasConflict(alias) {
   return Object.values(Generation).filter((command) => {
-    return command.flags.includes(flag);
-  }).length > 0 && flag.toUpperCase() || flag;
-}
-
-
-/**
- * @description Get last command built.
- * @return {string} Name of the last command built.
- */
-function lastBuiltCmd() {
-  return Object.keys(Generation).slice(-1)[0];
+    return command.alias.includes(alias);
+  }).length > 0 && alias.toUpperCase() || alias;
 }
 
 
@@ -307,18 +274,6 @@ function iterate(obj, callback, optional) {
       callback(prop, obj[prop], optional);
     }
   }
-}
-
-
-/**
- * @description Remove any dashes and camel case a string.
- * @param {string} str - String to normalize.
- * @return {string} Normalized string.
- */
-function camelCase(str) {
-  const camelCaseString = (word, id) => id == 0 && word.toLowerCase() ||
-        word[0].toUpperCase() + word.substr(1).toLowerCase();
-  return str.match(/[\w]+(?=[A-Z])|[\w]+/g).map(camelCaseString).join('');
 }
 
 
