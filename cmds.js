@@ -2,9 +2,9 @@
 const basename = require('path').basename;
 
 /**
-   * @description Contains the commands during generation.
+   * @description Contains the commands during building.
    */
-const Generation = {};
+const Builder = {};
 
 const Cmds = {
   // SECTION - Object Creation
@@ -13,15 +13,17 @@ const Cmds = {
    * @description Build the commands from a given object.
    * @param {Object} commands - Object containing all commands.
    * @return {Private} 'this' for chaining.
+   * @usage
+   * Refer to the README documentation.
    */
   commands(commands) {
     commands = Object.entries(commands)
         .map(([key, command]) => [key, {
-          alias: generateAlias(command.usage),
+          alias: generateAlias(command.usage, key),
           ...this.defaultRule,
           ...command,
         }]);
-    Object.assign(Generation, Object.fromEntries(commands));
+    Object.assign(Builder, Object.fromEntries(commands));
     return this;
   },
 
@@ -48,9 +50,9 @@ const Cmds = {
   version: 'v1.0.0',
 
   /**
-   * @description Enable debug by default.
+   * @description Disable debug by default.
    */
-  debug: true,
+  debug: false,
 
   // SECTION - Help Menu
 
@@ -60,12 +62,12 @@ const Cmds = {
    */
   help(exit) {
     const programName = basename(process.argv[1], '.js');
-    const cmdUsage = Object.values(Generation).map((cmd) => cmd.usage);
-    const longestUsage = longest(cmdUsage).length;
+    const cmdUsage = Object.values(Builder).map((cmd) => cmd.usage);
+    const longestUsage = longestString(cmdUsage).length;
     const defaultAmount = this.debug ? -2 : -1;
 
     // Build command usage and description strings
-    const cmds = Object.values(Generation)
+    const cmds = Object.values(Builder)
         .map((command) => {
           const {usage, description} = command;
           const spaces = Array((longestUsage + 4) - usage.length).join(' ');
@@ -90,22 +92,18 @@ const Cmds = {
   // SECTION - Main Parser
 
   /**
-   * @description Parse program args and add them to their command.
+   * @description Parse process.argv and process the arguments.
    * @param {Array} args - Expects process.argv.
+   * @return {Private} An object containing commands, their args, and validity.
    */
-  parse(args) {
-    // Add default commands
+  parse(args = args.slice(2)) {
     addDefaultCommands(this.debug);
-
-    // Remove node env args, expand concat flags, and convert stringed nums
-    args = convertNumbers(expandCombinedFlags(args.slice(2)));
-    if (args.length == 0) {
-      this.help(true);
-    }
-
-    // Populate main object with commands & their args + validity.
-    const commandArgs = parseArgs(args, Object.entries(Generation));
-    iterate(Generation, finalizeCommand.bind(this), commandArgs);
+    args = convertNumbers(expandConcat(args.slice(2)));
+    (!args.length && this.help(true));
+    const commands =
+      buildCommands(resolveArgs(args, Object.entries(Builder)));
+    issueCallbacks(commands);
+    return commands;
   },
 };
 
@@ -120,14 +118,16 @@ module.exports = Cmds;
  * @param {Object[]} commands - Object containing commands.
  * @return {Object} Generated object containing args.
  */
-function parseArgs(args, commands) {
+function resolveArgs(args, commands) {
   return args
       .reduce((prev, arg, id) => {
         const command =
           (commands.find(([_, obj]) => obj.alias.includes(arg)) || [])[0];
 
         const firstArgNotCommand = id == 0 && !command;
-        if (firstArgNotCommand) Cmds.help.call(Cmds, true);
+        if (firstArgNotCommand) {
+          Cmds.help.call(Cmds, true);
+        }
 
         const building = command || prev.building;
         const exists = prev.hasOwnProperty(command) && [...prev[command]];
@@ -140,11 +140,11 @@ function parseArgs(args, commands) {
 
 
 /**
- * @description - Expand combined short flags.
+ * @description - Expand concatenated short aliases.
  * @param {Array} arr - Argument array.
- * @return {Array} Array with expanded short flags at the beginning.
+ * @return {Array} Array with expanded short aliases (in place).
  */
-function expandCombinedFlags(arr) {
+function expandConcat(arr) {
   const exp = {
     concatenated: /(?<!\S)\W\w{2,}/,
     inbetweenChars: /(?<!\W)(?=\w)/g,
@@ -161,21 +161,23 @@ function expandCombinedFlags(arr) {
 // SECTION - Building Methods
 
 /**
- * @description Find every valid flag in an usage string.
- * @param {string} usage - Contains command flags.
- * @return {private} Array of found flags (up to 2).
+ * @description Find every valid alias in an usage string.
+ * @param {string} usage - Contains command aliases.
+ * @param {string} command - The
+ * @return {private} Array of found aliases (up to 2).
  */
-function generateAlias(usage) {
+function generateAlias(usage, command) {
   const flagRegex = /(?<!\S)(-\w\b|--[\w-]{3,}|(?=[^-])[\w-]{3,})/g;
-  return usage.match(flagRegex).slice(0, 2) || error(0, usage);
+  return usage.match(flagRegex).slice(0, 2) || error(0, command);
 }
 
+
 /**
- * @description Add the default commands to Generation object.
- * @param {boolean} debug - Debug enabled
+ * @description Add the default commands to Builder object.
+ * @param {boolean} debug - Enable the debug command.
  */
 function addDefaultCommands(debug) {
-  Object.assign(Generation, {
+  Object.assign(Builder, {
     help: {
       description: 'Output help menu.',
       alias: [aliasConflict('-h'), '--help'],
@@ -186,45 +188,86 @@ function addDefaultCommands(debug) {
       description: 'Output debug information.',
       alias: [aliasConflict('-d'), '--debug'],
       usage: `${aliasConflict('-d')} --debug`,
-      callback: () => console.log(Generation),
+      callback: () => console.log(Builder),
     }}),
   });
 }
 
 
 /**
- * @description Create the object the end user deals with.
- * @param {*} cmd - Command name.
- * @param {*} obj - Command object.
- * @param {*} args - Object containing command args.
+ * @description Handle conflicting aliases.
+ * @param {string} alias - Alias to look up.
+ * @return {boolean} A non-conflicting alias.
  */
-function finalizeCommand(cmd, obj, args) {
+function aliasConflict(alias) {
+  return Object.values(Builder).filter((command) => {
+    return command.alias.includes(alias);
+  }).length > 0 && alias.toUpperCase() || alias;
+}
+
+
+/**
+ * @description Build each command's object.
+ * @param {*} args - The processed arguments.
+ * @return {Object} The built commands.
+ */
+function buildCommands(args) {
+  const commands = {};
+  for (const cmd in Builder) {
+    if (Builder[cmd]) {
+      Object.assign(commands, build.call(Cmds, cmd, Builder[cmd], args));
+    }
+  }
+  return commands;
+}
+
+
+/**
+ * @description Builds individual command objects.
+ * @param {*} cmd - Command name.
+ * @param {*} obj - Builder object.
+ * @param {*} args - Object containing command args.
+ * @return {Object} The built command.
+ */
+function build(cmd, obj, args) {
   if (args.hasOwnProperty(cmd)) {
-    Object.assign(this, {
+    const commandObject = {
       [cmd]: {
         args: args[cmd],
-        valid: hasProperties(obj, 'rule', 'amount') ?
+        valid: obj.hasOwnProperty('rule') ?
           typeCheck({
             args: args[cmd].length ? args[cmd] : [true],
             rule: obj.rule,
             amount: obj.amount,
           }) : true,
       },
-    });
-
-    // Run callback for command
-    if (obj.callback) {
-      const {args, valid} = this[cmd];
-      obj.callback(args, valid);
-    }
+    };
+    Object.assign(this, commandObject);
+    return commandObject;
   }
+}
+
+
+/**
+ * @description Issue each command's callback function.
+ * @param {Object} that - 'this' context of main object (Cmds).
+ */
+function issueCallbacks(that) {
+  Object.entries(Builder).forEach(([cmd, obj]) => {
+    if (that[cmd]) {
+      const {args, valid} = that[cmd];
+      if (obj.callback) {
+        obj.callback(args, valid, that);
+      }
+    }
+  });
 }
 
 
 // SECTION - Type checking
 
 /**
- * @description Check the types and amount of args for a command.
+ * @description Validate the types and amount of args for a command.
  * @param {Array} obj - Command name and object.
  * @return {boolean} Validity represented by a boolean.
  */
@@ -251,33 +294,6 @@ function typeCheck({rule, amount = 0, args}) {
 // SECTION - Helper Methods
 
 /**
- * @description Handle conflicting alias'.
- * @param {string} alias - Alias to look up.
- * @return {boolean} Uppercase alias.
- */
-function aliasConflict(alias) {
-  return Object.values(Generation).filter((command) => {
-    return command.alias.includes(alias);
-  }).length > 0 && alias.toUpperCase() || alias;
-}
-
-
-/**
- * @description Run a callback for each property in an object.
- * @param {Object} obj - Object to iterate.
- * @param {*} callback - Receives property and its value.
- * @param {*} optional - Optional parameter to pass to callback.
- */
-function iterate(obj, callback, optional) {
-  for (const prop in obj) {
-    if (obj[prop]) {
-      callback(prop, obj[prop], optional);
-    }
-  }
-}
-
-
-/**
  * @description Capitalize the first letter of a word.
  * @param {string} word - Word to capitalize.
  * @return {string} Capitalized word.
@@ -292,7 +308,7 @@ function capitalize(word) {
  * @param {string[]} arr - Array of strings.
  * @return {string} Longest string.
  */
-function longest(arr) {
+function longestString(arr) {
   return arr.reduce((a, b) => b.length > a.length ? b : a);
 }
 
@@ -318,18 +334,6 @@ function flatten(arr) {
 }
 
 
-/**
- * @description Check an object for multiple properties.
- * @param {{}} obj - Object to check.
- * @param  {...any} properties - Properties to check.
- * @return {boolean} Result of the check.
- */
-function hasProperties(obj, ...properties) {
-  return properties.map((property) => obj.hasOwnProperty(property))
-      .every((value) => value == true);
-}
-
-
 // SECTION - Errors
 
 /**
@@ -339,8 +343,7 @@ function hasProperties(obj, ...properties) {
  */
 function error(code, value) {
   const errors = [
-    `Creation: No flags present in command '${value}'.`,
-    `First argument must be a valid command. Type -h.`,
+    `Creation: No valid aliases present in command '${value}'.`,
   ];
   console.error(`[Error] ${errors[code]}`);
   process.exit();
