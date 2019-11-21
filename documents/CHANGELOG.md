@@ -17,7 +17,7 @@ This change has happened for several reasons:
 &nbsp;
 
 ### Added:
-- Commands are now created as one passed object to the `.commands` method.
+- Commands are now created in a single object via the `.commands` method.
 - Callbacks are now passed the commands object as a third argument.
 - `.set(options)` method — takes in an object and sets global program options:
   - Program `version`.
