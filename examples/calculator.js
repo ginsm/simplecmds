@@ -38,6 +38,6 @@ simplecmds
 
 function op(operation) {
   return function(args, valid) {
-    valid ? console.log(args.reduce(operation)) : simplecmds.help();
+    valid ? console.log(args.reduce(operation)) : simplecmds.help(true);
   };
 }
