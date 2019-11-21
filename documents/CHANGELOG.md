@@ -5,8 +5,6 @@ All notable changes to this project will be documented in this file — the form
 
 ## Unreleased Version
 
----
-
 ## v2.0.0 — TBD
 ### Note:
 - **A major code-breaking change has happened**. Please refer to the `README.md` to see the new syntax and tools.
