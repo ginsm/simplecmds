@@ -30,6 +30,7 @@ This change has happened for several reasons:
 &nbsp;
 
 ### Updated
+- Command arguments over the amount limit will be ignored now.
 - Revised various JSDoc comments.
   - Added example usage and outputs.
   - Updated descriptions.
