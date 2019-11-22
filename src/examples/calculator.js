@@ -1,45 +1,42 @@
 /* eslint-disable require-jsdoc */
 const simplecmds = require('../cmds');
 
+const options = {
+  version: 'v1.1.0',
+  description: 'Basic NodeJS Calculator',
+  debug: false,
+  defaultRule: {
+    rule: '<number> [number]',
+    amount: 0,
+  },
+};
+
+const commands = {
+  add: {
+    usage: '-a --add [nums]',
+    description: 'Add all numbers given.',
+    callback: op((a, b) => a + b),
+  },
+  subtract: {
+    usage: '-s --subtract [nums]',
+    description: 'Subtract all numbers given',
+    callback: op((a, b) => a - b),
+  },
+  divide: {
+    usage: '-d --divide [nums]',
+    description: 'Divide all numbers given',
+    callback: op((a, b) => a / b),
+  },
+  multiply: {
+    usage: '-m --multiply [nums]',
+    description: 'Multiply all numbers given',
+    callback: op((a, b) => a * b),
+  },
+};
+
 simplecmds
-    .set({
-      version: 'v1.1.0',
-      description: 'Basic NodeJS Calculator',
-      debug: false,
-      defaultRule: {
-        rule: '<number> [number]',
-        amount: 0,
-      },
-    })
-    .commands({
-      add: {
-        usage: '-a --add [nums]',
-        description: 'Add all numbers given.',
-        callback: op((a, b) => a + b),
-      },
-      subtract: {
-        usage: '-s --subtract [nums]',
-        description: 'Subtract all numbers given',
-        callback: op((a, b) => a - b),
-      },
-      divide: {
-        usage: '-d --divide [nums]',
-        description: 'Divide all numbers given',
-        callback: op((a, b) => a / b),
-      },
-      multiply: {
-        usage: '-m --multiply [nums]',
-        description: 'Multiply all numbers given',
-        callback: op((a, b) => a * b),
-      },
-      test: {
-        usage: '-t --test',
-        description: 'Test command',
-        callback: console.log,
-        rule: '<string>',
-        amount: 2,
-      },
-    })
+    .set(options)
+    .commands(commands)
     .parse(process.argv);
 
 
