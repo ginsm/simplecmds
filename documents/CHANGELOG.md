@@ -29,7 +29,11 @@ This change has happened for several reasons:
 
 &nbsp;
 
-### Changed
+### Updated
+- Revised various JSDoc comments.
+  - Added example usage and outputs.
+  - Updated descriptions.
+  - Updated various return statements.
 - `parseFlags` method -> `generateAlias`.
 - `flagConflict` method -> `aliasConflict`.
 - `examples/calculator.js` has been updated to utilize these changes.
