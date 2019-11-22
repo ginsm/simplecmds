@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file — the form
 ## Unreleased Version
 
 ## v2.0.0 — TBD
-### Note:
+### Note
 - **A major code-breaking change has happened**. Please refer to the `README.md` to see the new syntax and tools.
 
 This change has happened for several reasons:
@@ -16,7 +16,7 @@ This change has happened for several reasons:
 
 &nbsp;
 
-### Added:
+### Added
 - Commands are now created in a single object via the `.commands` method.
 - Callbacks are now passed the commands object as a third argument.
 - `.set(options)` method — takes in an object and sets global program options:
@@ -30,7 +30,8 @@ This change has happened for several reasons:
 &nbsp;
 
 ### Updated
-- Command arguments over the amount limit will be ignored now.
+- Command arguments over the allowed `amount` will now be ignored.
+  - Prevents extra arguments from invalidating the command or being passed.
 - Revised various JSDoc comments.
   - Added example usage and outputs.
   - Updated descriptions.
@@ -41,7 +42,7 @@ This change has happened for several reasons:
   
 &nbsp;
 
-### Removed:
+### Removed
 - `.setVersion` method.
 - `.description` method.
 - `.command` method.
