@@ -11,11 +11,13 @@ const Cmds = {
 
   /**
    * Build the commands from a given object.
-   * @param {Object} commands - Object containing all commands.
+   * @param {{}} commands - Object containing all commands.
    * @example
    * {
    *  myCommand: {
+   *    // invoked with -c or --my-command
    *    usage: '-c --my-command <text>',
+   *    // used in the help menu
    *    description: 'My command',
    *    // called with (args, valid, commands)
    *    callback: myFunction,
@@ -42,11 +44,14 @@ const Cmds = {
   // SECTION - Setters
   /**
   * Set the program options.
-  * @param {Object} options - Program options.
+  * @param {{}} options - Program options.
   * @example
   * {
+  *   // the following are used in the help menu
   *   version: 'v1.0.0',
   *   descrition: 'My simple NodeJS Program',
+  *   // all commands inherit this rule unless
+  *   // the command object has 'rule: false'.
   *   defaultRule: {
   *     // first arg must be a number
   *     // subsequent args must be as well
@@ -111,32 +116,24 @@ const Cmds = {
 
   /**
    * Parse process.argv and process the arguments.
-   * @param {Array} args - Expects process.argv.
-   * @return {Private} An object containing commands, their args, and validity.
-   * @example
-   * {
-   *  myCommand: {
-   *    args: [1, 2],
-   *    valid: true,
-   *  },
-   *  myOtherCommand: {
-   *    args: [3, 4],
-   *    valid: false,
-   *  }
-   * }
+   * @param {[]} args - Expects process.argv.
+   * @return {{}} Command object generated from buildCommands.
    */
   parse(args) {
     addDefaultCommands.call(this);
 
     // Resolve arguments
-    args = convertNumbers(expandConcat(args.slice(2)));
+    args = convertNumbers(expandAliases(args.slice(2)));
     (!args.length && this.help(true));
 
     // Command building
-    const commands =
-        buildCommands(parseArgs(args, Object.entries(Builder)));
+    const commands = buildCommands(
+        parseArgs(args, Object.entries(Builder))
+    );
 
-    return issueCallbacks(commands);
+    issueCallbacks(commands);
+
+    return commands;
   },
 };
 
@@ -147,9 +144,9 @@ module.exports = Cmds;
 
 /**
  * Generate an object containing commands and their args.
- * @param {Array} args - Process.argv
- * @param {Object[]} commands - Object containing commands.
- * @return {Object} Generated object containing args.
+ * @param {[]} args - Process.argv
+ * @param {{}} commands - Object containing commands.
+ * @return {{}} Generated object containing args.
  * @example
  * { myCommand: [1, 2] }
  */
@@ -168,20 +165,25 @@ function parseArgs(args, commands) {
       }, {});
 }
 
-
 /**
- * Expand concatenated short aliases (in place).
- * @param {Array} arr - Array to parse.
- * @return {Array} Array with expanded short aliases.
+ * Expands concatenated aliases and arguments.
+ * @param {[*]} arr - Process.argv
+ * @return {[*]} Aliases and arguments expanded in place.
  * @example
- * expandConcat(['-m', 1, '-abf', 2]);
- * // output -> ['-m', 1, '-a', '-b', '-f', 2]
+ * expandAliases(['-l', 'one', '-abc', '1,2,3']);
+ * // output -> ['-l', 'one', '-a', 1, '-b', 2, '-c', 3]
  */
-function expandConcat(arr) {
-  // Expand any concatenated flags into short flags (in place)
-  return flatten(arr.map((arg) => /(?<!\S)-\w{2,}/.test(arg) ?
-      arg.replace(/(?<!\W)(?=\w)/g, '-').split(/(?=\W)/g) : arg
-  ));
+function expandAliases(arr) {
+  return flatten(arr.map((arg, id, arr) => {
+    const groupedAliases = /(?<!\S)-\w{2,}/.test(arg);
+    if (groupedAliases) {
+      const aliases = arg.replace(/(?<!\W)(?=\w)/g, '-').split(/(?=\W)/g);
+      const groupedArgs = /\w+(,\w+)+/g.test(arr[id + 1]);
+      const args = groupedArgs && arr[id + 1].split(',') || [];
+      return alternate(aliases, args);
+    }
+    return /\w+(,\w+)+/g.test(arg) ? undefined : arg;
+  })).filter((arg) => arg);
 }
 
 
@@ -243,7 +245,7 @@ function aliasConflict(alias) {
 /**
  * Build each command's object.
  * @param {*} args - The processed arguments.
- * @return {Object} Args and validity for each command.
+ * @return {{}} Args and validity for each command.
  * @example
  * {
  *  myCommand: {
@@ -269,10 +271,10 @@ function buildCommands(args) {
 
 /**
  * Builds individual command objects.
- * @param {*} cmd - Command name.
- * @param {*} obj - Builder object.
- * @param {*} args - Object containing command args.
- * @return {Object} The built command.
+ * @param {string} cmd - Command name.
+ * @param {{}} obj - Builder object.
+ * @param {{}} args - Object containing command args.
+ * @return {{}} The built command.
  * @example
  * {
  *  myCommand: {
@@ -283,7 +285,8 @@ function buildCommands(args) {
  */
 function build(cmd, obj, args) {
   if (args.hasOwnProperty(cmd)) {
-    const cmdArgs = args[cmd].slice(0, obj.amount);
+    const toAmount = obj.amount ? obj.amount : undefined;
+    const cmdArgs = args[cmd].slice(0, toAmount);
     const commandObject = {
       [cmd]: {
         args: cmdArgs,
@@ -303,8 +306,7 @@ function build(cmd, obj, args) {
 
 /**
  * Issue each command's callback function.
- * @param {Object} commands - The end-user command object.
- * @return {Object} - The end-user command object (untouched).
+ * @param {{}} commands - The end-user command object.
  */
 function issueCallbacks(commands) {
   Object.entries(Builder).forEach(([cmd, obj]) => {
@@ -315,7 +317,6 @@ function issueCallbacks(commands) {
       }
     }
   });
-  return commands;
 }
 
 
@@ -323,26 +324,28 @@ function issueCallbacks(commands) {
 
 /**
  * Validate the types and amount of args for a command.
- * @param {Array} obj - Command name and object.
+ * @param {[]} obj - Command name and object.
  * @return {boolean} Validity represented by a boolean.
  */
 function typeCheck({rule, amount = 0, args}) {
-  rule = rule.split(' ');
-  const required = rule.filter((rule) => rule[0] === '<');
-  const validRequiredAmount = args.length >= required.length;
-  const validAmount = args.length <= amount && validRequiredAmount;
-  const lastNotation = rule.slice(-1)[0];
+  if (rule) {
+    rule = rule.split(' ');
+    const required = rule.filter((rule) => rule[0] === '<');
+    const validRequiredAmount = args.length >= required.length;
+    const validAmount = args.length <= amount && validRequiredAmount;
+    const lastNotation = rule.slice(-1)[0];
 
-  // Check types
-  const valid = (rule, arg) => rule.includes(typeof arg);
-  const validTypes = args.map((arg, id) => {
-    const idRequired = (required.length - 1 >= id);
-    const noNotation = (id > rule.length - 1);
-    return idRequired ? valid(rule[id], arg) : !idRequired &&
-          (noNotation ? valid(lastNotation, arg) : valid(rule[id], arg));
-  }).every((arg) => arg === true);
+    // Check types
+    const valid = (rule, arg) => rule.includes(typeof arg);
+    const validTypes = args.map((arg, id) => {
+      const idRequired = (required.length - 1 >= id);
+      const noNotation = (id > rule.length - 1);
+      return idRequired ? valid(rule[id], arg) : !idRequired &&
+            (noNotation ? valid(lastNotation, arg) : valid(rule[id], arg));
+    }).every((arg) => arg === true);
 
-  return (amount ? validAmount : validRequiredAmount) && validTypes;
+    return (amount ? validAmount : validRequiredAmount) && validTypes;
+  }
 }
 
 
@@ -363,7 +366,7 @@ function capitalize(word) {
 
 /**
  * Find the longest string in an array.
- * @param {string[]} arr - Array of strings.
+ * @param {[string]} arr - Array of strings.
  * @return {string} Length of the longest string.
  */
 function longestString(arr) {
@@ -373,8 +376,8 @@ function longestString(arr) {
 
 /**
  * Convert any stringed number to a number.
- * @param {*} input - Value(s) to be converted.
- * @return {*} - Returns the input after attempting conversion.
+ * @param {[]|string} input - Value(s) to be converted.
+ * @return {[]|number} - Returns the input after attempting conversion.
  * @example
  * convertNumbers('12');
  * // output -> 12
@@ -389,11 +392,27 @@ function convertNumbers(input) {
 
 /**
  * Flatten an array.
- * @param {Array} arr - Array to flatten
- * @return {Array} The flattened array.
+ * @param {[]} arr - Array to flatten.
+ * @return {[]} The flattened array.
  */
 function flatten(arr) {
   return Array.prototype.concat.apply([], arr);
+}
+
+
+/**
+ * Concatenate two arrays alternating the values of the arrays.
+ * @param {[]} sup - Leading values.
+ * @param {[]} sub - Trailing values.
+ * @return {[]} Concatenated array containing alternated values.
+ * @example
+ * alternate([1, 3, 5], [2, 4, 6]);
+ * // output -> [1, 2, 3, 4, 5, 6]
+ */
+function alternate(sup, sub) {
+  return [...sup.reduce((prev, curr, id) => {
+    return sub[id] ? [...prev, curr, sub[id]] : [...prev, curr];
+  }, []), ...sub.slice(sup.length)];
 }
 
 
