@@ -73,7 +73,7 @@ simplecmds
 &nbsp;
 
 ### Program Options
-[[options wiki page]](https://github.com/ginsm/simplecmds/wiki/Program-Options)
+[[ options wiki page ]](https://github.com/ginsm/simplecmds/wiki/Program-Options)
 
 ```javascript
 const options = {
@@ -91,13 +91,13 @@ I excluded the `version` and `debug` options in order to use their default value
 1. Require the first argument of the commands to be a 'string' or 'number'
 2. Allow no more than 1 argument for the command.
 
-In order to understand the defaultRule better, I recommend reading the [command rules]() wiki page.
+In order to understand the defaultRule better I recommend reading the [ command rules ]() wiki page.
 
 &nbsp;
 
 ### Commands
 
-[[commands wiki page]](https://github.com/ginsm/simplecmds/wiki/commands)
+[[ commands wiki page ]](https://github.com/ginsm/simplecmds/wiki/commands)
 
 Commands are created as such: `[command]: {...commandOptions}`.
 
@@ -130,7 +130,7 @@ Great! Our three commands are set up. The first command negates the `defaultRule
 
 ### Callback Function
 
-[[callback wiki page]](https://github.com/ginsm/simplecmds/wiki/callbacks)
+[[ callback wiki page ]](https://github.com/ginsm/simplecmds/wiki/callbacks)
 
 Our callback receives three arguments: `args`, `valid`, and `commands`. The commands object contains the arguments and validity of every command ran. This makes it very easy to chain commands. In this case, I will destructure the commands object to grab the subject and body commands directly. I won't be using `args` or `valid` of the message command itself.
 
@@ -209,4 +209,6 @@ function print(args, valid, {subject, body}) {
 
 ## Final Note
 
-While there could be improvements to our simple interface, I hope creating it has helped you gain a better understanding of this package. Please refer to the [wiki](https://github.com/ginsm/simplecmds/wiki) for additional help or post an issue or feature request on the [issue tracker](https://github.com/ginsm/simplecmds/issues).
+While there could be improvements to the simple interface we created I hope it has helped you gain a better understanding of this package. If you have any other questions please read the wiki or post an issue and I'll be happy to help. Feature requests are welcomed as well! 
+
+Links: &nbsp; [[ Wiki ]](https://github.com/ginsm/simplecmds/wiki) &nbsp; [[ Issue Tracker ]](https://github.com/ginsm/simplecmds/issues) &nbsp; [[ NPM ]](https://www.npmjs.com/package/simplecmds)
