@@ -7,12 +7,7 @@ All notable changes to this project will be documented in this file — the form
 
 ## v2.0.0 — TBD
 ### Note
-- **A major code-breaking change has happened**. Please refer to the `README.md` to see the new syntax and tools.
-
-This change has happened for several reasons:
-- The command names will be declarative.
-- The properties of the command will be declarative.
-- There will be less iteration involved in the program.
+- **A code-breaking release has happened**. Please refer to the `README.md` to see the new syntax and tools.
 
 &nbsp;
 
@@ -24,20 +19,23 @@ This change has happened for several reasons:
   - Program `description`.
   - Enabling `debug` command.
   - `defaultRule` (applies to all commands).
+- Grouped short aliases can now have grouped arguments following them: `-abc one,two,three`.
+  - This would be the same as typing `-a one -b two -c three`.
 - `.help` now has an `exit` parameter; if true the process will exit.
 - `CHANGELOG.md` for better documentation.
+- Distribution file that is minified and transpiled via Babel.
 
 &nbsp;
 
 ### Updated
-- Command arguments over the allowed `amount` will now be ignored.
-  - Prevents extra arguments from invalidating the command or being passed.
+- Command arguments over the allowed `amount` will now be discarded.
+  - Prevents extra arguments from invalidating the command.
 - Revised various JSDoc comments.
-  - Added example usage and outputs.
+  - Added example outputs.
   - Updated descriptions.
-  - Updated various return statements.
-- `parseFlags` method -> `generateAlias`.
-- `flagConflict` method -> `aliasConflict`.
+  - Updated various @return statements.
+  - Updated @param types.
+- The codebase is now split up into several files.
 - `examples/calculator.js` has been updated to utilize these changes.
   
 &nbsp;
