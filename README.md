@@ -4,8 +4,8 @@ This package allows you to easily create command line interfaces for your projec
 ### Features
 - :wrench: Creation of custom commands.
 - :abc: Concatenated short aliases (`'-csa 1,2,3 4'` -> `'-c 1 -s 2 -a 3 4'`).
-- :speech_balloon: Variadic (unlimited) arguments per command.
-- :guardsman: Argument types and amount checking (validation).
+- :speech_balloon: Variadic (many) arguments per command.
+- :guardsman: Argument type and amount enforcing (validation).
 - :information_desk_person: Dynamic, customizable help menu.
 - :link: Command chaining.
 
