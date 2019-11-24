@@ -1,20 +1,11 @@
 // Node Imports
 const basename = require('path').basename;
-const {
-  parseArgs,
-  expandAliases,
-} = require(`./util/parsing`);
-const {
-  longestString,
-  convertNumbers,
-  capitalize,
-} = require('./util/helper');
-const {
-  generateAlias,
-  addDefaultCommands,
-  buildCommands,
-  issueCallbacks,
-} = require('./util/building');
+const {parseArgs, expandAliases} =
+      require(`./util/parsing`);
+const {longestString, convertNumbers, capitalize} =
+      require('./util/helper');
+const {generateAlias, addDefaultCommands, buildCommands, issueCallbacks} =
+      require('./util/building');
 
 /**
    * Contains the commands during building.
@@ -113,7 +104,6 @@ const Cmds = {
   /**
    * Output the program's help menu.
    * @param {boolean} exit - Exit program after running.
-   * @return {Private} Exit status.
    */
   showHelp(exit = false) {
     const programName = basename(process.argv[1], '.js');
@@ -136,7 +126,7 @@ const Cmds = {
       `\nUsage: ${programName} <command> [...args]`,
     ].forEach((line) => console.log(line));
 
-    return (exit && process.exit());
+    (exit && process.exit());
   },
 };
 
