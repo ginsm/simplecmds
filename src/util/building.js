@@ -141,7 +141,7 @@ const Build = {
    */
   issueCallbacks(Builder, commands) {
     Object.entries(Builder).forEach(([cmd, obj]) => {
-      if (commands[cmd]) {
+      if (commands[cmd] && commands[cmd].args) {
         const {args, valid} = commands[cmd];
         if (obj.callback) {
           obj.callback(args, valid, commands);
