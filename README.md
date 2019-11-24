@@ -1,5 +1,5 @@
 # SimpleCMDs <!-- omit in toc -->
-This module allows you to easily create command line interfaces for your projects.
+This package allows you to easily create command line interfaces for your projects.
 
 ### Features
 - :wrench: Creation of custom commands.
@@ -21,7 +21,8 @@ This module allows you to easily create command line interfaces for your project
   - [Program Options](#program-options)
   - [Commands](#commands)
   - [Callback Function](#callback-function)
-  - [Final Note](#final-note)
+  - [Full Code](#full-code)
+- [Final Note](#final-note)
 
 &nbsp;
 
@@ -96,7 +97,9 @@ In order to understand the defaultRule better, I recommend reading the [command 
 
 ### Commands
 
-[[commands wiki page]]()
+[[commands wiki page]](https://github.com/ginsm/simplecmds/wiki/commands)
+
+Commands are created as such: `[command]: {...commandOptions}`.
 
 ```javascript
 const commands = {
@@ -127,13 +130,13 @@ Great! Our three commands are set up. The first command negates the `defaultRule
 
 ### Callback Function
 
-[[callback wiki page]]()
+[[callback wiki page]](https://github.com/ginsm/simplecmds/wiki/callbacks)
 
 Our callback receives three arguments: `args`, `valid`, and `commands`. The commands object contains the arguments and validity of every command ran. This makes it very easy to chain commands. In this case, I will destructure the commands object to grab the subject and body commands directly. I won't be using `args` or `valid` of the message command itself.
 
 ```javascript
-function print(_, __, {subject, body}) {
-  // Ensure that both commands were issued and are valid
+function print(args, valid, {subject, body}) {
+  // Ensure that both commands are valid
   const bothValid = (subject.valid && body.valid) || simplecmds.showHelp(true);
 
   if (bothValid) {
@@ -151,13 +154,7 @@ Our print function will first check the validity of our `subject` and `body` com
 
 &nbsp;
 
-### Final Note
-
-While there could be improvements to our simple interface, I hope creating it has helped you gain a better understanding of this package. Please refer to the [wiki]() to answer any other questions or post an issue or feature request on the [issue tracker]().
-
-&nbsp;
-
-**Full Code**
+### Full Code
 
 ```javascript
 const simplecmds = require('simplecmds');
@@ -195,8 +192,8 @@ simplecmds
 
 
 // callback
-function print(_, __, {subject, body}) {
-  // Ensure that both commands were issued and are valid
+function print(args, valid, {subject, body}) {
+  // Ensure that both commands are valid
   const bothValid = (subject.valid && body.valid) || simplecmds.showHelp(true);
 
   if (bothValid) {
@@ -207,3 +204,9 @@ function print(_, __, {subject, body}) {
   }
 }
 ```
+
+&nbsp;
+
+## Final Note
+
+While there could be improvements to our simple interface, I hope creating it has helped you gain a better understanding of this package. Please refer to the [wiki](https://github.com/ginsm/simplecmds/wiki) for additional help or post an issue or feature request on the [issue tracker](https://github.com/ginsm/simplecmds/issues).
