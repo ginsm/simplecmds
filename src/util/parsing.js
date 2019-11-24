@@ -15,7 +15,7 @@ const Parsing = {
           const command = (commands.find(([_, obj]) => {
             return obj.alias.includes(arg);
           }) || [])[0];
-          ((id == 0 && !command) && this.help.call(this, true));
+          ((id == 0 && !command) && this.showHelp.call(this, true));
           const building = command || prev.building;
           const exists = prev.hasOwnProperty(command) && [...prev[command]];
           const key = command || prev.building;
