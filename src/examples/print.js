@@ -37,7 +37,7 @@ simplecmds
     .parse(process.argv);
 
 
-function print(_, __, {subject, body}) {
+function print(args, valid, {subject, body}) {
   // Ensure that both commands were issued and are valid
   const bothValid = (subject.valid && body.valid) || simplecmds.showHelp(true);
 
