@@ -70,7 +70,7 @@ const Cmds = {
   * }
   * @return {Private} 'this' for chaining.
   */
-  set(options) {
+  set(options = {}) {
     return Object.assign(this, {
       // defaults
       version: 'v1.0.0',
@@ -89,12 +89,12 @@ const Cmds = {
    * @return {{}} Command object generated from buildCommands.
    */
   parse(args) {
-    // run set if the user did not
+    // run set even if the user did not invoke it
     (!this.version && this.set({}));
 
     addDefaultCommands.call(this, Builder);
     args = convertNumbers(expandAliases(args.slice(2)));
-    (!args.length && this.help(true));
+    (!args.length && this.showHelp(true));
 
     // Command building
     const commands = buildCommands.call(this,
@@ -115,7 +115,7 @@ const Cmds = {
    * @param {boolean} exit - Exit program after running.
    * @return {Private} Exit status.
    */
-  help(exit = false) {
+  showHelp(exit = false) {
     const programName = basename(process.argv[1], '.js');
     const cmdUsage = Object.values(Builder).map((cmd) => cmd.usage);
     const longestUsage = longestString(cmdUsage);
