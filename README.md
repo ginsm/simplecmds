@@ -45,7 +45,7 @@ I believe the best way to learn a technology is to create something with it. In 
 
 &nbsp;
 
-**The Project:**
+**The Project (print):**
 
 There will be three commands: `message`, `subject`, and `body`. Running `node print -m -s 'My subject' -b 'My body text'` will print the message to the terminal as such:
 
@@ -91,13 +91,13 @@ I excluded the `version` and `debug` options in order to use their default value
 1. Require the first argument of the commands to be a 'string' or 'number'
 2. Allow no more than 1 argument for the command.
 
-In order to understand the defaultRule better I recommend reading the [ command rules ]() wiki page.
+In order to understand the defaultRule better I recommend reading the [ rules ](https://github.com/ginsm/simplecmds/wiki/Command-Creation#rule) wiki page.
 
 &nbsp;
 
 ### Commands
 
-[[ commands wiki page ]](https://github.com/ginsm/simplecmds/wiki/commands)
+[[ commands wiki page ]](https://github.com/ginsm/simplecmds/wiki/Command-Creation)
 
 Commands are created as such: `[command]: {...commandOptions}`.
 
@@ -130,7 +130,7 @@ Great! Our three commands are set up. The first command negates the `defaultRule
 
 ### Callback Function
 
-[[ callback wiki page ]](https://github.com/ginsm/simplecmds/wiki/callbacks)
+[[ callback wiki page ]](https://github.com/ginsm/simplecmds/wiki/Command-Creation#callback-function)
 
 Our callback receives three arguments: `args`, `valid`, and `commands`. The commands object contains the arguments and validity of every command ran. This makes it very easy to chain commands. In this case, I will destructure the commands object to grab the subject and body commands directly. I won't be using `args` or `valid` of the message command itself.
 
