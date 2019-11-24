@@ -1,5 +1,5 @@
 /* eslint-disable require-jsdoc */
-const simplecmds = require('../cmds');
+const simplecmds = require('../simplecmds');
 
 const options = {
   version: 'v1.1.0',
@@ -7,7 +7,6 @@ const options = {
   debug: false,
   defaultRule: {
     rule: '<number> [number]',
-    amount: 0,
   },
 };
 
