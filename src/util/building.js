@@ -32,7 +32,7 @@ const Build = {
         description: 'Output help menu.',
         alias: [alias.help, '--help'],
         usage: `${alias.help} --help`,
-        callback: this.help.bind(this),
+        callback: this.showHelp.bind(this),
       },
       ...(this.debug && {debug: {
         description: 'Output debug information.',
@@ -122,6 +122,15 @@ const Build = {
       Object.assign(this, commandObject);
       return commandObject;
     }
+
+    const commandObject = {
+      [cmd]: {
+        args: undefined,
+        valid: false,
+      },
+    };
+    Object.assign(this, commandObject);
+    return commandObject;
   },
 
 
