@@ -104,8 +104,8 @@ Commands are created as such: `[command]: {...commandOptions}`.
 ```javascript
 const commands = {
   message: {
-    usage: '-m --message',
-    description: 'Begin writing a message',
+    usage: '-m --message *subject *body',
+    description: 'Write a message; requires -s and -b',
     callback: print,
     rule: false, // negate defaultRule
   },
@@ -168,8 +168,8 @@ const options = {
 };
 const commands = {
   message: {
-    usage: '-m --message',
-    description: 'Begin writing a message',
+    usage: '-m --message *subject *body',
+    description: 'Write a message; requires -s and -b',
     callback: print,
     rule: false, // negate defaultRule
   },
