@@ -4,7 +4,7 @@ This package allows you to easily create command line interfaces for your projec
 ### Features
 - :wrench: Creation of custom commands.
 - :abc: Concatenated short aliases (`'-csa 1,2,3 4'` -> `'-c 1 -s 2 -a 3 4'`).
-- :speech_balloon: Variadic (many) arguments per command.
+- :speech_balloon: Variadic (multiple) arguments per command.
 - :guardsman: Argument type and amount enforcing (validation).
 - :information_desk_person: Dynamic, customizable help menu.
 - :link: Command chaining.
@@ -50,7 +50,7 @@ I believe the best way to learn a technology is to create something with it. In 
 There will be three commands: `message`, `subject`, and `body`. Running `node print -m -s 'My subject' -b 'My body text'` will print the message to the terminal as such:
 
 ```
-Subject: My Subject
+Subject: My subject
 
 Body: My body text
 ```
