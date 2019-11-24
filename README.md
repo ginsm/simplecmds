@@ -2,11 +2,11 @@
 This package allows you to easily create command line interfaces for your projects.
 
 ### Features
-- :wrench: Creation of custom commands.
+- :pencil2: Creation of custom commands.
 - :abc: Concatenated short aliases (`'-csa 1,2,3 4'` -> `'-c 1 -s 2 -a 3 4'`).
 - :speech_balloon: Variadic (multiple) arguments per command.
 - :guardsman: Argument type and amount enforcing (validation).
-- :information_desk_person: Dynamic, customizable help menu.
+- :question: Dynamic, customizable help menu.
 - :link: Command chaining.
 
 &nbsp;
