@@ -49,7 +49,11 @@ I believe the best way to learn a technology is to create something with it. In 
 
 There will be three commands: `message`, `subject`, and `body`. Running `node print -m -s 'My subject' -b 'My body text'` will print the message to the terminal as such:
 
-![Print output](documents/Print.svg?v=4&s=100)
+```bash
+~: node print -m -s 'My Subject' -b 'My body text'
+Subject: My subject
+Body: My body text
+```
 
 &nbsp;
 
@@ -196,7 +200,7 @@ function print(args, valid, {subject, body}) {
     // add a limit of 60 characters
     const subjectText = subject.args[0].slice(0, 60);
     const bodyText = body.args[0];
-    console.log(`Subject: ${subjectText}\n\nBody: ${bodyText}`);
+    console.log(`Subject: ${subjectText}\nBody: ${bodyText}`);
   }
 }
 ```
