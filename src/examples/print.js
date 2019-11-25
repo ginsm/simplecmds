@@ -1,7 +1,6 @@
 /* eslint-disable require-jsdoc */
 const simplecmds = require('../simplecmds');
 
-
 const options = {
   description: 'Print a message with a subject and body.',
   defaultRule: {
@@ -12,14 +11,13 @@ const options = {
 
 const commands = {
   message: {
-    usage: '-m --message',
-    description: 'Begin writing a message',
+    usage: '-m --message *subject *body',
+    description: 'Write a message; requires -s and -b',
     callback: print,
-    rule: false,
+    rule: false, // negate defaultRule
   },
 
   // The default rule will be added to the next two commands
-
   subject: {
     usage: '-s --subject <subject>',
     description: 'Set the subject text',
@@ -30,15 +28,15 @@ const commands = {
   },
 };
 
-
 simplecmds
     .set(options)
     .commands(commands)
     .parse(process.argv);
 
 
+// callback
 function print(args, valid, {subject, body}) {
-  // Ensure that both commands were issued and are valid
+  // Ensure that both commands are valid
   const bothValid = (subject.valid && body.valid) || simplecmds.showHelp(true);
 
   if (bothValid) {
