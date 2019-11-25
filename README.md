@@ -3,11 +3,11 @@ This package allows you to easily create command line interfaces for your projec
 
 ### Features
 - :pencil2: Creation of custom commands.
-- :abc: Concatenated short aliases (`'-csa 1,2,3 4'` -> `'-c 1 -s 2 -a 3 4'`).
+- :link: Easy command chaining.
 - :speech_balloon: Variadic (multiple) arguments per command.
 - :guardsman: Argument type and amount enforcing (validation).
+- :abc: Concatenated short aliases support.
 - :question: Dynamic, customizable help menu.
-- :link: Command chaining.
 
 &nbsp;
 
