@@ -1,4 +1,5 @@
 const typeCheck = require('./typecheck');
+const error = require('./errors');
 
 const Build = {
   /**
@@ -11,10 +12,9 @@ const Build = {
    * // output -> ['-m', '--my-command']
    */
   generateAlias(usage, command) {
-    const flagRegex = /(?<!\S)(-\w\b|--[\w-]{3,}|(?=[^-])[\w-]{2,})/g;
-    return (usage.match(flagRegex) || error(
-        `Unable to create '${command}'. No aliases found in usage string.`
-    )).slice(0, 2);
+    const aliases = /(?<!\S)(-\w\b|--[\w-]{3,}|(?=[^-])[\w-]{2,})/g;
+    const matches = usage.match(aliases);
+    return (matches || error('CommandBuild', command)).slice(0, 2);
   },
 
 
@@ -108,6 +108,7 @@ const Build = {
   build(cmd, obj, args) {
     if (args.hasOwnProperty(cmd)) {
       const cmdArgs = obj.amount ? args[cmd].slice(0, obj.amount) : args[cmd];
+
       const commandObject = {
         [cmd]: {
           args: cmdArgs,
@@ -119,16 +120,12 @@ const Build = {
           }) : true,
         },
       };
+
       Object.assign(this, commandObject);
       return commandObject;
     }
 
-    const commandObject = {
-      [cmd]: {
-        args: undefined,
-        valid: false,
-      },
-    };
+    const commandObject = {[cmd]: {args: undefined, valid: false}};
     Object.assign(this, commandObject);
     return commandObject;
   },
@@ -152,14 +149,3 @@ const Build = {
 };
 
 module.exports = Build;
-
-
-/**
- * - Dispatch an error and exit process.
- * @param {number} message - Error message
- * @param {*} value - Relevant information.
- */
-function error(message) {
-  console.error('Error:', message);
-  process.exit();
-}
