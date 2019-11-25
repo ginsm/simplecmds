@@ -13,17 +13,18 @@ All notable changes to this project will be documented in this file — the form
 
 ### Added
 - Commands are now created in a single object via the `.commands` method.
-- Callbacks are now passed the commands object as a third argument.
 - `.set(options)` method — takes in an object and sets global program options:
   - Program `version`.
   - Program `description`.
   - Enabling `debug` command.
   - `defaultRule` (applies to all commands).
+- Callbacks are now passed the built commands object as a third argument.
 - Grouped short aliases can now have grouped arguments following them: `-abc one,two,three`.
   - This would be the same as typing `-a one -b two -c three`.
-- `.help` now has an `exit` parameter; if true the process will exit.
+- `.showHelp` now has an `exit` parameter; if true the process will exit.
+- Minified distribution file via WebPack and Babel.
 - `CHANGELOG.md` for better documentation.
-- Distribution file that is minified and transpiled via Babel.
+- GitHub Wiki documentation.
 
 &nbsp;
 
@@ -35,8 +36,10 @@ All notable changes to this project will be documented in this file — the form
   - Updated descriptions.
   - Updated various @return statements.
   - Updated @param types.
-- The codebase is now split up into several files.
 - `examples/calculator.js` has been updated to utilize these changes.
+- `.help` method has been renamed to `.showHelp`.
+- The codebase is now split up into several files.
+- Revised `README.md` to better reflect the new update.
   
 &nbsp;
 
