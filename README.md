@@ -49,7 +49,7 @@ I believe the best way to learn a technology is to create something with it. In 
 
 There will be three commands: `message`, `subject`, and `body`. Running `node print -m -s 'My subject' -b 'My body text'` will print the message to the terminal as such:
 
-![Print output](documents/Print.svg =340x192)
+![Print output](documents/Print.svg?v=4&s=100)
 
 &nbsp;
 
