@@ -45,6 +45,6 @@ function print(args, valid, {subject, body}) {
     // add a limit of 60 characters
     const subjectText = subject.args[0].slice(0, 60);
     const bodyText = body.args[0];
-    console.log(`Subject: ${subjectText}\n\nBody: ${bodyText}`);
+    console.log(`Subject: ${subjectText}\nBody: ${bodyText}`);
   }
 }
