@@ -4,11 +4,11 @@
  * @param {*} value - Relevant information.
  */
 function error(type, value) {
-  const types = {
+  const message = {
     'CommandBuild':
       `No valid aliases found in ${value}.usage string.`,
   };
-  console.error(`${type}Error: ${types[type]}`);
+  console.error(`${type}Error: ${message[type]}`);
   process.exit();
 }
 
