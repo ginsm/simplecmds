@@ -109,7 +109,7 @@ const Cmds = {
     const programName = basename(process.argv[1], '.js');
     const cmdUsage = Object.values(Builder).map((cmd) => cmd.usage);
     const longestUsage = longestString(cmdUsage);
-    const defaultAmount = this.debug ? -2 : -1;
+    const defaultAmount = this.debug ? -3 : -2;
 
     // Build command usage and description strings
     const cmds = Object.values(Builder).map(({usage, description}) => {
