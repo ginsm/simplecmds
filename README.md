@@ -2,9 +2,9 @@
 This package allows you to easily create command line interfaces for your projects.
 
 ### Features
-- :pencil2: Creation of custom commands.
-- :link: Easy command chaining.
-- :speech_balloon: Variadic (multiple) arguments per command.
+- :pencil2: Create custom commands.
+- :link: Easily chain commands.
+- :speech_balloon: Multiple arguments per command.
 - :guardsman: Argument type and amount enforcing (validation).
 - :abc: Concatenated short aliases support.
 - :question: Dynamic, customizable help menu.
