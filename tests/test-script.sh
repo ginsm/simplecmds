@@ -1,89 +1,70 @@
 #!/bin/sh
 
-# SECTION - Fixed Variables
-wdir=$(cd "$(dirname "${0}")" ; pwd -P)
-RESTORE='\033[0m'
-HEADER='\033[01;37m'
-PASS='\033[01;32m'
-FAIL='\033[01;31m'
-status="${PASS}Passed$RESTORE"
-reusable=("$HEADER" "$PASS" "$FAIL" "$RESTORE")
-
-
 # SECTION - Variables
+wdir=$(cd "$(dirname "${0}")" ; pwd -P)
 cmd="node $wdir/test-interface"
-title="Simplecmds Test Script"
 
 
-# SECTION - Header
-printf "\n${HEADER}[  $title  ]${RESTORE}\n\n"
+# SECTION - Importing
+source $wdir/utility.sh
+
+
+# SECTION - Script Header
+header "Simplecmds Test Script"
 printf "These tests are designed to ensure that the packages functionality is working
 as intended. It uses an interface that was created for the tests to cover all of the
-functionality.\n\n"
-
-# SECTION - Helper Functions
-run_test() {
-  local title="$1"
-  shift
-  local arr=("$@")
-  sh $wdir/run.sh "$title" "${reusable[@]}" "${arr[@]}"
-}
+functionality (test-interface.js)."
+newline 2
 
 
 # SECTION - Test Definitions
-# Configure with 3 array items per test:
-# - command arguments
-# - expected output
-# - description
+header "Type Checking"
 
-validation_check=(
-  "$cmd -t string"
-  "true"
-  "Command expecting string returns true when given string"
+define "Command expecting string returns true when given string" \
+    "true" \
+    "$cmd -t string"
 
-  "$cmd -t 42"
-  "false"
-  "Command expecting string returns false when given number"
+define "Command expecting string returns false when given number" \
+    "false" \
+    "$cmd -t 42"
 
-  "$cmd -b"
-  "true"
-  "Command expecting bool returns true when no arguments are given"
+define "Command expecting bool returns true when no arguments are given" \
+    "true" \
+    "$cmd -b"
 
-  "$cmd -b 0"
-  "false"
-  "Command expecting bool returns false when given arguments"
+define "Command expecting bool returns false when given arguments" \
+    "false" \
+    "$cmd -b 0"
 
-  "$cmd -tn 30,20"
-  "false
-true"
-  "Concatenated arguments work and validate properly"
+define "Concatenated arguments work and validate properly." \
+"false
+true" \
+    "$cmd -tn 30,20"
 
-  "$cmd -A 20"
-  "true"
-  "Command accepting number or string returns true when given number"
+define "Command accepting number or string returns true when given number" \
+    "true" \
+    "$cmd -A 20"
 
-  "$cmd -A"
-  "false"
-  "Command accepting number or string returns false when given no arguments"
+define "Command accepting number or string returns false when given no arguments" \
+    "false" \
+    "$cmd -A"
 
-  "$cmd -m 'string' 20"
-  "true"
-  "Command expecting multiple arguments/types returns true when given proper arguments"
+define "Command expecting multiple arguments/types returns true when given proper arguments" \
+    "true" \
+    "$cmd -m 'string' 20"
 
-  "$cmd -m 20 'string'"
-  "false"
-  "Command expecting multiple arguments/types returns false when given improper arguments"
-)
+define "Command expecting multiple arguments/types returns false when given improper arguments" \
+    "false" \
+    "$cmd -m 20 'string'"
 
-length_tests=(
-  "$cmd -a -l one two three four"
-  "3"
-  "Command enforcing 3 arguments max returns 3 for args length when given 4 arguments"
-)
 
-# SECTION - Test Executions
-# run_test "Correct Arguments" "${type_check_valid_true[@]}"
-# run_test "Incorrect Arguments" "${type_check_valid_false[@]}"
-run_test "Type Check Tests" "${validation_check[@]}"
 
-run_test "Argument Length Tests" "${length_tests[@]}"
+
+header "Argument Amount"
+
+define "Command enforcing at most 3 arguments returns 3 for amount of arguments when given 4 arguments" \
+    "3" \
+    "$cmd -a -l one two three four"
+
+
+newline
