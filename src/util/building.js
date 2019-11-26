@@ -26,6 +26,7 @@ const Build = {
     const alias = {
       help: Build.aliasConflict(Builder, '-h'),
       debug: Build.aliasConflict(Builder, '-d'),
+      version: Build.aliasConflict(Builder, '-v'),
     };
     Object.assign(Builder, {
       help: {
@@ -33,6 +34,12 @@ const Build = {
         alias: [alias.help, '--help'],
         usage: `${alias.help} --help`,
         callback: this.showHelp.bind(this),
+      },
+      vers: {
+        description: 'Output version information.',
+        alias: [alias.version, '--version'],
+        usage: `${alias.version} --version`,
+        callback: () => console.log(this.version),
       },
       ...(this.debug && {debug: {
         description: 'Output debug information.',
