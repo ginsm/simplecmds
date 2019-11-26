@@ -4,7 +4,7 @@
   "description": "Easily create commandline interfaces and type check arguments.",
   "main": "./cmds.js",
   "scripts": {
-    "test": "sh ./tests/test:simplecmds.sh"
+    "test": "./tests/test-script.sh"
   },
   "files": [
     "cmds.js",
