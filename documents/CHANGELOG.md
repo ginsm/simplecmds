@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file — the form
 - Grouped short aliases can now have grouped arguments following them: `-abc one,two,three`.
   - This would be the same as typing `-a one -b two -c three`.
 - `.showHelp` now has an `exit` parameter; if true the process will exit.
+- Default version command: `-v` or `--version`.
 - Minified distribution file via WebPack and Babel.
 - `CHANGELOG.md` for better documentation.
 - GitHub Wiki documentation.
