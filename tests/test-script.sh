@@ -13,13 +13,13 @@ success="${PASS}Passed${RESTORE}"
 # SECTION - Script Header
 header "Simplecmds Test Script"
 printf "These tests are designed to ensure that the packages functionality is working
-as intended. It uses an interface that was created via simplecmds specifically
-for the tests."
+as intended. It uses an interface that was created via simplecmds for testing
+purposes (${ACTION}test-interface.js${RESTORE})."
 newline 2
 
 
 # SECTION - Test Definitions
-header "Type Checking"
+header "Testing: Type Checking"
 
   define "Command expecting string returns true when given string" \
       "true" \
@@ -36,11 +36,6 @@ header "Type Checking"
   define "Command expecting bool returns false when given arguments" \
       "false" \
       "$cmd -b 0"
-
-  define "Concatenated arguments work and validate properly." \
-  "false
-true" \
-      "$cmd -tn 30,20"
 
   define "Command accepting number or string returns true when given number" \
       "true" \
@@ -60,25 +55,37 @@ true" \
 
 
 
-header "Argument Amount"
+header "Testing: Concatenated Commands"
 
-  define "Command enforcing at most 3 arguments returns 3 for amount of arguments when given 4 arguments" \
+  define "Concatenated arguments work and validate properly." \
+  "false
+true" \
+      "$cmd -tn 30,20"
+
+
+
+header "Testing: Argument Amounts"
+
+  define "Command enforcing at most 3 arguments returns 3 when given 4 arguments" \
       "3" \
       "$cmd -a -l one two three four"
 
+  define "Command enforcing at most 3 optional arguments returns 2 when given 2 arguments" \
+      "2" \
+      "$cmd -a -l one two"
 
-end=`date +%s%N`
+
 
 header "Summary"
-printf "Status: ${success}"
-newline
 printf "Passed: ${HEADER}${passed}${RESTORE}"
 newline
 printf "Failed: ${HEADER}${failed}${RESTORE}"
+newline
+printf "Status: ${success}"
 
 newline 2
 
 if [[ "${verbose}" == "false" ]]; then
-  printf "Run '${HEADER}npm run test:verbose${RESTORE}' to see all of the test definitions."
+  printf "Run '${ACTION}npm run test:verbose${RESTORE}' to see all of the test definitions."
   newline 2
 fi

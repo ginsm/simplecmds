@@ -4,6 +4,7 @@ DESC='\033[01;37m'
 PASS='\033[01;32m'
 FAIL='\033[01;31m'
 HEADER='\033[01;33m'
+ACTION='\033[01;33m'
 
 # SECTION - Variables
 count=0
