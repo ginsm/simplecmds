@@ -1,5 +1,5 @@
 # SimpleCMDs <!-- omit in toc -->
-This package allows you to easily create command line interfaces for your projects.
+SimpleCMDs is a zero-dependency module designed to help you easily create custom command line interfaces.
 
 ### Features
 - :pencil2: Create custom commands.

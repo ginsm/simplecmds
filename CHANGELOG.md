@@ -26,7 +26,7 @@ All notable changes to this project will be documented in this file — the form
 - Minified distribution file via WebPack and Babel.
 - `CHANGELOG.md` for better documentation.
 - GitHub Wiki documentation.
-- Test script to ensure functionality is working as intended.
+- Test script to ensure functionality works as intended.
 
 &nbsp;
 
