@@ -1,4 +1,4 @@
-const {flatten, alternate} = require('./helper');
+const {convertNumbers, flatten, alternate} = require('./helper');
 
 const Parsing = {
   /**
@@ -12,14 +12,26 @@ const Parsing = {
   parseArgs(args, commands) {
     return args
         .reduce((prev, arg, id) => {
+          // Find command with given alias or set as undefined
           const command = (commands.find(([_, obj]) => {
             return obj.alias.includes(arg);
           }) || [])[0];
+
+          // call help if first arg isn't a command
           ((id == 0 && !command) && this.showHelp.call(this, true));
+
+          // Used for building purposes
           const building = command || prev.building;
           const exists = prev.hasOwnProperty(command) && [...prev[command]];
           const key = command || prev.building;
-          const value = command ? exists || [] : [...prev[building], arg];
+
+          // Arg spread expands concatenated arguments
+          const value = command ? exists || [] : [
+            ...prev[building],
+            ...((typeof arg == 'string') ? arg.includes('+') ?
+              convertNumbers(arg.split('+')) : [arg] : [arg]),
+          ];
+
           return ({...prev, [key]: value, building});
         }, {});
   },
@@ -36,8 +48,10 @@ const Parsing = {
     return flatten(arr.map((arg, id, arr) => {
       const groupedAliases = /(?<!\S)-\w{2,}/.test(arg);
       if (groupedAliases) {
+        // -ab -> -a -b
         const aliases = arg.replace(/(?<!\W)(?=\w)/g, '-').split(/(?=\W)/g);
         const groupedArgs = /\w+(,\w+)+/g.test(arr[id + 1]);
+        // split args up to be alternated with aliases
         const args = groupedArgs && arr[id + 1].split(',') || [];
         return alternate(aliases, args);
       }
