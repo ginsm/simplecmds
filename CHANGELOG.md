@@ -23,7 +23,7 @@ All notable changes to this project will be documented in this file — the form
   - This would be the same as typing `-a one -b two -c three`.
 - `.showHelp` now has an `exit` parameter; if true the process will exit.
 - Default version command: `-v` or `--version`.
-- Minified distribution file via WebPack and Babel.
+- Minified distribution file via WebPack.
 - `CHANGELOG.md` for better documentation.
 - GitHub Wiki documentation.
 - Test script to ensure functionality works as intended.
