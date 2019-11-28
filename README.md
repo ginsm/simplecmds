@@ -45,12 +45,12 @@ I believe the best way to learn a technology is to create something with it. In 
 
 &nbsp;
 
-**The Project (print):**
+**The Project (print.js):**
 
 There will be three commands: `message`, `subject`, and `body`. Running `node print -m -s 'My subject' -b 'My body text'` will print the message to the terminal as such:
 
 ```bash
-~: node print -m -s 'My Subject' -b 'My body text'
+~: node print -ms 'My Subject' -b 'My body text'
 Subject: My subject
 Body: My body text
 ```
@@ -88,10 +88,10 @@ const options = {
 **Explanation**
 
 I excluded the `version` and `debug` options in order to use their default values. The program description will be used when printing the help menu (`<program> -h`). The defaultRule does two things: 
-1. Require the first argument of the commands to be a 'string' or 'number'
-2. Allow no more than 1 argument for the command.
+1. Require the first argument to be a 'string' or 'number'.
+2. Allow no more than 1 argument.
 
-In order to understand the defaultRule better I recommend reading the [ rules ](https://github.com/ginsm/simplecmds/wiki/Command-Creation#rule) wiki page.
+In order to understand the `defaultRule` better I recommend reading the [ rules ](https://github.com/ginsm/simplecmds/wiki/Command-Creation#rule) wiki page.
 
 &nbsp;
 
