@@ -7,7 +7,6 @@ cmd="node $wdir/test-interface"
 
 # SECTION - Importing
 source $wdir/utility.sh $1
-success="${PASS}Passed${RESTORE}"
 
 
 # SECTION - Script Header
@@ -23,7 +22,7 @@ header "Testing: Type Checking"
 
   define "Command expecting string returns true when given string" \
       "true" \
-      "$cmd -t string"
+      "$cmd -t 'string'"
 
   define "Command expecting string returns false when given number" \
       "false" \
@@ -53,14 +52,23 @@ header "Testing: Type Checking"
       "false" \
       "$cmd -m 20 'string'"
 
+end_section
+
 
 
 header "Testing: Concatenated Commands"
 
-  define "Concatenated arguments work and validate properly." \
-  "false
+  define "Concatenated aliases work and validate properly" \
+      "false
 true" \
-      "$cmd -tn 30,20"
+      "$cmd -tn 20,20"
+
+  define "Multiple arguments provided to multiple aliases work and validate properly" \
+      "true
+true" \
+      "$cmd -mA string+42,string"
+
+end_section
 
 
 
@@ -68,11 +76,12 @@ header "Testing: Argument Amounts"
 
   define "Command enforcing at most 3 arguments returns 3 when given 4 arguments" \
       "3" \
-      "$cmd -a -l one two three four"
+      "$cmd -a -l 'one' 'two' 'three' 'four'"
 
   define "Command enforcing at most 3 optional arguments returns 2 when given 2 arguments" \
       "2" \
-      "$cmd -a -l one two"
+      "$cmd -a -l 'one' 'two'"
+end_section
 
 
 
@@ -85,7 +94,4 @@ printf "Status: ${success}"
 
 newline 2
 
-if [[ "${verbose}" == "false" ]]; then
-  printf "Run '${ACTION}npm run test:verbose${RESTORE}' to see all of the test definitions."
-  newline 2
-fi
+verbose_enabled "npm run test:verbose"
