@@ -16,7 +16,7 @@ const Cmds = {
   // SECTION - Object Creation
 
   /**
-   * Build the commands from a given object.
+   * @description Build the commands from a given object.
    * @param {{}} commands - Object containing all commands.
    * @example
    * {
@@ -47,20 +47,20 @@ const Cmds = {
   },
 
   /**
-  * Set the program options.
-  * @param {{}} options - Program options.
-  * @example
-  * {
-  *   version: 'v1.0.0',
-  *   descrition: 'My simple NodeJS Program',
-  *   debug: true,
-  *   defaultRule: {
-  *     rule: '<number> [number]',
-  *     amount: 0,
-  *   },
-  * }
-  * @return {Private} 'this' for chaining.
-  */
+   * @description Set the program options.
+   * @param {{}} options - Program options.
+   * @example
+   * {
+   *   version: 'v1.0.0',
+   *   descrition: 'My simple NodeJS Program',
+   *   debug: true,
+   *   defaultRule: {
+   *     rule: '<number> [number]',
+   *     amount: 0,
+   *   },
+   * }
+   * @return {Private} 'this' for chaining.
+   */
   set(options = {}) {
     return Object.assign(this, {
       // defaults
@@ -75,19 +75,18 @@ const Cmds = {
   // SECTION - Main Parser
 
   /**
-   * Parse process.argv and process the arguments.
+   * @description Parse process.argv and process the arguments.
    * @param {[]} args - Expects process.argv.
    * @return {{}} Command object generated from buildCommands.
    */
   parse(args) {
     // run set even if the user did not invoke it
-    (!this.version && this.set({}));
+    (!this.hasOwnProperty('version') && this.set({}));
 
     addDefaultCommands.call(this, Builder);
     args = convertNumbers(expandAliases(args.slice(2)));
     (!args.length && this.showHelp(true));
 
-    // Command building
     const commands = buildCommands.call(this,
         Builder,
         parseArgs.call(this, args, Object.entries(Builder))
@@ -102,7 +101,7 @@ const Cmds = {
   // SECTION - Help Menu
 
   /**
-   * Output the program's help menu.
+   * @description Output the program's help menu.
    * @param {boolean} exit - Exit program after running.
    */
   showHelp(exit = false) {
