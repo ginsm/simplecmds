@@ -1,3 +1,5 @@
+const error = require('./errors');
+
 const Helper = {
   /**
    * Capitalize the first letter of a word.
@@ -9,6 +11,21 @@ const Helper = {
    */
   capitalize(word) {
     return word[0].toUpperCase() + word.substr(1);
+  },
+
+  /**
+   * Ensures the rules properly adhere to the syntax.
+   * @param {string} rule - Rule to validate.
+   * @param {string} cmdName - Name of the command.
+   * @return {string} - The rule string.
+   */
+  validRule(rule, cmdName) {
+    const optionalBeforeRequired = /(?<=\] )(?=<)/;
+    (optionalBeforeRequired.test(rule) && error(
+        'InvalidRule',
+        `${cmdName}.rule cannot contain an optional rule before a required one.`
+    ));
+    return rule;
   },
 
 
