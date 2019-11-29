@@ -1,14 +1,10 @@
 /**
  * Dispatch an error and exit process.
  * @param {string} type - Error type.
- * @param {*} value - Relevant information.
+ * @param {string} message - Message to issue about the error.
  */
-function error(type, value) {
-  const message = {
-    'CommandBuild':
-      `No valid aliases found in ${value}.usage string.`,
-  };
-  console.error(`${type}Error: ${message[type]}`);
+function error(type, message) {
+  console.error(`${type}Error: ${message}`);
   process.exit();
 }
 
