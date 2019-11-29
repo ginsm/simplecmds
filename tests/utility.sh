@@ -20,8 +20,10 @@ define() {
   local expected="${2}"
   local result=$(${3})
 
-  if [[ "${result}" == "${expected}" ]]; then
-    if [[ "${verbose}" == "true" ]]; then
+  if [[ "${result}" = "${expected}" ]]
+  then
+    if [[ "${verbose}" = "true" ]]
+    then
       printf "${DESC}${desc}${RESTORE}"
       newline
 
@@ -34,7 +36,9 @@ define() {
     printf "${DESC}${desc}${RESTORE}"
     newline
 
-    printf "Status: ${FAIL}Failed${RESTORE} (${result})"
+    printf "Status: ${FAIL}Failed${RESTORE} 
+    Output: ${result}
+    Expected: ${expected}"
     newline 2
 
     success="${FAIL}Failed${RESTORE}"
@@ -50,9 +54,11 @@ define() {
 
 # SECTION - Helper Functions
 newline() {
-  if [[ ! ${1} ]]; then
+  if [[ ! ${1} ]]
+  then
     printf "\n"
-  elif (( $1 > 1 )); then 
+  elif (( $1 > 1 ))
+  then 
     for i in $(seq $1); do
       printf "\n"
     done
@@ -68,7 +74,7 @@ header() {
 }
 
 end_section() {
-  if [[ "${verbose}" == "false" ]]; then
+  if [[ "${verbose}" = "false" ]]; then
     if [[ "${section}" != "${FAIL}Failed${RESTORE}" ]]; then
       printf "${section}"
       newline 2
@@ -79,7 +85,7 @@ end_section() {
 
 verbose_enabled() {
   local command="${1}"
-  if [[ "${verbose}" == "false" ]]; then
+  if [[ "${verbose}" = "false" ]]; then
   printf "Run '${ACTION}${command}${RESTORE}' to see all of the test definitions."
   newline 2
 fi
