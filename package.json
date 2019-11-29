@@ -2,15 +2,14 @@
   "name": "simplecmds",
   "version": "2.0.0",
   "description": "Easily create commandline interfaces and type check arguments.",
-  "main": "./cmds.js",
+  "main": "./simplecmds.js",
   "scripts": {
     "test": "./tests/test-script.sh false",
     "test:verbose": "./tests/test-script.sh true",
     "build:production": "webpack --config webpack.production.js"
   },
   "files": [
-    "cmds.js",
-    "package.json"
+    "dist/simplecmds.js"
   ],
   "repository": {
     "type": "git",
