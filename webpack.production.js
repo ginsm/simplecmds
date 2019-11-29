@@ -13,6 +13,7 @@ module.exports = {
     libraryTarget: 'umd',
     globalObject: 'this',
   },
+  target: 'node',
   optimization: {
     minimize: true,
     minimizer: [new TerserPlugin({
