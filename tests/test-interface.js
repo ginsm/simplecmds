@@ -1,4 +1,5 @@
 /* eslint-disable require-jsdoc */
+// const cli = require('../src/simplecmds');
 const cli = require('../dist/simplecmds');
 
 const options = {
@@ -12,7 +13,7 @@ const options = {
 
 const commands = {
   text: {
-    usage: '-t --text <str>',
+    usage: '-s --string <str>',
     description: 'Require a string.',
     callback: log,
     rule: '<string>',
@@ -48,6 +49,13 @@ const commands = {
     callback: log,
     amount: 3,
 
+  },
+  wrongAmount: {
+    usage: '-w --wrong-amount',
+    description: 'Amount is less than required amount',
+    callback: log,
+    rule: '<number> <string>',
+    // inherits 'amount: 1' from defaultRule
   },
   argl: {
     usage: '-a --arg-length',

@@ -6,7 +6,7 @@ cmd="node $wdir/test-interface"
 
 
 # SECTION - Importing
-source $wdir/utility.sh $1
+. $wdir/utility.sh $1
 
 
 # SECTION - Script Header
@@ -22,11 +22,11 @@ header "Testing: Type Checking"
 
   define "Command expecting string returns true when given string" \
       "true" \
-      "$cmd -t 'string'"
+      "$cmd -s 'string'"
 
   define "Command expecting string returns false when given number" \
       "false" \
-      "$cmd -t 42"
+      "$cmd -s 42"
 
   define "Command expecting bool returns true when no arguments are given" \
       "true" \
@@ -61,7 +61,7 @@ header "Testing: Concatenated Commands"
   define "Concatenated aliases work and validate properly" \
       "false
 true" \
-      "$cmd -tn 20,20"
+      "$cmd -sn 20,20"
 
   define "Multiple arguments provided to multiple aliases work and validate properly" \
       "true
@@ -81,6 +81,11 @@ header "Testing: Argument Amounts"
   define "Command enforcing at most 3 optional arguments returns 2 when given 2 arguments" \
       "2" \
       "$cmd -a -l 'one' 'two'"
+
+  define "Command with more required arguments than amount rule uses required amount instead" \
+      "2" \
+      "$cmd -a -w 20 'string'"
+
 end_section
 
 
