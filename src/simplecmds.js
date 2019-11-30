@@ -1,14 +1,12 @@
-// Node Imports
-const basename = require('path').basename;
-const {parseArgs, expandAliases} =
-      require(`./util/parsing`);
-const {longestString, convertNumbers, capitalize} =
-      require('./util/helper');
-const {generateAlias, addDefaultCommands, buildCommands, issueCallbacks} =
-      require('./util/building');
+const {convertNumbers} = require('./util/helper');
+const showHelp = require('./util/helpmenu');
+const {parseArgs, expandAliases, generateAlias} =
+      require(`./util/parse`);
+const {addDefaultCommands, buildCommands, issueCallbacks} =
+      require('./util/build');
 
 /**
-   * Contains the commands during building.
+   * Contains the commands building instructions.
    */
 const Builder = {};
 
@@ -17,7 +15,7 @@ const Cmds = {
 
   /**
    * @description Build the commands from a given object.
-   * @param {{}} commands - Object containing all commands.
+   * @param {{}} commands - Object containing command options.
    * @example
    * {
    *  myCommand: {
@@ -33,7 +31,7 @@ const Cmds = {
    *    amount: 1,
    *  },
    * }
-   * @return {Private} 'this' for chaining.
+   * @return {{}} 'this' for chaining.
    */
   commands(commands) {
     commands = Object.entries(commands)
@@ -89,7 +87,7 @@ const Cmds = {
 
     const commands = buildCommands.call(this,
         Builder,
-        parseArgs.call(this, args, Object.entries(Builder))
+        parseArgs.call(this, args, Object.entries(Builder)),
     );
 
     issueCallbacks(Builder, commands);
@@ -97,36 +95,11 @@ const Cmds = {
     return commands;
   },
 
-
-  // SECTION - Help Menu
-
   /**
    * @description Output the program's help menu.
    * @param {boolean} exit - Exit program after running.
    */
-  showHelp(exit = false) {
-    const programName = basename(process.argv[1], '.js');
-    const cmdUsage = Object.values(Builder).map((cmd) => cmd.usage);
-    const longestUsage = longestString(cmdUsage);
-    const defaultAmount = this.debug ? -3 : -2;
-
-    // Build command usage and description strings
-    const cmds = Object.values(Builder).map(({usage, description}) => {
-      const spaces = Array((longestUsage + 4) - usage.length).join(' ');
-      return `${usage} ${spaces} ${description}`;
-    });
-
-    [`Program: ${capitalize(programName)} (${this.version})`,
-      this.description && `Description: ${this.description}\n` || '',
-      'Commands:',
-      ...cmds.slice(0, defaultAmount),
-      `\nDefaults:`,
-      ...cmds.slice(defaultAmount),
-      `\nUsage: ${programName} <command> [...args]`,
-    ].forEach((line) => console.log(line));
-
-    (exit && process.exit());
-  },
+  showHelp,
 };
 
 module.exports = Cmds;
