@@ -1,4 +1,4 @@
-const error = require('./errors');
+const error = require('./error');
 
 const Helper = {
   /**
@@ -22,7 +22,7 @@ const Helper = {
   validRule(rule, cmdName) {
     const optionalBeforeRequired = /(?<=\] )(?=<)/;
     (optionalBeforeRequired.test(rule) && error(
-        'InvalidRule',
+        'BuildError',
         `${cmdName}.rule cannot contain an optional rule before a required one.`
     ));
     return rule;
