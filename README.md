@@ -78,8 +78,8 @@ simplecmds
 ```javascript
 const options = {
   description: 'Print a message with a subject and body.',
-  defaultRule: {
-    rule: '<string,number>',
+  defaults: {
+    rules: '<string,number>',
     amount: 1,
   }
 };
@@ -107,10 +107,10 @@ const commands = {
     usage: '-m --message *subject *body',
     description: 'Write a message; requires -s and -b',
     callback: print,
-    rule: false, // negate defaultRule
+    rules: false, // negate default rules
   },
 
-  // The default rule will be added to the next two commands
+  // The defaults will be added to the next two commands
   subject: {
     usage: '-s --subject <subject>',
     description: 'Set the subject text',
@@ -161,8 +161,8 @@ const simplecmds = require('simplecmds');
 
 const options = {
   description: 'Print a message with a subject and body.',
-  defaultRule: {
-    rule: '<string,number>',
+  defaults: {
+    rules: '<string,number>',
     amount: 1,
   }
 };
@@ -171,10 +171,10 @@ const commands = {
     usage: '-m --message *subject *body',
     description: 'Write a message; requires -s and -b',
     callback: print,
-    rule: false, // negate defaultRule
+    rules: false, // negate default rules
   },
 
-  // The default rule will be added to the next two commands
+  // The defaults will be added to the next two commands
   subject: {
     usage: '-s --subject <subject>',
     description: 'Set the subject text',
