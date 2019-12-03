@@ -27,7 +27,7 @@ const Parsing = {
           const key = command || prev.building;
           const concatArg = (typeof arg == 'string' && arg.includes('+'));
 
-          // Arg spread expands concatArg arguments
+          // Arg spread expands concatenated arguments
           const value = command ? exists || [] : [
             ...prev[building],
             ...(concatArg ? convertNumbers(arg.split('+')) : [arg]),
