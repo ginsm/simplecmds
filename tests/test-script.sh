@@ -63,7 +63,7 @@ header "Testing: Concatenated Commands"
 true" \
       "$cmd -sn 20,20"
 
-  define "Multiple arguments provided to multiple aliases work and validate properly" \
+  define "Concatenated arguments provided to concatenated aliases work and validate properly" \
       "true
 true" \
       "$cmd -mA string+42,string"
@@ -82,7 +82,7 @@ header "Testing: Argument Amounts"
       "2" \
       "$cmd -a -l 'one' 'two'"
 
-  define "Command with more required arguments than amount rule uses required amount instead" \
+  define "Command with more required arguments than amount utilizes required amount instead" \
       "2" \
       "$cmd -a -w 20 'string'"
 
