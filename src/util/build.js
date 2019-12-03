@@ -1,5 +1,4 @@
 const validate = require('./validate');
-const {validRule} = require('./helper');
 
 const Build = {
   /**
@@ -74,7 +73,7 @@ const Build = {
     for (const cmd in Builder) {
       if (Builder[cmd]) {
         Object.assign(commands,
-            Build.build.call(this, cmd, Builder[cmd], args)
+            Build.build.call(this, cmd, Builder[cmd], args),
         );
       }
     }
@@ -84,8 +83,8 @@ const Build = {
 
   /**
    * Builds individual command objects.
-   * @param {string} cmdName - Command name.
-   * @param {{}} builderObj - Command's builder object.
+   * @param {string} cmd - Command name.
+   * @param {{}} Builder - Command's Builder object.
    * @param {{}} args - Object containing all commands arguments.
    * @return {{}} The built command.
    * @example
@@ -96,18 +95,18 @@ const Build = {
    *  }
    * }
    */
-  build(cmdName, builderObj, args) {
-    if (args.hasOwnProperty(cmdName)) {
-      const cmdArgs = Build.enforceArgumentAmount(builderObj, args[cmdName]);
+  build(cmd, Builder, args) {
+    if (args.hasOwnProperty(cmd)) {
+      const cmdArgs = Build.enforceArgumentAmount(Builder, args[cmd]);
 
       const commandObject = {
-        [cmdName]: {
+        [cmd]: {
           args: cmdArgs,
-          valid: builderObj.hasOwnProperty('rule') ?
+          valid: Builder.hasOwnProperty('rules') && Builder.rules ?
           validate({
             args: cmdArgs.length ? cmdArgs : [true],
-            rule: validRule(builderObj.rule).split(' '),
-          }, cmdName) : true,
+            rules: Builder.rules.split(' '),
+          }, cmd) : true,
         },
       };
 
@@ -115,13 +114,9 @@ const Build = {
       return commandObject;
     }
 
-    if (builderObj.hasOwnProperty('rule')) {
-      validRule(builderObj.rule, cmdName);
-    }
-
     // This is here as an edge case where someone tries to validate a command
     // that has not been issued by the user.
-    const commandObject = {[cmdName]: {args: undefined, valid: false}};
+    const commandObject = {[cmd]: {args: undefined, valid: false}};
     Object.assign(this, commandObject);
     return commandObject;
   },
@@ -143,16 +138,17 @@ const Build = {
     });
   },
 
+
   /**
    * Enforces the specified argument amount; discarding any over the limit.
-   * @param {{}} obj - The command's builder object.
+   * @param {{}} obj - The command's Builder object.
    * @param {[]} args - The command's arguments.
    * @return {[]} An array containing no more than the amount.
    */
   enforceArgumentAmount(obj, args) {
     if (obj.amount) {
-      if (obj.rule) {
-        const requiredAmount = obj.rule.split(' ')
+      if (obj.rules) {
+        const requiredAmount = obj.rules.split(' ')
             .filter((rule) => rule[0] == '<').length;
 
         Object.assign(obj, {
