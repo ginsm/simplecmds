@@ -6,7 +6,7 @@ const options = {
   version: 'v0.1.0',
   description: 'Simplecmds Tester CLI.',
   defaults: {
-    amounts: 1,
+    amount: 1,
   },
 };
 
