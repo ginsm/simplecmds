@@ -1,5 +1,3 @@
-const error = require('./error');
-
 const Helper = {
   /**
    * Capitalize the first letter of a word.
@@ -13,21 +11,6 @@ const Helper = {
     return word[0].toUpperCase() + word.substr(1);
   },
 
-  /**
-   * Ensures the rules properly adhere to the syntax.
-   * @param {string} rule - Rule to validate.
-   * @param {string} cmdName - Name of the command.
-   * @return {string} - The rule string.
-   */
-  validRule(rule, cmdName) {
-    const optionalBeforeRequired = /(?<=\] )(?=<)/;
-    (optionalBeforeRequired.test(rule) && error(
-        'BuildError',
-        `${cmdName}.rule cannot contain an optional rule before a required one.`
-    ));
-    return rule;
-  },
-
 
   /**
    * Find the longest string in an array.
@@ -35,7 +18,7 @@ const Helper = {
    * @return {string} Length of the longest string.
    */
   longestString(arr) {
-    return arr.reduce((a, b) => b.length > a.length ? b : a).length;
+    return arr.reduce((a, b) => b.length > a.length ? b : a);
   },
 
 
