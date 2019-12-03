@@ -1,23 +1,23 @@
 /* eslint-disable require-jsdoc */
-const simplecmds = require('../simplecmds');
+const simplecmds = require('../src/simplecmds');
 
 const options = {
   description: 'Print a message with a subject and body.',
-  defaultRule: {
-    rule: '<string,number>',
+  defaults: {
+    rules: '<string,number>',
     amount: 1,
   },
 };
 
 const commands = {
   message: {
-    usage: '-m --message *subject *body',
+    usage: '-m --message @subjectCmd @bodyCmd',
     description: 'Write a message; requires -s and -b',
     callback: print,
-    rule: false, // negate defaultRule
+    rules: false, // negate default rules
   },
 
-  // The default rule will be added to the next two commands
+  // The defaults will be added to the next two commands
   subject: {
     usage: '-s --subject <subject>',
     description: 'Set the subject text',

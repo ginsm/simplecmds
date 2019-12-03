@@ -1,12 +1,12 @@
 /* eslint-disable require-jsdoc */
-const simplecmds = require('../simplecmds');
+const simplecmds = require('../src/simplecmds');
 
 const options = {
   version: 'v1.1.0',
   description: 'Basic NodeJS Calculator',
   debug: false,
-  defaultRule: {
-    rule: '<number> [number]',
+  defaults: {
+    rules: '<number> [number]',
   },
 };
 
@@ -37,7 +37,6 @@ simplecmds
     .set(options)
     .commands(commands)
     .parse(process.argv);
-
 
 function op(operation) {
   return function(args, valid) {

@@ -5,9 +5,8 @@ const cli = require('../dist/simplecmds');
 const options = {
   version: 'v0.1.0',
   description: 'Simplecmds Tester CLI.',
-  debug: false,
-  defaultRule: {
-    amount: 1,
+  defaults: {
+    amounts: 1,
   },
 };
 
@@ -16,31 +15,31 @@ const commands = {
     usage: '-s --string <str>',
     description: 'Require a string.',
     callback: log,
-    rule: '<string>',
+    rules: '<string>',
   },
   num: {
     usage: '-n --number <num>',
     description: 'Require a number.',
     callback: log,
-    rule: '<number>',
+    rules: '<number>',
   },
   bool: {
     usage: '-b --boolean <bool>',
     description: 'Require a boolean.',
     callback: log,
-    rule: '<boolean>',
+    rules: '<boolean>',
   },
   any: {
     usage: '-A --any <str,num>',
     description: 'Require a string or number.',
     callback: log,
-    rule: '<string,number>',
+    rules: '<string,number>',
   },
   multi: {
     usage: '-m --multi <str> <num> [num,str]',
     description: 'Allow for multiple arguments.',
     callback: log,
-    rule: '<string> <number> [number,string]',
+    rules: '<string> <number> [number,string]',
     amount: 0,
   },
   limit: {
@@ -54,13 +53,13 @@ const commands = {
     usage: '-w --wrong-amount',
     description: 'Amount is less than required amount',
     callback: log,
-    rule: '<number> <string>',
+    rules: '<number> <string>',
     // inherits 'amount: 1' from defaultRule
   },
   argl: {
     usage: '-a --arg-length',
     description: 'Switch from outputting validity to arg length.',
-    rule: '<boolean>',
+    rules: '<boolean>',
   },
 };
 
