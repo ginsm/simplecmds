@@ -12,15 +12,11 @@ All notable changes to this project will be documented in this file — the form
 &nbsp;
 
 ### Added
-- `.set(options)` method — takes in an object and sets global program options:
-  - Program `version`.
-  - Program `description`.
-  - Enabling `debug` command.
-  - `defaultRule` (applies to all commands).
+- `.set(options)` method — takes in an object and sets global program options (read wiki).
 - Commands are now created in a single object via the `.commands` method.
-- `amount` (command option) functionality has been improved, added:
+- `amount` (command option) functionality has been improved:
   - Command arguments over the allowed `amount` will now be discarded.
-  - Ensure the `amount` allows for all required arguments in the commands `rule`.
+  - Ensures the `amount` allows for all required arguments in the `rules` string.
 - Default version command: `-v` or `--version`.
 - Callbacks are now passed the built commands object as a third argument.
 - Minified distribution file via WebPack.
@@ -41,7 +37,7 @@ All notable changes to this project will be documented in this file — the form
   - Updated @param types.
 - `examples/calculator.js` has been updated to utilize these changes.
 - `.help` method has been renamed to `.showHelp`.
-- The codebase is now split up into several files.
+- The codebase is now split up into different modules.
 - Revised `README.md` to better reflect the new update:
   - `README.md` goes over the process of creating a tiny interface (`print.js`).
   - The code can be found in `examples/print.js`.
