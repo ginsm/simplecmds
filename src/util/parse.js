@@ -25,37 +25,36 @@ const Parsing = {
           const building = command || prev.building;
           const exists = prev.hasOwnProperty(command) && [...prev[command]];
           const key = command || prev.building;
+          const concatArg = (typeof arg == 'string' && arg.includes('+'));
 
-          // Arg spread expands concatenated arguments
+          // Arg spread expands concatArg arguments
           const value = command ? exists || [] : [
             ...prev[building],
-            ...((typeof arg == 'string') ? arg.includes('+') ?
-              convertNumbers(arg.split('+')) : [arg] : [arg]),
+            ...(concatArg ? convertNumbers(arg.split('+')) : [arg]),
           ];
 
-          return ({...prev, [key]: value, building});
+          return ({...prev, [key]: convertNumbers(value), building});
         }, {});
   },
 
   /**
- * Expands concatenated aliases and arguments.
- * @param {[*]} arr - Process.argv
- * @return {[*]} Aliases and arguments expanded in place.
- * @example
- * expandAliases(['-l', 'one', '-abc', '1,2,3']);
- * // output -> ['-l', 'one', '-a', 1, '-b', 2, '-c', 3]
- */
+   * Expands concatArg aliases and arguments.
+   * @param {[*]} arr - Process.argv
+   * @return {[*]} Aliases and arguments expanded in place.
+   * @example
+   * expandAliases(['-l', 'one', '-abc', '1,2,3']);
+   * // output -> ['-l', 'one', '-a', 1, '-b', 2, '-c', 3]
+   */
   expandAliases(arr) {
     return flatten(arr.map((arg, id, arr) => {
       const groupedAliases = /(?<!\S)-\w{2,}/.test(arg);
       if (groupedAliases) {
-        // -ab -> -a -b
         const aliases = arg.replace(/(?<!\W)(?=\w)/g, '-').split(/(?=\W)/g);
         const groupedArgs = /\w+(,\w+)+/g.test(arr[id + 1]);
-        // split args up to be alternated with aliases
         const args = groupedArgs && arr[id + 1].split(',') || [];
         return alternate(aliases, args);
       }
+      // set grouped arguments as undefined so it can be removed with filter
       return /\w+(,\w+)+/g.test(arg) ? undefined : arg;
     })).filter((arg) => arg);
   },
