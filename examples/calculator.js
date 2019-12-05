@@ -1,4 +1,3 @@
-/* eslint-disable require-jsdoc */
 const simplecmds = require('../src/simplecmds');
 
 const options = {
