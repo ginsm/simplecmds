@@ -23,7 +23,9 @@ All notable changes to this project will be documented in this file — the form
 - Test script to ensure functionality works as intended.
 - Grouped short aliases can now have grouped arguments following them: `-abc one+two,three,four`.
   - This would be the same as typing `-a one two -b three -c four`.
-- `.showHelp` now has an `exit` parameter; if true the process will exit.
+- The help menu has been revamped:
+  - Supports single command help pages (via command option `helpPage`). Accessed via -h 'command'.
+  - The main help page is accessible as normal.
 - `CHANGELOG.md` for better documentation.
 - GitHub Wiki documentation.
 
