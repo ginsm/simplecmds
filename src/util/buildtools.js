@@ -10,11 +10,11 @@ const BuildTools = {
   init(entries = [], that) {
     BuildTools.noConflictingAliases(entries);
     BuildTools.validateRules(entries);
-    const defaults = this.addDefaultCommands(that);
+    entries = entries.map(this.requiredAmountMet);
     Object.assign(BuildTools, {
       commands: {
         ...Object.fromEntries(entries),
-        ...defaults,
+        ...this.addDefaultCommands(that),
       },
     });
   },
@@ -90,6 +90,25 @@ const BuildTools = {
         ));
       }
     });
+  },
+
+
+  /**
+   * Ensure that the amount accounts for the required amount of arguments.
+   * @param {string} cmd - The command's property name.
+   * @param {{}} obj - The command's options object.
+   * @return {{}} Resolved amount.
+   */
+  requiredAmountMet([cmd, obj]) {
+    if (obj.amount && obj.rules) {
+      const requiredAmount = obj.rules.split(' ')
+          .filter((rule) => rule[0] == '<').length;
+
+      return ([cmd, {...obj,
+        amount: requiredAmount > obj.amount ? requiredAmount : obj.amount,
+      }]);
+    }
+    return [cmd, obj];
   },
 
 
