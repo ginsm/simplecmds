@@ -104,15 +104,6 @@ const Build = {
    */
   enforceArgumentAmount(obj, args) {
     if (obj.amount) {
-      if (obj.rules) {
-        const requiredAmount = obj.rules.split(' ')
-            .filter((rule) => rule[0] == '<').length;
-
-        Object.assign(obj, {
-          amount: (requiredAmount > obj.amount) ? requiredAmount : obj.amount,
-        });
-      }
-
       return (args.length > obj.amount) ? args.slice(0, obj.amount) : args;
     }
     return args;
