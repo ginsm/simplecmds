@@ -17,7 +17,7 @@ const Helper = {
    * @param {[string]} arr - Array of strings.
    * @return {string} Length of the longest string.
    */
-  longestString(arr) {
+  longest(arr) {
     return arr.reduce((a, b) => b.length > a.length ? b : a);
   },
 
