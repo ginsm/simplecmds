@@ -1,11 +1,11 @@
-const basename = require('path').basename;
-const {longestString, capitalize} =
-      require('./util/helper');
+// SECTION - Imports
+const {mainPage, singleCommandPage} =
+      require('./util/helpmenu');
 const {parseArgs, expandAliases, generateAlias} =
       require(`./util/parse`);
-const {addDefaultCommands, buildCommands, issueCallbacks} =
+const {buildCommands, issueCallbacks} =
       require('./util/build');
-const buildTools = require('./util/build-tools');
+const buildTools = require('./util/buildtools');
 
 const Cmds = {
   // SECTION - Object Creation
@@ -38,6 +38,7 @@ const Cmds = {
               ...this.defaults,
               ...command,
             }]),
+        this,
     );
     return this;
   },
@@ -73,15 +74,15 @@ const Cmds = {
   // SECTION - Main Parser
 
   /**
-   * @description Parse process.argv and process the arguments.
+   * @description Parse the process.argv input.
    * @param {[]} args - Expects process.argv.
-   * @return {{}} Command object generated from buildCommands.
+   * @return {{}} Output object generated from buildCommands.
    */
   parse(args) {
     // run set method even if the user did not invoke it (defaults)
     (!this.hasOwnProperty('version') && this.set({}));
 
-    addDefaultCommands.call(this, buildTools.commands);
+    // addDefaultCommands.call(this, buildTools.commands);
 
     // expand concatenated aliases and arguments
     args = expandAliases(args.slice(2));
@@ -98,34 +99,27 @@ const Cmds = {
   },
 
 
+  // SECTION - Show Help Menu
+
   /**
    * @description Output the program's help menu.
-   * @param {boolean} exit - Exit program after running; default false.
+   * @param {[]} args - The command arguments.
+   * @param {boolean} valid - Whether the command was valid or not.
+   * @param {{}} commands - The command args/validity object.
+   * @param {boolean} options - Exit program after running; default false.
    */
-  showHelp(exit = false) {
-    const programName = basename(process.argv[1], '.js');
-    const cmdUsage = Object.values(buildTools.commands).map((cmd) => cmd.usage);
-    const longestUsage = longestString(cmdUsage).length;
-    const defaultAmount = this.debug ? -3 : -2;
-
-    // Build command usage and description strings
-    const cmds = Object.values(buildTools.commands)
-        .map(({usage, description = ''}) => {
-          const spaces = Array((longestUsage + 4) - usage.length).join(' ');
-          return `${usage} ${spaces} ${description}`;
-        });
-
-    [`Program: ${capitalize(programName)} (${this.version})`,
-      this.description && `Description: ${this.description}\n` || '',
-      'Commands:',
-      ...cmds.slice(0, defaultAmount),
-      `\nDefaults:`,
-      ...cmds.slice(defaultAmount),
-      `\nUsage: ${programName} <command> [...args]`,
-    ].forEach((line) => console.log(line));
-
+  showHelp({exit = false, command = false}) {
+    if (command) {
+      singleCommandPage.call(this, buildTools.commands[command]);
+      (exit && process.exit());
+    }
+    mainPage.call(this, Object.values(buildTools.commands));
     (exit && process.exit());
   },
 };
 
 module.exports = Cmds;
+
+/*
+  I need to look at each alias of each command to find which help page to show.
+*/
