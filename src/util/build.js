@@ -1,55 +1,8 @@
+// SECTION - Imports
 const validate = require('./validate');
 
 const Build = {
-  /**
-   * Add the default commands to the Builder object.
-   * @param {{}} Builder - Contains command building instructions.
-   */
-  addDefaultCommands(Builder) {
-    const alias = {
-      help: Build.aliasConflict(Builder, '-h'),
-      debug: Build.aliasConflict(Builder, '-d'),
-      version: Build.aliasConflict(Builder, '-v'),
-    };
-    Object.assign(Builder, {
-      help: {
-        description: 'Output help menu.',
-        alias: [alias.help, '--help'],
-        usage: `${alias.help} --help`,
-        callback: this.showHelp.bind(this),
-      },
-      vers: {
-        description: 'Output version information.',
-        alias: [alias.version, '--version'],
-        usage: `${alias.version} --version`,
-        callback: () => console.log(this.version),
-      },
-      ...(this.debug && {debug: {
-        description: 'Output debug information.',
-        alias: [alias.debug, '--debug'],
-        usage: `${alias.debug} --debug`,
-        callback: () => console.log(Builder),
-      }}),
-    });
-  },
-
-
-  /**
-   * Handle conflicting aliases.
-   * @param {{}} Builder - Contains command building instructions.
-   * @param {string} alias - Alias to look up.
-   * @return {boolean} A non-conflicting alias.
-   * @example
-   * // another command uses -h
-   * aliasConflict('-h');
-   * // output -> '-H'
-   */
-  aliasConflict(Builder, alias) {
-    return Object.values(Builder).filter((command) => {
-      return command.alias.includes(alias);
-    }).length > 0 && alias.toUpperCase() || alias;
-  },
-
+  // SECTION - Output Building
 
   /**
    * Build each command's object.
@@ -122,6 +75,8 @@ const Build = {
   },
 
 
+  // SECTION - Handle Callbacks
+
   /**
    * Issue each command's callback function.
    * @param {{}} Builder - Contains command building instructions.
@@ -138,6 +93,8 @@ const Build = {
     });
   },
 
+
+  // SECTION - Helpers
 
   /**
    * Enforces the specified argument amount; discarding any over the limit.
