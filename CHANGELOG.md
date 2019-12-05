@@ -13,14 +13,21 @@ All notable changes to this project will be documented in this file — the form
 
 ### Added
 - `.set(options)` method — takes in an object and sets global program options (read wiki).
-- Commands are now created in a single object via the `.commands` method.
+- Commands are now created in a single object via the `.commands` method (read wiki).
 - `amount` (command option) functionality has been improved:
   - Command arguments over the allowed `amount` will now be discarded.
   - Ensures the `amount` allows for all required arguments in the `rules` string.
 - Default version command: `-v` or `--version`.
-- Callbacks are now passed the built commands object as a third argument.
+- Callbacks are now:
+  - passed the built commands object as a third argument.
+  - run in the order that they are issued.
 - Minified distribution file via WebPack.
+  - Preserves exposed module's JSDocs.
+  - Minified via Terser.
+  - Babel for compatibility.
 - Test script to ensure functionality works as intended.
+  - `npm test` shows a simplified version.
+  - `npm run test:verbose` shows a verbose version.
 - Grouped short aliases can now have grouped arguments following them: `-abc one+two,three,four`.
   - This would be the same as typing `-a one two -b three -c four`.
 - The help menu has been revamped:
@@ -39,7 +46,7 @@ All notable changes to this project will be documented in this file — the form
   - Updated @param types.
 - `examples/calculator.js` has been updated to utilize these changes.
 - `.help` method has been renamed to `.showHelp`.
-- The codebase is now split up into different modules.
+- The codebase is now split up into different modules (loc: `src/util/*`).
 - Revised `README.md` to better reflect the new update:
   - `README.md` goes over the process of creating a tiny interface (`print.js`).
   - The code can be found in `examples/print.js`.
@@ -47,9 +54,4 @@ All notable changes to this project will be documented in this file — the form
 &nbsp;
 
 ### Removed
-- `.setVersion` method.
-- `.description` method.
-- `.command` method.
-- `.rule` method.
-- `lastBuiltCommand` method.
-- `.camelCase` method.
+- Various methods no longer in use.
