@@ -38,7 +38,7 @@ simplecmds
     .parse(process.argv);
 
 function op(operation) {
-  return function(args, valid) {
+  return function({args, valid}) {
     valid ? console.log(args.reduce(operation)) : simplecmds.showHelp(true);
   };
 }

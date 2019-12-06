@@ -57,7 +57,7 @@ const commands = {
     rules: '<number> <string>',
     // inherits 'amount: 1' from defaultRule
   },
-  argl: {
+  arglen: {
     usage: '-a --arg-length',
     description: 'Switch from outputting validity to arg length.',
     rules: '<boolean>',
@@ -66,7 +66,7 @@ const commands = {
 
 cli.set(options).commands(commands).parse(process.argv);
 
-function log(args, valid, {argl}) {
-  const output = (argl.valid ? args.length : valid);
+function log({args, valid, commands: {arglen}}) {
+  const output = (arglen.valid ? args.length : valid);
   console.log(output);
 }
