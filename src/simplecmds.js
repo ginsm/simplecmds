@@ -82,18 +82,17 @@ const Cmds = {
     // run set method even if the user did not invoke it (defaults)
     (!this.hasOwnProperty('version') && this.set({}));
 
-    // addDefaultCommands.call(this, buildTools.commands);
-
     // expand concatenated aliases and arguments
     args = expandAliases(args.slice(2));
     (!args.length && this.showHelp(true));
 
     const commands = buildCommands.call(this,
-        buildTools.commands,
-        parseArgs.call(this, args, Object.entries(buildTools.commands)),
+        buildTools.directive,
+        parseArgs.call(this, args, Object.entries(buildTools.directive)),
     );
+    Object.assign(this, {cmds: commands});
 
-    issueCallbacks(buildTools.commands, commands);
+    issueCallbacks(buildTools.directive, commands);
 
     return commands;
   },
@@ -110,10 +109,10 @@ const Cmds = {
    */
   showHelp({exit = false, command = false}) {
     if (command) {
-      singleCommandPage.call(this, buildTools.commands[command]);
+      singleCommandPage.call(this, buildTools.directive[command]);
       (exit && process.exit());
     }
-    mainPage.call(this, Object.values(buildTools.commands));
+    mainPage.call(this, Object.values(buildTools.directive));
     (exit && process.exit());
   },
 };
