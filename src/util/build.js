@@ -5,10 +5,10 @@ const Build = {
   // SECTION - Output Building
 
   /**
-   * Build each command's object.
-   * @param {{}} Builder - Contains command building instructions.
-   * @param {*} args - Object containing commands and their arguments.
-   * @return {{}} Args and validity for each command.
+   * Build every command's output object.
+   * @param {{}} directive - Contains every command building instructions.
+   * @param {{}} args - Object containing commands and their arguments.
+   * @return {{}} Args and validity output for each command.
    * @example
    * {
    *  myCommand: {
@@ -21,25 +21,25 @@ const Build = {
    *  }
    * }
    */
-  buildCommands(Builder, args) {
-    const commands = {};
-    for (const cmd in Builder) {
-      if (Builder[cmd]) {
-        Object.assign(commands,
-            Build.build.call(this, cmd, Builder[cmd], args),
-        );
-      }
-    }
-    return commands;
+  buildCommands(directive, args) {
+    const issued = Object.entries(args)
+        .filter(([_, value]) => Array.isArray(value))
+        .map(([cmd, obj]) => Build.build(cmd, directive[cmd], obj));
+
+    const rest = Object.keys(directive)
+        .filter((key) => !Object.keys(args).includes(key))
+        .map((key) => [key, {args: false, valid: false}]);
+
+    return Object.fromEntries([...issued, ...rest]);
   },
 
 
   /**
-   * Builds individual command objects.
+   * Build an individual command's output object.
    * @param {string} cmd - Command name.
-   * @param {{}} Builder - Command's Builder object.
+   * @param {{}} directive - Contains command building instructions.
    * @param {{}} args - Object containing all commands arguments.
-   * @return {{}} The built command.
+   * @return {{}} The built command output.
    * @example
    * {
    *  myCommand: {
@@ -48,30 +48,15 @@ const Build = {
    *  }
    * }
    */
-  build(cmd, Builder, args) {
-    if (args.hasOwnProperty(cmd)) {
-      const cmdArgs = Build.enforceArgumentAmount(Builder, args[cmd]);
-
-      const commandObject = {
-        [cmd]: {
-          args: cmdArgs,
-          valid: Builder.hasOwnProperty('rules') && Builder.rules ?
+  build(cmd, directive, args) {
+    args = Build.enforceArgumentAmount(directive, args);
+    return [cmd, {args,
+      valid: directive.hasOwnProperty('rules') && directive.rules ?
           validate({
-            args: cmdArgs.length ? cmdArgs : [true],
-            rules: Builder.rules.split(' '),
+            args: args.length ? args : [true],
+            rules: directive.rules.split(' '),
           }, cmd) : true,
-        },
-      };
-
-      Object.assign(this, commandObject);
-      return commandObject;
-    }
-
-    // This is here as an edge case where someone tries to validate a command
-    // that has not been issued by the user.
-    const commandObject = {[cmd]: {args: undefined, valid: false}};
-    Object.assign(this, commandObject);
-    return commandObject;
+    }];
   },
 
 
@@ -79,15 +64,15 @@ const Build = {
 
   /**
    * Issue each command's callback function.
-   * @param {{}} Builder - Contains command building instructions.
+   * @param {{}} directive - Contains command building instructions.
    * @param {{}} commands - The end-user command object.
    */
-  issueCallbacks(Builder, commands) {
-    Object.entries(Builder).forEach(([cmd, obj]) => {
-      if (commands[cmd] && commands[cmd].args) {
-        const {args, valid} = commands[cmd];
-        if (obj.callback) {
-          obj.callback(args, valid, commands);
+  issueCallbacks(directive, commands) {
+    Object.entries(commands).forEach(([cmd, {args, valid}]) => {
+      if (args) {
+        const command = directive[cmd];
+        if (command.callback) {
+          command.callback(args, valid, commands);
         }
       }
     });
@@ -98,7 +83,7 @@ const Build = {
 
   /**
    * Enforces the specified argument amount; discarding any over the limit.
-   * @param {{}} obj - The command's Builder object.
+   * @param {{}} obj - The command's directive object.
    * @param {[]} args - The command's arguments.
    * @return {[]} An array containing no more than the amount.
    */
