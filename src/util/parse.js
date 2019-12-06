@@ -19,7 +19,7 @@ const Parsing = {
           }) || [])[0];
 
           // call help if first arg isn't a command
-          ((id == 0 && !command) && this.showHelp.call(this, true));
+          ((id == 0 && !command) && this.showHelp.call(this, {exit: true}));
 
           // Used for building purposes
           const building = command || prev.building;
