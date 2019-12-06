@@ -1,10 +1,11 @@
 /* eslint-disable require-jsdoc */
-// const cli = require('../src/simplecmds');
-const cli = require('../dist/simplecmds');
+const cli = require('../src/simplecmds');
+// const cli = require('../dist/simplecmds');
 
 const options = {
   version: 'v0.1.0',
   description: 'Simplecmds Tester CLI.',
+  debug: true,
   defaults: {
     amount: 1,
   },
