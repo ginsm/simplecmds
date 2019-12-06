@@ -4,7 +4,7 @@
 const BuildTools = {
   /**
    * Initiates the build tools and ensures there are no user errors.
-   * @param {[]} entries - Entries for each command.
+   * @param {[]} entries - Entries for each command directive.
    * @param {{}} that - `this` context of simplecmds.js.
    */
   init(entries = [], that) {
@@ -12,7 +12,7 @@ const BuildTools = {
     BuildTools.validateRules(entries);
     entries = entries.map(this.requiredAmountMet);
     Object.assign(BuildTools, {
-      commands: {
+      directive: {
         ...Object.fromEntries(entries),
         ...this.addDefaultCommands(that),
       },
@@ -26,7 +26,7 @@ const BuildTools = {
    * @return {{}} An object containing the default commands.
    */
   addDefaultCommands(that) {
-    const alias = this.defaultShortAlias();
+    const alias = this.defaultAliases();
     return {
       help: {
         description: 'Output help menu.',
@@ -35,7 +35,7 @@ const BuildTools = {
         callback: function([command]) {
           that.showHelp.call(that, {exit: true, command});
         },
-        rules: '<number,string>',
+        rules: '[number,string]',
         amount: 1,
       },
       vers: {
@@ -48,7 +48,7 @@ const BuildTools = {
         description: 'Output debug information.',
         alias: [alias.debug, '--debug'],
         usage: `${alias.debug} --debug`,
-        callback: () => console.log(this.commands),
+        callback: () => console.log(this.directive, that.cmds),
       }}),
     };
   },
@@ -104,9 +104,9 @@ const BuildTools = {
       const requiredAmount = obj.rules.split(' ')
           .filter((rule) => rule[0] == '<').length;
 
-      return ([cmd, {...obj,
+      return [cmd, {...obj,
         amount: requiredAmount > obj.amount ? requiredAmount : obj.amount,
-      }]);
+      }];
     }
     return [cmd, obj];
   },
@@ -114,10 +114,10 @@ const BuildTools = {
 
   // SECTION - Helpers
   /**
-   * Capitalizes default if there's a conflicting alias.
+   * Handles default command aliases; capitalizing upon any conflicts.
    * @return {{}} Non-conflicting aliases for default commands.
    */
-  defaultShortAlias() {
+  defaultAliases() {
     const resolve = (alias) => {
       return this.aliases.includes(alias) ? alias.toUpperCase() : alias;
     };
