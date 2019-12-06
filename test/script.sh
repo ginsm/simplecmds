@@ -2,7 +2,7 @@
 
 # SECTION - Variables
 wdir=$(cd "$(dirname "${0}")" ; pwd -P)
-cmd="node $wdir/test-interface"
+cmd="node $wdir/interface"
 
 
 # SECTION - Importing
