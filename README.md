@@ -137,7 +137,7 @@ Our callback receives three arguments: `args`, `valid`, and `commands`. The comm
 ```javascript
 function print(args, valid, {subject, body}) {
   // Ensure that both commands are valid
-  const bothValid = (subject.valid && body.valid) || simplecmds.showHelp(true);
+  const bothValid = (subject.valid && body.valid) || simplecmds.help(true);
 
   if (bothValid) {
     // add a limit of 60 characters
@@ -194,7 +194,7 @@ simplecmds
 // callback
 function print(args, valid, {subject, body}) {
   // Ensure that both commands are valid
-  const bothValid = (subject.valid && body.valid) || simplecmds.showHelp(true);
+  const bothValid = (subject.valid && body.valid) || simplecmds.help(true);
 
   if (bothValid) {
     // add a limit of 60 characters
