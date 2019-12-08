@@ -80,7 +80,7 @@ const Cmds = {
    */
   parse(args) {
     // run set method even if the user did not invoke it (defaults)
-    (!this.hasOwnProperty('version') && this.set({}));
+    (!this.hasOwnProperty('version') && this.set());
 
     // expand concatenated aliases and arguments
     args = expandAliases(args.slice(2));
@@ -108,9 +108,9 @@ const Cmds = {
    * @param {boolean} options - Exit program after running; default false.
    */
   showHelp({exit = false, command = false}) {
-    (command &&
+    (command ?
       singleCommandPage
-          .call(this, buildTools.directive[command]) ||
+          .call(this, buildTools.searchDirective(command)) :
       mainPage
           .call(this, Object.values(buildTools.directive)));
     (exit && process.exit());
