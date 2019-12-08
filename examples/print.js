@@ -36,7 +36,8 @@ simplecmds
 // callback
 function print({commands: {subject, body}}) {
   // Ensure that both commands are valid
-  const bothValid = (subject.valid && body.valid) || simplecmds.showHelp(true);
+  const bothValid = (subject.valid && body.valid) || 
+      simplecmds.showHelp({exit: true});
 
   if (bothValid) {
     // add a limit of 60 characters
