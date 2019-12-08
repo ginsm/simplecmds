@@ -76,7 +76,7 @@ const Cmds = {
   /**
    * @description Parse the process.argv input.
    * @param {[]} args - Expects process.argv.
-   * @return {{}} Output object generated from buildCommands.
+   * @return {{}} The output generated from buildCommands.
    */
   parse(args) {
     // run set method even if the user did not invoke it (defaults)
@@ -86,15 +86,15 @@ const Cmds = {
     args = expandAliases(args.slice(2));
     (!args.length && this.showHelp(true));
 
-    const commands = buildCommands.call(this,
+    const output = buildCommands.call(this,
         buildTools.directive,
         parseArgs.call(this, args, Object.entries(buildTools.directive)),
     );
-    Object.assign(this, {cmds: commands});
+    Object.assign(this, {cmds: output});
 
-    issueCallbacks(buildTools.directive, commands);
+    issueCallbacks(buildTools.directive, output);
 
-    return commands;
+    return output;
   },
 
 
@@ -108,11 +108,11 @@ const Cmds = {
    * @param {boolean} options - Exit program after running; default false.
    */
   showHelp({exit = false, command = false}) {
-    if (command) {
-      singleCommandPage.call(this, buildTools.directive[command]);
-      (exit && process.exit());
-    }
-    mainPage.call(this, Object.values(buildTools.directive));
+    (command &&
+      singleCommandPage
+          .call(this, buildTools.directive[command]) ||
+      mainPage
+          .call(this, Object.values(buildTools.directive)));
     (exit && process.exit());
   },
 };
