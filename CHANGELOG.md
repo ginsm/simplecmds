@@ -24,7 +24,7 @@ All notable changes to this project will be documented in this file — the form
 - Minified distribution file via WebPack.
   - Preserves exposed module's JSDocs.
   - Minified via Terser.
-  - Babel for compatibility.
+  - Babel for Node 8.0 compatibility.
 - Test script to ensure functionality works as intended.
   - `npm test` shows a simplified version.
   - `npm run test:verbose` shows a verbose version.
@@ -45,7 +45,6 @@ All notable changes to this project will be documented in this file — the form
   - Updated various @return statements.
   - Updated @param types.
 - `examples/calculator.js` has been updated to utilize these changes.
-- `.help` method has been renamed to `.showHelp`.
 - The codebase is now split up into different modules (loc: `src/util/*`).
 - Revised `README.md` to better reflect the new update:
   - `README.md` goes over the process of creating a tiny interface (`print.js`).
