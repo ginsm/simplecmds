@@ -1,3 +1,6 @@
+// SECTION - Imports
+const error = require('./error');
+
 /**
  * Parses the commands object and checks for any errors.
  */
@@ -19,6 +22,19 @@ const BuildTools = {
     });
   },
 
+  /**
+   * Search the directive for a specific command with an alias.
+   * @param {string} alias - The alias to search by.
+   * @return {Object} - The specific command's
+   */
+  searchDirective(alias) {
+    const dashedAlias = alias.length > 1 ? `--${alias}` : `-${alias}`;
+    return Object.values(this.directive).find((obj) =>
+      obj.alias.includes(dashedAlias)) ||
+      error('NotFound', `Could not find a command with the alias ${alias}`);
+  },
+
+
   // SECTION - Default Commands
   /**
    * Add the default commands to the Builder object.
@@ -32,7 +48,7 @@ const BuildTools = {
         description: 'Output help menu.',
         alias: [alias.help, '--help'],
         usage: `${alias.help} --help`,
-        callback: function([command]) {
+        callback: function({args: [command]}) {
           that.showHelp.call(that, {exit: true, command});
         },
         rules: '[number,string]',
