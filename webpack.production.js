@@ -26,4 +26,13 @@ module.exports = {
     })],
   },
   plugins: [new CleanWebpackPlugin()],
+  module: {
+    rules: [
+      {
+        loader: 'babel-loader',
+        test: /\.js$/,
+        exclude: /(node_modules|dist|examples|test)/,
+      },
+    ],
+  },
 };
