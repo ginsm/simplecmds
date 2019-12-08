@@ -39,6 +39,6 @@ simplecmds
 
 function op(operation) {
   return function({args, valid}) {
-    valid ? console.log(args.reduce(operation)) : simplecmds.showHelp(true);
+    valid ? console.log(args.reduce(operation)) : simplecmds.help({exit: true});
   };
 }

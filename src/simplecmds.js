@@ -84,7 +84,7 @@ const Cmds = {
 
     // expand concatenated aliases and arguments
     args = expandAliases(args.slice(2));
-    (!args.length && this.showHelp(true));
+    (!args.length && this.help({exit: true}));
 
     const output = buildCommands.call(this,
         buildTools.directive,
@@ -107,7 +107,7 @@ const Cmds = {
    * @param {{}} commands - The command args/validity object.
    * @param {boolean} options - Exit program after running; default false.
    */
-  showHelp({exit = false, command = false}) {
+  help({exit = false, command = false}) {
     (command ?
       singleCommandPage
           .call(this, buildTools.searchDirective(command)) :

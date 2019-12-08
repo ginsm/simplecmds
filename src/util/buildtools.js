@@ -49,7 +49,7 @@ const BuildTools = {
         alias: [alias.help, '--help'],
         usage: `${alias.help} --help`,
         callback: function({args: [command]}) {
-          that.showHelp.call(that, {exit: true, command});
+          that.help.call(that, {exit: true, command});
         },
         rules: '[number,string]',
         amount: 1,
