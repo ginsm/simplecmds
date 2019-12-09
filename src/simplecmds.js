@@ -86,6 +86,7 @@ const Cmds = {
     args = expandAliases(args.slice(2));
     (!args.length && this.help({exit: true}));
 
+    // build the output object
     const output = buildCommands.call(this,
         buildTools.directive,
         parseArgs.call(this, args, Object.entries(buildTools.directive)),
@@ -93,7 +94,6 @@ const Cmds = {
     Object.assign(this, {cmds: output});
 
     issueCallbacks(buildTools.directive, output);
-
     return output;
   },
 
@@ -108,17 +108,15 @@ const Cmds = {
    * @param {boolean} options - Exit program after running; default false.
    */
   help({exit = false, command = false}) {
-    (command ?
+    if (command) {
       singleCommandPage
-          .call(this, buildTools.searchDirective(command)) :
+          .call(this, buildTools.searchDirective(command));
+    } else {
       mainPage
-          .call(this, Object.values(buildTools.directive)));
+          .call(this, Object.values(buildTools.directive));
+    }
     (exit && process.exit());
   },
 };
 
 module.exports = Cmds;
-
-/*
-  I need to look at each alias of each command to find which help page to show.
-*/
