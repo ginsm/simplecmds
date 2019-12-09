@@ -1,6 +1,7 @@
 // SECTION - Imports
 const error = require('./error');
 
+
 /**
  * Parses the commands object and checks for any errors.
  */
@@ -23,15 +24,15 @@ const BuildTools = {
   },
 
   /**
-   * Search the directive for a specific command with an alias.
-   * @param {string} alias - The alias to search by.
-   * @return {Object} - The specific command's
+   * Search the directive using an alias for a specific command.
+   * @param {string} alias - Search parameter.
+   * @return {Object} - The specific command's directive object.
    */
   searchDirective(alias) {
     const dashedAlias = alias.length > 1 ? `--${alias}` : `-${alias}`;
     return Object.values(this.directive).find((obj) =>
-      obj.alias.includes(dashedAlias)) ||
-      error('NotFound', `Could not find a command with the alias ${alias}`);
+      obj.alias.includes(dashedAlias)) || this.directive[alias] ||
+      error('NotFound', `Could not find a command with the alias '${alias}'.`);
   },
 
 
@@ -73,7 +74,7 @@ const BuildTools = {
   // SECTION - Error checking
   /**
    * Ensure there are no conflicting aliases.
-   * @param {[]} entries - Entries for each command.
+   * @param {[]} entries - Entries for each command directive.
    */
   noConflictingAliases(entries = []) {
     const aliases = BuildTools.allAliases(entries);
@@ -88,14 +89,14 @@ const BuildTools = {
 
   /**
    * Ensure every command's rules use valid syntax.
-   * @param {[]} entries - Entries for each command.
+   * @param {[]} entries - Entries for each command directive.
    */
   validateRules(entries = []) {
     const whitespaceInRule = /<\w*\s.*>|\[\w*\s.*\]/;
     const optionalBeforeRequired = '] <';
     entries.forEach((cmd, {rules}) => {
-      cmd = `${cmd}.rules`;
       if (rules) {
+        cmd = `${cmd}.rules`;
         // ensure there are no whitespaces within a rule bracket
         (!whitespaceInRule.test(rules) || error('Creation',
             `${cmd} cannot contain whitespace inside of the brackets.`,
@@ -146,7 +147,7 @@ const BuildTools = {
 
   /**
    * Get an array of all the aliases.
-   * @param {[]} entries - Entries for each command.
+   * @param {[]} entries - Entries for each command directive.
    * @return {[]} Array containing all command aliases.
    */
   allAliases(entries = []) {
