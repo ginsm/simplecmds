@@ -10,8 +10,12 @@ const options = {
 
 const commands = {
   message: {
-    usage: '-m --message @subjectCmd @bodyCmd',
+    usage: '-m --message @subject @body',
     description: 'Write a message; requires -s and -b',
+    help: "Used to print a message. This command requires two other commands:\n\n\
+    -s --subject   Set the subject text\n\
+    -b --body      Set the body text",
+    require: ['body', 'subject'],
     callback: print,
     rules: false, // negate default rules
   },
