@@ -34,7 +34,7 @@ const HelpMenu = {
     const {programName} = HelpMenu;
     [`\nProgram: ${capitalize(programName)} (${this.version})`,
       `Command: ${obj.alias.join(', ')}\n`,
-      `${obj.helpPage || 'There is no help page for this command.'}\n`,
+      `${obj.help || obj.description}\n`,
       `Usage: ${programName} ${obj.usage}\n`,
     ].forEach((line) => console.log(line));
   },
