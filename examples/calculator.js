@@ -2,7 +2,7 @@ const simplecmds = require('../src/simplecmds');
 
 const options = {
   version: 'v1.1.0',
-  description: 'Basic NodeJS Calculator',
+  description: 'A basic single operation calculator',
   debug: false,
   defaults: {
     rules: '<number> [number]',
