@@ -259,7 +259,7 @@ function saveProfile({args: [name], valid, commands: {key, cert, port}}) {
 
 ```
 
-This code can be found in the `examples` directory in this repository as well as two other examples.
+This code can be found in the [examples](examples/) directory in this repository as well as two other examples.
 
 &nbsp;
 
