@@ -13,22 +13,8 @@ const Cmds = {
   /**
    * @description Create commands using an object.
    * @param {{}} commands - Object containing command options.
-   * @example
-   * {
-   *  myCommand: {
-   *    // invoked with -c or --my-command
-   *    usage: '-c --my-command <text>',
-   *    // used in the help menu
-   *    description: 'My command does ...',
-   *    // called with (args, valid, commands)
-   *    callback: myFunction,
-   *    // first arg must be a string
-   *    rules: '<string>',
-   *    // only allow one argument
-   *    amount: 1,
-   *  },
-   * }
    * @return {{}} 'this' for chaining.
+   * @see https://github.com/ginsm/simplecmds/wiki#command-options
    */
   commands(commands) {
     buildTools.init(
@@ -46,19 +32,9 @@ const Cmds = {
 
   /**
    * @description Set the program options.
-   * @param {{}} options - Program options.
-   * @example
-   * {
-   *   version: 'v1.0.0',
-   *   descrition: 'My simple NodeJS Program',
-   *   debug: true,
-   *   // default command options
-   *   defaults: {
-   *     rules: '<number> [number]',
-   *     amount: 0,
-   *   },
-   * }
+   * @param {{}} options - Object containing program options.
    * @return {Private} 'this' for chaining.
+   * @see https://github.com/ginsm/simplecmds/wiki#program-options
    */
   set(options = {}) {
     return Object.assign(this, {
@@ -98,11 +74,11 @@ const Cmds = {
   },
 
 
-  // SECTION - Show Help Menu
+  // SECTION - Help Menu Interface
 
   /**
-   * @description Output the program's help menu.
-   * @param {{}} options
+   * @description Output a help menu.
+   * @param {{}} options - default: {exit: false, command: false}
    * @see https://github.com/ginsm/simplecmds/wiki/HelpMenu
    */
   help({exit = false, command = false}) {
