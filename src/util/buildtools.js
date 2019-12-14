@@ -10,6 +10,7 @@ const BuildTools = {
    * Initiates the build tools and ensures there are no user errors.
    * @param {[]} entries - Entries for each command directive.
    * @param {{}} that - `this` context of simplecmds.js.
+   * @memberof buildtools.js
    */
   init(entries = [], that) {
     BuildTools.noConflictingAliases(entries);
@@ -27,6 +28,7 @@ const BuildTools = {
    * Search the directive using an alias for a specific command.
    * @param {string} alias - Search parameter.
    * @return {Object} - The specific command's directive object.
+   * @memberof buildtools.js
    */
   searchDirective(alias) {
     const dashedAlias = alias.length > 1 ? `--${alias}` : `-${alias}`;

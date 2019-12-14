@@ -9,6 +9,7 @@ const HelpMenu = {
   /**
    * Outputs the main help page (all commands).
    * @param {[{}]} options - Every commands' build options.
+   * @memberof helpmenu.js
    */
   mainPage(options) {
     const {helpString, programName} = HelpMenu;
@@ -29,6 +30,7 @@ const HelpMenu = {
   /**
    * Outputs a single command's help page.
    * @param {*} obj - The command's build object.
+   * @memberof helpmenu.js
    */
   singleCommandPage(obj) {
     const {programName} = HelpMenu;

@@ -3,6 +3,7 @@
  * @param {[]} obj - Command arguments and rules.
  * @param {string} cmdName - Name of the command.
  * @return {boolean} Validity represented by a boolean.
+ * @memberof validate.js
  */
 function typeCheck({args, rules}, cmdName) {
   const required = rules.filter((rule) => rule[0] === '<');

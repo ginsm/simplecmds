@@ -20,6 +20,7 @@ const Build = {
    *    valid: false,
    *  }
    * }
+   * @memberof build.js
    */
   buildCommands(directive, args) {
     const issued = Object.entries(args)
@@ -47,6 +48,7 @@ const Build = {
    *    valid: true,
    *  }
    * }
+   * @memberof build.js
    */
   build(cmd, directive, args) {
     args = Build.enforceArgumentAmount(directive, args);
@@ -66,6 +68,7 @@ const Build = {
    * Issue each command's callback function.
    * @param {{}} directive - Contains command building instructions.
    * @param {{}} commands - The end-user command object.
+   * @memberof build.js
    */
   issueCallbacks(directive, commands) {
     Object.entries(commands).forEach(([cmd, {args, valid}]) => {
@@ -86,6 +89,7 @@ const Build = {
    * @param {{}} obj - The command's directive object.
    * @param {[]} args - The command's arguments.
    * @return {[]} An array containing no more than the amount.
+   * @memberof build.js
    */
   enforceArgumentAmount(obj, args) {
     if (obj.amount) {

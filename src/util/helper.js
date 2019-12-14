@@ -6,6 +6,7 @@ const Helper = {
    * @example
    * capitalize('hello');
    * // output -> 'Hello'
+   * @memberof helper.js
    */
   capitalize(word) {
     return word[0].toUpperCase() + word.substr(1);
@@ -16,6 +17,7 @@ const Helper = {
    * Find the longest string in an array.
    * @param {[string]} arr - Array of strings.
    * @return {string} Length of the longest string.
+   * @memberof helper.js
    */
   longest(arr) {
     return arr.reduce((a, b) => b.length > a.length ? b : a);
@@ -31,6 +33,7 @@ const Helper = {
    * // output -> 12
    * convertNumbers(['test', '13', '15']);
    * // output -> ['test', 13, 15]
+   * @memberof helper.js
    */
   convertNumbers(input) {
     const convert = (arg) => +arg ? +arg : arg;
@@ -42,6 +45,7 @@ const Helper = {
    * Flatten an array.
    * @param {[]} arr - Array to flatten.
    * @return {[]} The flattened array.
+   * @memberof helper.js
    */
   flatten(arr) {
     return Array.prototype.concat.apply([], arr);
@@ -56,6 +60,7 @@ const Helper = {
    * @example
    * alternate([1, 3, 5], [2, 4, 6]);
    * // output -> [1, 2, 3, 4, 5, 6]
+   * @memberof helper.js
    */
   alternate(sup, sub) {
     return [...sup.reduce((prev, curr, id) => {
