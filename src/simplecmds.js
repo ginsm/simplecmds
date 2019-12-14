@@ -102,10 +102,8 @@ const Cmds = {
 
   /**
    * @description Output the program's help menu.
-   * @param {[]} args - The command arguments.
-   * @param {boolean} valid - Whether the command was valid or not.
-   * @param {{}} commands - The command args/validity object.
-   * @param {boolean} options - Exit program after running; default false.
+   * @param {{}} options
+   * @see https://github.com/ginsm/simplecmds/wiki/HelpMenu
    */
   help({exit = false, command = false}) {
     if (command) {
