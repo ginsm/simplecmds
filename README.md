@@ -45,14 +45,22 @@ I believe the best way to learn a technology is to create something with it. In 
 
 &nbsp;
 
-**The Project (print.js):**
+**The Project (`HTTP2-server.js`):**
 
-There will be three commands: `message`, `subject`, and `body`. Running `node print -m -s 'My subject' -b 'My body text'` will print the message to the terminal as such:
+In this project, we will be creating a pseudo profile creator for HTTP2 servers. It will have four commands:
+- `save`: '-s --save' — Save the profile.
+- `key`: '-k --key' — Set the private key path.
+- `cert`: '-c --cert' — Set the certificate path.
+- `port`: '-p --port' — Set the port number.
 
 ```bash
-~: node print -ms 'My Subject' -b 'My body text'
-Subject: My subject
-Body: My body text
+~: node HTTP2-server -s 'profileName' -k './path/to/key' -c './path/to/cert' -p 443
+HTTP2-server: 'profileName' created!
+```
+
+We will be making use of Node's `fs` module so be sure to require it at the top of the file:
+```javascript
+const fs = require('fs');
 ```
 
 &nbsp;
@@ -73,13 +81,13 @@ simplecmds
 &nbsp;
 
 ### Program Options
-[[ options wiki page ]](https://github.com/ginsm/simplecmds/wiki/Program-Options)
+[[ program options ]](https://github.com/ginsm/simplecmds/wiki#program-options)
 
 ```javascript
 const options = {
-  description: 'Print a message with a subject and body.',
+  description: 'Save HTTP2 server profiles.',
   defaults: {
-    rules: '<string,number>',
+    rules: '<string>',
     amount: 1,
   }
 };
@@ -87,70 +95,92 @@ const options = {
 
 **Explanation**
 
-I excluded the `version` and `debug` options in order to use their default values. The program description will be used when printing the help menu (`<program> -h`). The defaultRule does two things: 
-1. Require the first argument to be a 'string' or 'number'.
-2. Allow no more than 1 argument.
-
-In order to understand the `defaultRule` better I recommend reading the [ rules ](https://github.com/ginsm/simplecmds/wiki/Command-Creation#rule) wiki page.
+I excluded the `version` and `debug` options in order to use their default values. The program description will be used when printing the help menu (`node createProfile -h`). In order to understand the [defaults](https://github.com/ginsm/simplecmds/wiki/defaults) property better I recommend reading about the [command options](https://github.com/ginsm/simplecmds/wiki#command-options).
 
 &nbsp;
 
 ### Commands
 
-[[ commands wiki page ]](https://github.com/ginsm/simplecmds/wiki/Command-Creation)
-
-Commands are created as such: `[command]: {...commandOptions}`.
+[[ command options ]](https://github.com/ginsm/simplecmds/wiki#command-options)
 
 ```javascript
-const commands = {
-  message: {
-    usage: '-m --message *subject *body',
-    description: 'Write a message; requires -s and -b',
-    callback: print,
-    rules: false, // negate default rules
-  },
+// this string will be used for the 'save' command's help page.
+const saveHelp = 'This command lets you create a configuration profile for your server.\n\n\
+You must provide a key and certificate in order to create a profile.\n\
+You can issue them by running the following commands:\n\n\
+  -k --key     Set the private key path\n\
+  -c --cert    Set the certificate path\n\n\
+You can provide an optional port to change it from the default (443):\n\n\
+  -p --port    Set the port number'
 
-  // The defaults will be added to the next two commands
-  subject: {
-    usage: '-s --subject <subject>',
-    description: 'Set the subject text',
+
+// each one of these inherits 'amount' from program option's 'defaults' property.
+const commands = {
+  save: {
+    usage: '-s --save <profile>',
+    description: 'Create a new profile',
+    callback: saveProfile,
+    rules: '<number,string>',
+    help: saveHelp,
   },
-  body: {
-    usage: '-b --body <bodyText>',
-    description: 'Set the body text',
+  key: {
+    usage: '-k --key <path>',
+    description: 'Set the private key path',
+  },
+  cert: {
+    usage: '-c --cert <path>',
+    description: 'Set the certificate path',
+  },
+  port: {
+    usage: '-p --port <number>',
+    description: 'Set the port number',
+    rules: '<number>',
   }
 };
 ```
 
 **Explanation**
 
-Great! Our three commands are set up. The first command negates the `defaultRule` (via `rule: false`) and uses a function called `print` as it's callback. The following two are simple setter commands that will be consumed in `print`.
+All of the commands will inherit `amount: 1` from `defaults`.
+
+- save: I provided a callback function, replaced the default `rules` with my own, and created a help page for it.
+- key: A basic command. It inherits `rules` from `defaults`.
+- cert: A basic command. It inherits the `defaults` option's `rules`.
+- port: A basic command. Its `rules` property ensures only a number is given to it.
+
 
 &nbsp;
 
 ### Callback Function
 
-[[ callback wiki page ]](https://github.com/ginsm/simplecmds/wiki/Command-Creation#callback-function)
-
-Our callback receives three arguments: `args`, `valid`, and `commands`. The commands object contains the arguments and validity of every command ran. This makes it very easy to chain commands. In this case, I will destructure the commands object to grab the subject and body commands directly. I won't be using `args` or `valid` of the message command itself.
+[[ callback wiki page ]](https://github.com/ginsm/simplecmds/wiki/callback)
 
 ```javascript
-function print(args, valid, {subject, body}) {
-  // Ensure that both commands are valid
-  const bothValid = (subject.valid && body.valid) || simplecmds.help(true);
+function saveProfile({args: [name], valid, commands: {key, cert, port}}) {
+  // ensure 'save', 'key', and 'cert' were all valid
+  if (valid && key.valid && cert.valid) {
+    // convert to JSON-formatted data
+    const config = JSON.stringify({
+      name,
+      key: key.args[0],
+      cert: cert.args[0],
+      port: (port.valid && port.args[0] || 443),
+    }, null, 2)
 
-  if (bothValid) {
-    // add a limit of 60 characters
-    const subjectText = subject.args[0].slice(0, 60);
-    const bodyText = body.args[0];
-    console.log(`Subject: ${subjectText}\n\nBody: ${bodyText}`);
+    // write the config to a file
+    fs.writeFileSync(`${__dirname}/${name}.json`, config);
+    return console.log(`HTTP2-server: '${name}' created!`);
   }
+  // print the help page for 'save' if one was invalid
+  simplecmds.help({exit: true, command: 'save'});
 }
 ```
 
 **Explanation**
 
-Our print function will first check the validity of our `subject` and `body` commands. From there, it will grab both the subject and the body text; ensuring that the subject is no longer than 60 characters. Finally, it will print the message to the terminal.
+Our `saveProfile` function will ensure that `save`, `cert`, and `key` were all valid. If that is the case it will create a new file as such: `profileName.json`. Inside this file will contain the name of the profile, key and cert paths, and the port. If the user did not provide a port number it will be the default `443`.
+
+This completes our little program. It doesn't serve much practical use but shows you the various features of this package.
 
 &nbsp;
 
@@ -158,30 +188,47 @@ Our print function will first check the validity of our `subject` and `body` com
 
 ```javascript
 const simplecmds = require('simplecmds');
+const fs = require('fs');
 
 const options = {
-  description: 'Print a message with a subject and body.',
+  description: 'Save HTTP2 server profiles.',
   defaults: {
-    rules: '<string,number>',
+    rules: '<string>',
     amount: 1,
   }
 };
-const commands = {
-  message: {
-    usage: '-m --message *subject *body',
-    description: 'Write a message; requires -s and -b',
-    callback: print,
-    rules: false, // negate default rules
-  },
 
-  // The defaults will be added to the next two commands
-  subject: {
-    usage: '-s --subject <subject>',
-    description: 'Set the subject text',
+// this string will be used for the 'save' command's help page.
+const saveHelp = 'This command lets you create a configuration profile for your server.\n\n\
+You must provide a key and certificate in order to create a profile.\n\
+You can issue them by running the following commands:\n\n\
+  -k --key     Set the private key path\n\
+  -c --cert    Set the certificate path\n\n\
+You can provide an optional port to change it from the default (443):\n\n\
+  -p --port    Set the port number'
+
+
+// each one of these inherits 'amount' from program option's 'defaults' property.
+const commands = {
+  save: {
+    usage: '-s --save <profile>',
+    description: 'Create a new profile',
+    callback: saveProfile,
+    rules: '<number,string>',
+    help: saveHelp,
   },
-  body: {
-    usage: '-b --body <bodyText>',
-    description: 'Set the body text',
+  key: {
+    usage: '-k --key <path>',
+    description: 'Set the private key path',
+  },
+  cert: {
+    usage: '-c --cert <path>',
+    description: 'Set the certificate path',
+  },
+  port: {
+    usage: '-p --port <number>',
+    description: 'Set the port number',
+    rules: '<number>',
   }
 };
 
@@ -191,24 +238,47 @@ simplecmds
     .parse(process.argv);
 
 
-// callback
-function print(args, valid, {subject, body}) {
-  // Ensure that both commands are valid
-  const bothValid = (subject.valid && body.valid) || simplecmds.help(true);
+function saveProfile({args: [name], valid, commands: {key, cert, port}}) {
+  // ensure 'save', 'key', and 'cert' were all valid
+  if (valid && key.valid && cert.valid) {
+    // convert to JSON-formatted data
+    const config = JSON.stringify({
+      name,
+      key: key.args[0],
+      cert: cert.args[0],
+      port: (port.valid && port.args[0] || 443),
+    }, null, 2)
 
-  if (bothValid) {
-    // add a limit of 60 characters
-    const subjectText = subject.args[0].slice(0, 60);
-    const bodyText = body.args[0];
-    console.log(`Subject: ${subjectText}\nBody: ${bodyText}`);
+    // write the config to a file
+    fs.writeFileSync(`${__dirname}/${name}.json`, config);
+    return console.log(`HTTP2-server: '${name}' created!`);
   }
+  // print the help page for 'save' if any commands were invalid
+  simplecmds.help({exit: true, command: 'save'});
 }
+
+```
+
+This code can be found in the `examples` directory in this repository as well as two other examples.
+
+&nbsp;
+
+The following command should output the help page for `save`:
+```bash
+~: node createProfile -s 'profile' -k ./path/to/key
+# ... save's help page
+```
+
+The following command should create a new profile for us:
+```bash
+~: node createProfile -s 'profile' -k './path/to/key' -c './path/to/cert'
+HTTP2-server: 'profile' created!
 ```
 
 &nbsp;
 
 ## Final Note
 
-While there could be improvements to the simple interface we created I hope it has helped you gain a better understanding of this package. If you have any other questions please read the wiki or post an issue and I'll be happy to help. Feature requests are welcomed as well! 
+I hope this has given you an idea of how to use this package. If you have any questions please read the [wiki](https://github.com/ginsm/simplecmds/wiki) or post an [issue](https://github.com/ginsm/simplecmds/issues) and I'll be happy to help. Feature requests are welcomed as well! 
 
 Links: &nbsp; [[ Wiki ]](https://github.com/ginsm/simplecmds/wiki) &nbsp; [[ Issue Tracker ]](https://github.com/ginsm/simplecmds/issues) &nbsp; [[ NPM ]](https://www.npmjs.com/package/simplecmds)
