@@ -99,4 +99,4 @@ printf "Status: ${success}"
 
 newline 2
 
-verbose_enabled "npm run test:verbose"
+verbose_disabled "npm run test:verbose"

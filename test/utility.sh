@@ -7,7 +7,6 @@ HEADER='\033[01;33m'
 ACTION='\033[00;33m'
 
 # SECTION - Variables
-count=0
 passed=0
 failed=0
 verbose=$1
@@ -18,12 +17,10 @@ section="Status: ${PASS}Passed${RESTORE}"
 define() {
   local desc="${1}"
   local expected="${2}"
-  local result=$(${3})
+  local result="$(${3})"
 
-  if [[ "${result}" = "${expected}" ]]
-  then
-    if [[ "${verbose}" = "true" ]]
-    then
+  if [ "${result}" = "${expected}" ]; then
+    if [ "${verbose}" = "true" ]; then
       printf "${DESC}${desc}${RESTORE}"
       newline
 
@@ -45,25 +42,18 @@ define() {
     section="${FAIL}Failed${RESTORE}"
     
     failed=$(($failed + 1))
-    
   fi
-
-  count=$(($count + 1))
 }
 
 
 # SECTION - Helper Functions
 newline() {
-  if [[ ! ${1} ]]
-  then
+  if [ ! ${1} ]; then
     printf "\n"
-  elif (( $1 > 1 ))
-  then 
-    for i in $(seq $1); do
-      printf "\n"
+  else
+    i=0 ; while [ "${i}" -lt "${1}" ]; do
+      printf "\n"; i=$((i+1))
     done
-  else 
-    printf "\n"
   fi
 }
 
@@ -74,8 +64,8 @@ header() {
 }
 
 end_section() {
-  if [[ "${verbose}" = "false" ]]; then
-    if [[ "${section}" != "${FAIL}Failed${RESTORE}" ]]; then
+  if [ "${verbose}" = "false" ]; then
+    if [ "${section}" != "${FAIL}Failed${RESTORE}" ]; then
       printf "${section}"
       newline 2
     fi
@@ -83,10 +73,10 @@ end_section() {
   fi
 }
 
-verbose_enabled() {
+verbose_disabled() {
   local command="${1}"
-  if [[ "${verbose}" = "false" ]]; then
-  printf "Run '${ACTION}${command}${RESTORE}' to see all of the test definitions."
-  newline 2
-fi
+  if [ "${verbose}" = "false" ]; then
+    printf "Run '${ACTION}${command}${RESTORE}' to see all of the test definitions."
+    newline 2
+  fi
 }
