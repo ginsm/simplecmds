@@ -1,7 +1,11 @@
+// SECTION - Imports
 const {convertNumbers, flatten, alternate} = require('./helper');
 const error = require('./error');
 
+
 const Parsing = {
+  // SECTION - Arguments
+
   /**
    * Generate an object containing commands and their args.
    * @param {[]} args - Process.argv
@@ -37,6 +41,9 @@ const Parsing = {
           return ({...prev, [key]: convertNumbers(value), building});
         }, {});
   },
+
+
+  // SECTION - Aliases
 
   /**
    * Expands concatenated aliases and arguments.
