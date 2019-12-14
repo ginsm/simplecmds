@@ -29,7 +29,7 @@ const Build = {
 
     const rest = Object.keys(directive)
         .filter((key) => !Object.keys(args).includes(key))
-        .map((key) => [key, {args: false, valid: false}]);
+        .map((key) => [key, {args: undefined, valid: false}]);
 
     return Object.fromEntries([...issued, ...rest]);
   },
