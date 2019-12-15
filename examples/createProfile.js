@@ -1,3 +1,4 @@
+const simplecmds = require('../src/simplecmds')
 const fs = require('fs');
 
 const options = {
@@ -49,20 +50,26 @@ simplecmds
 
 
 function saveProfile({args: [name], valid, commands: {key, cert, port}}) {
-  // ensure 'save', 'key', and 'cert' were all valid
+  // Ensure 'save', 'key', and 'cert' were all valid.
   if (valid && key.valid && cert.valid) {
-    // convert to JSON-formatted data
+    // Convert the data to JSON.
     const config = JSON.stringify({
       name,
       key: key.args[0],
       cert: cert.args[0],
       port: (port.valid && port.args[0] || 443),
-    }, null, 2)
+    }, null, 2);
 
-    // write the config to a file
+    // Create the directory if it does not exist yet.
+    if (!fs.existsSync(`${__dirname}/profiles/`)) {
+      fs.mkdirSync(`${__dirname}/profiles/`);
+    }
+
+    // Write the config to a file and alert the user.
     fs.writeFileSync(`${__dirname}/${name}.json`, config);
     return console.log(`HTTP2-server: '${name}' created!`);
   }
-  // print the help page for 'save' if any commands were invalid
+  
+  // Print the help page for 'save' if any commands were invalid.
   simplecmds.help({exit: true, command: 'save'});
 }
