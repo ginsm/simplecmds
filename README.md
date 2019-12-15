@@ -163,13 +163,19 @@ function saveProfile({args: [name], valid, commands: {key, cert, port}}) {
       key: key.args[0],
       cert: cert.args[0],
       port: (port.valid && port.args[0] || 443),
-    }, null, 2)
+    }, null, 2);
+
+    // Create the directory if it does not exist yet.
+    if (!fs.existsSync(`${__dirname}/profiles/`)) {
+      fs.mkdirSync(`${__dirname}/profiles/`);
+    }
 
     // Write the config to a file and alert the user.
     fs.writeFileSync(`${__dirname}/${name}.json`, config);
     return console.log(`HTTP2-server: '${name}' created!`);
   }
-  // Print the help page for 'save' if one was invalid
+
+  // Print the help page for 'save' if any commands were invalid.
   simplecmds.help({exit: true, command: 'save'});
 }
 ```
@@ -208,7 +214,7 @@ const options = {
   }
 };
 
-// this string will be used for the 'save' command's help page.
+// This string will be used for the 'save' command's help page.
 const saveHelp = 'This command lets you create a configuration profile for your server.\n\n\
 You must provide a key and certificate in order to create a profile.\n\
 You can issue them by running the following commands:\n\n\
@@ -218,7 +224,7 @@ You can provide an optional port to change it from the default (443):\n\n\
   -p --port    Set the port number'
 
 
-// each one of these inherits 'amount' from program option's 'defaults' property.
+// Each one of these inherits 'amount' from program option's 'defaults' property.
 const commands = {
   save: {
     usage: '-s --save <profile>',
@@ -249,27 +255,33 @@ simplecmds
 
 
 function saveProfile({args: [name], valid, commands: {key, cert, port}}) {
-  // ensure 'save', 'key', and 'cert' were all valid
+  // Ensure 'save', 'key', and 'cert' were all valid.
   if (valid && key.valid && cert.valid) {
-    // convert to JSON-formatted data
+    // Convert the data to JSON.
     const config = JSON.stringify({
       name,
       key: key.args[0],
       cert: cert.args[0],
       port: (port.valid && port.args[0] || 443),
-    }, null, 2)
+    }, null, 2);
 
-    // write the config to a file
+    // Create the directory if it does not exist yet.
+    if (!fs.existsSync(`${__dirname}/profiles/`)) {
+      fs.mkdirSync(`${__dirname}/profiles/`);
+    }
+
+    // Write the config to a file and alert the user.
     fs.writeFileSync(`${__dirname}/${name}.json`, config);
     return console.log(`HTTP2-server: '${name}' created!`);
   }
-  // print the help page for 'save' if any commands were invalid
+
+  // Print the help page for 'save' if any commands were invalid.
   simplecmds.help({exit: true, command: 'save'});
 }
 
 ```
 
-This code can be found in the [examples](examples/) directory in this repository as well as two other examples.
+This code can be found in the [examples](examples/) directory of this repository as well as two other examples.
 
 &nbsp;
 
