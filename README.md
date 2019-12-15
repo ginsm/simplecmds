@@ -111,7 +111,7 @@ You can issue them by running the following commands:\n\n\
   -k --key     Set the private key path\n\
   -c --cert    Set the certificate path\n\n\
 You can provide an optional port to change it from the default (443):\n\n\
-  -p --port    Set the port number'
+  -p --port    Set the port number';
 
 
 // Each one of these inherits 'amount' from program option's 'defaults' property.
@@ -221,7 +221,7 @@ You can issue them by running the following commands:\n\n\
   -k --key     Set the private key path\n\
   -c --cert    Set the certificate path\n\n\
 You can provide an optional port to change it from the default (443):\n\n\
-  -p --port    Set the port number'
+  -p --port    Set the port number';
 
 
 // Each one of these inherits 'amount' from program option's 'defaults' property.
