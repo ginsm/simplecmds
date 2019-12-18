@@ -4,7 +4,7 @@
       "@babel/preset-env",
       {
         "useBuiltIns": "usage",
-        "targets": {"node": "8.0.0"},
+        "targets": {"node": "9.0.0"},
         "corejs": "2.6.10"
       }
     ]
