@@ -1,7 +1,7 @@
 {
   "name": "simplecmds",
   "version": "2.0.0",
-  "description": "Easily create commandline interfaces and type check arguments.",
+  "description": "Easily create custom commandline interfaces.",
   "main": "./simplecmds.js",
   "scripts": {
     "test": "./test/script.sh false",
@@ -31,10 +31,11 @@
     "url": "https://github.com/ginsm/simplecmds/issues"
   },
   "homepage": "https://github.com/ginsm/simplecmds",
-  "dependencies": {},
+  "dependencies": {
+    "core-js": "^3.5.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.7.5",
-    "@babel/polyfill": "^7.7.0",
     "@babel/preset-env": "^7.7.6",
     "babel-loader": "^8.0.6",
     "clean-webpack-plugin": "^3.0.0",
