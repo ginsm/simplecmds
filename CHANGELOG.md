@@ -3,9 +3,9 @@ All notable changes to this project will be documented in this file — the form
 
 &nbsp;
 
-## Unreleased Version
+## Released Versions
 
-## v2.0.0 — TBD
+## v2.0.1 — 12/18/2019
 ### Note
 - **A code-breaking release has happened**. Please refer to the `README.md` and Wiki to see the new syntax and tools.
 
