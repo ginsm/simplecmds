@@ -1,3 +1,6 @@
+// SECTION - Polyfills
+require('core-js/features/object/from-entries');
+
 // SECTION - Imports
 const {mainPage, singleCommandPage} =
       require('./util/helpmenu');
