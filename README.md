@@ -1,5 +1,5 @@
 # SimpleCMDs <!-- omit in toc -->
-SimpleCMDs is a zero-dependency library designed to help you easily create custom command line interfaces.
+SimpleCMDs is a library designed to help you easily create custom command line interfaces.
 
 ### Features
 - :pencil2: Create custom commands.
