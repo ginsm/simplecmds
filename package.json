@@ -6,7 +6,7 @@
   "scripts": {
     "test": "./test/script.sh false",
     "test:verbose": "./test/script.sh true",
-    "build:production": "webpack --config webpack.production.js"
+    "build": "webpack --config webpack.production.js"
   },
   "files": [
     "dist/simplecmds.js"
