@@ -1,8 +1,8 @@
 {
   "name": "simplecmds",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Easily create custom commandline interfaces.",
-  "main": "./simplecmds.js",
+  "main": "dist/simplecmds.js",
   "scripts": {
     "test": "./test/script.sh false",
     "test:verbose": "./test/script.sh true",
