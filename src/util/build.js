@@ -24,12 +24,12 @@ const Build = {
    */
   buildCommands(directive, args) {
     const issued = Object.entries(args)
-        .filter(([_, value]) => Array.isArray(value))
+        .filter(([_, obj]) => Array.isArray(obj))
         .map(([cmd, obj]) => Build.build(cmd, directive[cmd], obj));
 
     const rest = Object.keys(directive)
-        .filter((key) => !Object.keys(args).includes(key))
-        .map((key) => [key, {args: undefined, valid: false}]);
+        .filter((cmd) => !Object.keys(args).includes(cmd))
+        .map((cmd) => [cmd, {args: undefined, valid: false}]);
 
     return Object.fromEntries([...issued, ...rest]);
   },
@@ -52,12 +52,11 @@ const Build = {
    */
   build(cmd, directive, args) {
     args = Build.enforceArgumentAmount(directive, args);
-    return [cmd, {args,
-      valid: directive.hasOwnProperty('rules') && directive.rules ?
+    return [cmd, {args, valid: !directive.rules ? true :
           validate({
             args: args.length ? args : [true],
             rules: directive.rules.split(' '),
-          }, cmd) : true,
+          }, cmd),
     }];
   },
 

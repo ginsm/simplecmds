@@ -68,6 +68,7 @@ const Parsing = {
     })).filter((arg) => arg);
   },
 
+
   /**
    * Find every valid alias in an usage string.
    * @param {string} usage - Contains command aliases.
