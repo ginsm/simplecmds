@@ -5,11 +5,17 @@ All notable changes to this project will be documented in this file — the form
 
 ## Released Versions
 
-## v2.0.3 - 12/24/2019
+
+## v2.0.3 - 12/24/2019 (Bug Fixes)
+
+### Added
+- The test script now contains 4 additional tests.
 
 ### Fixed
 - A rule containing only an optional's validity is now true given no arguments.
 - An argument of '0' is now properly converted to the number 0.
+
+&nbsp;
 
 
 ## v2.0.1 — 12/18/2019
