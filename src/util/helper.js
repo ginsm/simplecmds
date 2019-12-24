@@ -36,7 +36,9 @@ const Helper = {
    * @memberof helper.js
    */
   convertNumbers(input) {
-    const convert = (arg) => +arg ? +arg : arg;
+    const convert = (arg) => {
+      return typeof +arg == 'number' && !isNaN(+arg) ? +arg : arg;
+    };
     return Array.isArray(input) && input.map(convert) || convert(input);
   },
 
