@@ -52,6 +52,18 @@ header "Testing: Type Checking"
       "false" \
       "$cmd -m 20 'string'"
 
+  define "Command with optional argument should be true with no argument" \
+      "undefined true" \
+      "$cmd -o"
+
+  define "Command with optional argument should be false with invalid argument" \
+      "stringer false" \
+      "$cmd -o stringer"
+
+  define "Zero is properly converted to type number" \
+      "true" \
+      "$cmd -n 0"
+
 end_section
 
 
