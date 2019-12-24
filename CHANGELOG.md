@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file — the form
 ## Released Versions
 
 
-## v2.0.3 - 12/24/2019 (Bug Fixes)
+## v2.0.4 - 12/24/2019 (Bug Fixes)
 
 ### Added
 - The test script now contains 4 additional tests.
