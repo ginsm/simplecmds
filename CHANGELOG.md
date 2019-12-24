@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file — the form
 
 ## Released Versions
 
+## v2.0.3 - 12/24/2019
+
+### Fixed
+- A rule containing only an optional's validity is now true given no arguments.
+- An argument of '0' is now properly converted to the number 0.
+
+
 ## v2.0.1 — 12/18/2019
 ### Note
 - **A code-breaking release has happened**. Please refer to the `README.md` and Wiki to see the new syntax and tools.
