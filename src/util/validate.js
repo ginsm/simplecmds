@@ -13,6 +13,12 @@ function typeCheck({args, rules}, cmdName) {
   // Check types
   const valid = (rules, arg) => rules.includes(typeof arg);
   const validTypes = args.map((arg, id) => {
+    // Handle the rule being a single optional argument
+    if (required.length == 0 && rules.length == 1) {
+      return valid(rules[id], arg) || typeof arg == 'boolean';
+    }
+
+    // Otherwise run the type checking
     const idRequired = (required.length - 1 >= id);
     const noNotation = (id > rules.length - 1);
     return idRequired ? valid(rules[id], arg) : !idRequired &&
