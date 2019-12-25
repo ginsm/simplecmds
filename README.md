@@ -7,7 +7,6 @@ SimpleCMDs is a library designed to help you easily create custom command line i
 - :guardsman: Argument type and amount enforcing (validation).
 - :link: Easily chain commands.
 - :question: Dynamic, customizable help menu.
-- :abc: Concatenated short aliases support.
 
 &nbsp;
 
