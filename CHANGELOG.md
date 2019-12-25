@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file — the form
 
 ## Released Versions
 
+## v2.0.5 - 12/25/2019
+
+### Disabled
+- Concatenation — needs to be heavily reworked/revised.
+- Disabled the concatenation tests in `test/script.sh`.
+
+&nbsp;
 
 ## v2.0.4 - 12/24/2019 (Bug Fixes)
 
