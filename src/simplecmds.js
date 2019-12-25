@@ -4,7 +4,7 @@ require('core-js/features/object/from-entries');
 // SECTION - Imports
 const {mainPage, singleCommandPage} =
       require('./util/helpmenu');
-const {parseArgs, expandAliases, generateAlias} =
+const {parseArgs, generateAlias} =
       require(`./util/parse`);
 const {buildCommands, issueCallbacks} =
       require('./util/build');
@@ -61,8 +61,9 @@ const Cmds = {
     // run set method even if the user did not invoke it (defaults)
     (!this.hasOwnProperty('version') && this.set());
 
-    // expand concatenated aliases and arguments
-    args = expandAliases(args.slice(2));
+    // remove node variables
+    args = args.slice(2);
+
     (!args.length && this.help({exit: true}));
 
     // build the output object

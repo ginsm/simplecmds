@@ -68,19 +68,19 @@ end_section
 
 
 
-header "Testing: Concatenated Commands"
+# header "Testing: Concatenated Commands"
 
-  define "Concatenated aliases work and validate properly" \
-      "false
-true" \
-      "$cmd -sn 20,20"
+#   define "Concatenated aliases work and validate properly" \
+#       "false
+# true" \
+#       "$cmd -sn 20,20"
 
-  define "Concatenated arguments provided to concatenated aliases work and validate properly" \
-      "true
-true" \
-      "$cmd -mA string+42,string"
+#   define "Concatenated arguments provided to concatenated aliases work and validate properly" \
+#       "true
+# true" \
+#       "$cmd -mA string+42,string"
 
-end_section
+# end_section
 
 
 

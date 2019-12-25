@@ -16,7 +16,7 @@ const Parsing = {
    * @memberof parse.js
    */
   parseArgs(args, commands) {
-    return args
+    return convertNumbers(args)
         .reduce((prev, arg, id) => {
           // Find command with given alias or set as undefined
           const command = (commands.find(([_, obj]) => {
@@ -26,19 +26,13 @@ const Parsing = {
           // call help if first arg isn't a command
           ((id == 0 && !command) && this.help.call(this, {exit: true}));
 
-          // Used for building purposes
-          const building = command || prev.building;
-          const exists = prev.hasOwnProperty(command) && [...prev[command]];
-          const key = command || prev.building;
-          const concatArg = (typeof arg == 'string' && arg.includes('+'));
+          // Used for Building purposes
+          const key = command || prev.key;
+          const issuedAlready = prev[command] && [...prev[command]];
+          const value = command ? issuedAlready || [] : [...prev[key], arg];
 
-          // Arg spread expands concatenated arguments
-          const value = command ? exists || [] : [
-            ...prev[building],
-            ...(concatArg ? convertNumbers(arg.split('+')) : [arg]),
-          ];
-
-          return ({...prev, [key]: convertNumbers(value), building});
+          // Continue building
+          return ({...prev, [key]: value, key});
         }, {});
   },
 
