@@ -1,4 +1,4 @@
-const simplecmds = require('../src/simplecmds');
+const simplecmds = require('../dist/simplecmds');
 
 const options = {
   version: 'v1.1.0',
