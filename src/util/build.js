@@ -74,7 +74,7 @@ const Build = {
       if (args) {
         const command = directive[cmd];
         if (command.callback) {
-          command.callback({args, valid, commands});
+          command.callback.call(this, {args, valid, commands});
         }
       }
     });
