@@ -16,14 +16,16 @@ const HelpMenu = {
     const length = longest(options.map((obj) => obj.usage)).length;
     const helpStrings = options.map(helpString(length));
 
-    [`\nProgram: ${capitalize(programName)} (${this.version})`,
-      this.description && `Description: ${this.description}\n` || '',
-      'Commands:',
-      ...helpStrings.slice(0, this.debug ? -3 : -2),
-      `\nDefaults:`,
-      ...helpStrings.slice(this.debug ? -3 : -2),
-      `\nUsage: ${programName} <command> [...args]\n`,
-    ].forEach((line) => console.log(line));
+    console.log(
+        [`\nProgram: ${capitalize(programName)} (${this.version})`,
+          this.description && `Description: ${this.description}\n` || '',
+          'Commands:',
+          ...helpStrings.slice(0, this.debug ? -3 : -2),
+          `\nDefaults:`,
+          ...helpStrings.slice(this.debug ? -3 : -2),
+          `\nUsage: ${programName} <command> [...args]\n`,
+        ].join('\n'),
+    );
   },
 
 
@@ -34,11 +36,19 @@ const HelpMenu = {
    */
   singleCommandPage(obj) {
     const {programName} = HelpMenu;
-    [`\nProgram: ${capitalize(programName)} (${this.version})`,
-      `Command: ${obj.alias.join(', ')}\n`,
-      `${obj.help || obj.description}\n`,
-      `Usage: ${programName} ${obj.usage}\n`,
-    ].forEach((line) => console.log(line));
+    const help = obj.help;
+    const description = obj.description;
+
+    console.log(
+        [`\nProgram: ${capitalize(programName)} (${this.version})`,
+          `Command: ${obj.alias.join(', ')}\n`,
+          `${
+            help || description || 'There is no help page for this command.'
+          }\n`,
+          `Usage: ${programName} ${obj.usage}`,
+          '',
+        ].join('\n'),
+    );
   },
 
 
