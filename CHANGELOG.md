@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file — the form
 
 ## Released Versions
 
+----
+## v2.1.0 - 12/31/2019
+
+### Added
+- New `onNoCommand` program option 
+  - Expects a function that will run when no commands are issued.
+  - Defaults to outputting the help menu.
+- The `help` method can now be accessed via `this.help` in callback functions.
+- The library now ensures that each command has an usage string (required) and alerts the user.
+
+### Fixed
+- Naming a command `key` would result in unexpected behavior; this is no longer the case.
+- Commands with no `help` or `description` property have a default help page now.
+
+## Removed
+- Zombie code from `simplecmds.js`.
+
+&nbsp;
+
+----
 ## v2.0.5 - 12/25/2019
 
 ### Disabled
@@ -24,7 +44,7 @@ All notable changes to this project will be documented in this file — the form
 
 &nbsp;
 
-
+----
 ## v2.0.1 — 12/18/2019
 ### Note
 - **A code-breaking release has happened**. Please refer to the `README.md` and Wiki to see the new syntax and tools.
