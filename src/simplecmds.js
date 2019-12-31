@@ -19,7 +19,7 @@ const Cmds = {
    * @return {{}} 'this' for chaining.
    * @see https://github.com/ginsm/simplecmds/wiki#command-options
    */
-  commands(commands) {
+  commands(commands = {}) {
     buildTools.init(
         Object.entries(commands)
             .map(([key, command]) => [key, {
@@ -44,6 +44,9 @@ const Cmds = {
       // defaults
       version: 'v1.0.0',
       debug: false,
+      onNoCommand: function() {
+        return this.help();
+      },
       // user options
       ...options,
     });
@@ -64,7 +67,11 @@ const Cmds = {
     // remove node variables
     args = args.slice(2);
 
-    (!args.length && this.help({exit: true}));
+    // exit upon no arguments
+    if (!args.length) {
+      this.onNoCommand();
+      process.exit();
+    }
 
     // build the output object
     const output = buildCommands.call(this,
@@ -73,7 +80,8 @@ const Cmds = {
     );
     Object.assign(this, {cmds: output});
 
-    issueCallbacks(buildTools.directive, output);
+    // issue the callbacks
+    issueCallbacks.call(this, buildTools.directive, output);
     return output;
   },
 
@@ -85,7 +93,7 @@ const Cmds = {
    * @param {{}} options - default: {exit: false, command: false}
    * @see https://github.com/ginsm/simplecmds/wiki/HelpMenu
    */
-  help({exit = false, command = false}) {
+  help({exit = false, command = false} = {}) {
     if (command) {
       singleCommandPage
           .call(this, buildTools.searchDirective(command));
