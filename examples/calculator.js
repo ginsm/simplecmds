@@ -1,4 +1,4 @@
-const simplecmds = require('../dist/simplecmds');
+const simplecmds = require('../src/simplecmds');
 
 const options = {
   version: 'v1.1.0',
@@ -39,6 +39,6 @@ simplecmds
 
 function op(operation) {
   return function({args, valid}) {
-    valid ? console.log(args.reduce(operation)) : simplecmds.help({exit: true});
+    valid ? console.log(args.reduce(operation)) : this.help({exit: true});
   };
 }
