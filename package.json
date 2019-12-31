@@ -1,6 +1,6 @@
 {
   "name": "simplecmds",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Easily create custom commandline interfaces.",
   "main": "dist/simplecmds.js",
   "scripts": {
