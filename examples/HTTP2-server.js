@@ -26,7 +26,7 @@ You can provide an optional port to change it from the default (443):\n\
 const commands = {
   // inherits amount: 1
   save: {
-    // usage: '-s --save <profile>',
+    usage: '-s --save <profile>',
     description: 'Create a new config profile',
     callback: saveProfile,
     rules: '<number,string>',
