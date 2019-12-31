@@ -5,7 +5,14 @@ All notable changes to this project will be documented in this file — the form
 
 ## Released Versions
 
-----
+
+## 2.1.1 - 12/31/2019
+
+### Fixed
+- The changelog had an issue. Oof.
+
+&nbsp;
+
 ## v2.1.0 - 12/31/2019
 
 ### Added
@@ -19,12 +26,12 @@ All notable changes to this project will be documented in this file — the form
 - Naming a command `key` would result in unexpected behavior; this is no longer the case.
 - Commands with no `help` or `description` property have a default help page now.
 
-## Removed
+### Removed
 - Zombie code from `simplecmds.js`.
 
 &nbsp;
 
-----
+
 ## v2.0.5 - 12/25/2019
 
 ### Disabled
@@ -44,7 +51,7 @@ All notable changes to this project will be documented in this file — the form
 
 &nbsp;
 
-----
+
 ## v2.0.1 — 12/18/2019
 ### Note
 - **A code-breaking release has happened**. Please refer to the `README.md` and Wiki to see the new syntax and tools.
