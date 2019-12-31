@@ -39,6 +39,7 @@ const BuildTools = {
 
 
   // SECTION - Default Commands
+
   /**
    * Add the default commands to the Builder object.
    * @param {{}} that - `this` context of simplecmds.js.
@@ -74,12 +75,15 @@ const BuildTools = {
 
 
   // SECTION - Error checking
+
   /**
    * Ensure there are no conflicting aliases.
    * @param {[]} entries - Entries for each command directive.
    */
   noConflictingAliases(entries = []) {
-    const aliases = BuildTools.allAliases(entries);
+    const aliases = entries.reduce((prev, [_, command]) =>
+      ([...prev, ...command.alias]), []);
+
     Object.assign(BuildTools, {aliases});
 
     // ensure there are no duplicate aliases
@@ -147,15 +151,6 @@ const BuildTools = {
     });
   },
 
-  /**
-   * Get an array of all the aliases.
-   * @param {[]} entries - Entries for each command directive.
-   * @return {[]} Array containing all command aliases.
-   */
-  allAliases(entries = []) {
-    return entries.reduce((prev, [_, command]) =>
-      ([...prev, ...command.alias]), []);
-  },
 };
 
 module.exports = BuildTools;
