@@ -41,34 +41,6 @@ const Helper = {
     };
     return Array.isArray(input) && input.map(convert) || convert(input);
   },
-
-
-  /**
-   * Flatten an array.
-   * @param {[]} arr - Array to flatten.
-   * @return {[]} The flattened array.
-   * @memberof helper.js
-   */
-  flatten(arr) {
-    return Array.prototype.concat.apply([], arr);
-  },
-
-
-  /**
-   * Concatenate two arrays alternating the values of the arrays.
-   * @param {[]} sup - Leading values.
-   * @param {[]} sub - Trailing values.
-   * @return {[]} New array containing alternated values.
-   * @example
-   * alternate([1, 3, 5], [2, 4, 6]);
-   * // output -> [1, 2, 3, 4, 5, 6]
-   * @memberof helper.js
-   */
-  alternate(sup, sub) {
-    return [...sup.reduce((prev, curr, id) => {
-      return sub[id] ? [...prev, curr, sub[id]] : [...prev, curr];
-    }, []), ...sub.slice(sup.length)];
-  },
 };
 
 module.exports = Helper;

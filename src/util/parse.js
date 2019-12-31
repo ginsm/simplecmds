@@ -1,5 +1,5 @@
 // SECTION - Imports
-const {convertNumbers, flatten, alternate} = require('./helper');
+const {convertNumbers} = require('./helper');
 const error = require('./error');
 
 
@@ -16,6 +16,7 @@ const Parsing = {
    * @memberof parse.js
    */
   parseArgs(args, commands) {
+    let key; // Used to keep track of the command being parsed.
     return convertNumbers(args)
         .reduce((prev, arg, id) => {
           // Find command with given alias or set as undefined
@@ -23,45 +24,25 @@ const Parsing = {
             return obj.alias.includes(arg);
           }) || [])[0];
 
-          // call help if first arg isn't a command
-          ((id == 0 && !command) && this.help.call(this, {exit: true}));
+          // Call help if first arg isn't a command and exit
+          if (id == 0 && !command) {
+            this.help();
+            process.exit();
+          }
 
           // Used for Building purposes
-          const key = command || prev.key;
+          key = command || key;
           const issuedAlready = prev[command] && [...prev[command]];
-          const value = command ? issuedAlready || [] : [...prev[key], arg];
+          const value = command ? issuedAlready || [] :
+                [...(prev[key] && prev[key]), arg];
 
           // Continue building
-          return ({...prev, [key]: value, key});
+          return ({...prev, [key]: value});
         }, {});
   },
 
 
   // SECTION - Aliases
-
-  /**
-   * Expands concatenated aliases and arguments.
-   * @param {[*]} arr - Process.argv
-   * @return {[*]} Aliases and arguments expanded in place.
-   * @example
-   * expandAliases(['-l', 'one', '-abc', '1,2,3']);
-   * // output -> ['-l', 'one', '-a', 1, '-b', 2, '-c', 3]
-   * @memberof parse.js
-   */
-  expandAliases(arr) {
-    return flatten(arr.map((arg, id, arr) => {
-      const groupedAliases = /(?<!\S)-\w{2,}/.test(arg);
-      if (groupedAliases) {
-        const aliases = arg.replace(/(?<!\W)(?=\w)/g, '-').split(/(?=\W)/g);
-        const groupedArgs = /\w+(,\w+)+/g.test(arr[id + 1]);
-        const args = groupedArgs ? arr[id + 1].split(',') : [];
-        return alternate(aliases, args);
-      }
-      // set grouped arguments as undefined so it can be removed with filter
-      return /\w+(,\w+)+/g.test(arg) ? undefined : arg;
-    })).filter((arg) => arg);
-  },
-
 
   /**
    * Find every valid alias in an usage string.
@@ -74,10 +55,13 @@ const Parsing = {
    * @memberof parse.js
    */
   generateAlias(usage, command) {
+    if (!usage) {
+      error('Creation', `${command} does not have a usage string (required).`);
+    }
     const aliases = /(?<!\S)(-\w\b|--[\w-]{3,}|(?=[^-])[\w-]{2,})/g;
     const matches = usage.match(aliases);
     return (matches || error('ParseError',
-        `No valid aliases found in ${command}.usage string.`)).slice(0, 2);
+        `No valid aliases found in the ${command}.usage string.`)).slice(0, 2);
   },
 };
 
